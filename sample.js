@@ -142,7 +142,7 @@ async function createHost(snapshot=null,token=null){
  const generation=++hostGeneration;const current=()=>generation===hostGeneration&&(!token||token.current());
  const host=await worldFactory($('#world'),{audio,recoverySnapshot:snapshot,signal:token?.signal,
   onFrame:s=>{if(!current())return;drawCombat(s);drawHover(s);drawTravel(s);renderAim(s);},
-  onReady:()=>{if(!current()||recovering)return;ready=true;light=false;failed=false;clearTimeout(timeout);document.body.classList.remove('light');$('#runtime-notice').hidden=true;status('世界已展开',100);$('#load-title').textContent='即刻启程';enter();},
+  onReady:()=>{if(!current()||recovering)return;ready=true;light=false;failed=false;clearTimeout(timeout);document.body.classList.remove('light');$('#runtime-notice').hidden=true;status('世界已展开',100);$('#load-title').textContent='即刻启程';enter();requestAnimationFrame(()=>{if(!current()||performance.getEntriesByName('heybox-first-frame').length)return;performance.mark('heybox-first-frame');if(new URLSearchParams(location.search).has('measure'))console.info('HEYBOX first frame:',Math.round(performance.now()),'ms');});},
   onState:s=>{if(current()&&!recovering)state(s);},
   onQualityChange:(value,details)=>{if(!current())return;quality=value;try{localStorage.setItem('heybox-quality',quality);}catch{}renderQuality();if(details.notify&&!qualityNoticeShown){qualityNoticeShown=true;$('#runtime-notice').hidden=false;$('#runtime-notice').textContent='已切换至标准画质，让旅程保持流畅。可随时在画质按钮中重新选择。';setTimeout(()=>{if(!recovering&&!failed)$('#runtime-notice').hidden=true;},6500);}},
   onContextLost:(saved,source)=>{if(current())recovery.lost(source,saved);},
