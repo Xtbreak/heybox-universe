@@ -1,23 +1,23 @@
 import { EffectComposer } from './vendor/EffectComposer.js';
 import { RenderPass } from './vendor/RenderPass.js';
 import { UnrealBloomPass } from './vendor/UnrealBloomPass.js';
-import { createCinematicPass } from './cinematic-pass.js?v=journey-26';
-import { normalizeQuality, createQualityMonitor } from './journey-quality.js?v=journey-26';
+import { createCinematicPass } from './cinematic-pass.js?v=journey-27';
+import { normalizeQuality, createQualityMonitor } from './journey-quality.js?v=journey-27';
 import { OutputPass } from './vendor/OutputPass.js';
-import { createSpatialRefraction } from './spatial-refraction.js?v=journey-26';
-import {createMiniatureCar} from './miniature-car.js?v=journey-26';
-import {createTexturePrewarm} from './texture-prewarm.js?v=journey-26';
-import {createDestinationArrival} from './destination-arrival.js?v=journey-26';
-import {createPortalEntry} from './portal-entry.js?v=journey-26';
-import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-26';
+import { createSpatialRefraction } from './spatial-refraction.js?v=journey-27';
+import {createMiniatureCar} from './miniature-car.js?v=journey-27';
+import {createTexturePrewarm} from './texture-prewarm.js?v=journey-27';
+import {createDestinationArrival} from './destination-arrival.js?v=journey-27';
+import {createPortalEntry} from './portal-entry.js?v=journey-27';
+import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-27';
 import * as THREE from './vendor/three.module.js';
 import { MeshoptDecoder } from './vendor/meshopt_decoder.module.js';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { RoomEnvironment } from './vendor/RoomEnvironment.js';
-import { createCosmicJourney } from './cosmic-journey.js?v=journey-26';
-import { createGame as createFlight } from './flight-game.js?v=journey-26';
-import { createGame as createSandbox } from './sandbox-game.js?v=journey-26';
-import { createGame as createDriving } from './driving-game.js?v=journey-26';
+import { createCosmicJourney } from './cosmic-journey.js?v=journey-27';
+import { createGame as createFlight } from './flight-game.js?v=journey-27';
+import { createGame as createSandbox } from './sandbox-game.js?v=journey-27';
+import { createGame as createDriving } from './driving-game.js?v=journey-27';
 
 // One renderer, three independently owned worlds, and the original cinematic journey.
 export async function createWorld(canvas, { onReady, onError, onState, onQualityChange, audio = null, onFrame, onContextLost, recoverySnapshot = null, signal } = {}) {
@@ -210,7 +210,8 @@ export async function createWorld(canvas, { onReady, onError, onState, onQuality
   function resize(){if(!hoverEntry.isExplicit)resetHover();const rect=canvas.getBoundingClientRect();width=Math.max(1,rect.width);height=Math.max(1,rect.height);const ratio=Math.min(globalThis.devicePixelRatio||1,width<760?1.25:1.5);renderer.setPixelRatio(ratio);renderer.setSize(width,height,false);if(composer){composer.setPixelRatio?.(ratio);composer.setSize(width,height);}camera.aspect=width/height;camera.updateProjectionMatrix();game?.resize?.(width,height);}
   const observer=new ResizeObserver(resize);observer.observe(canvas);resize();
   function updateModelHover(now){
-    const visible=names.filter(id=>entries[id].group.visible&&entries[id].state==='loaded');
+    // Gallery models stop being entries once they start flying into the living room.
+    const visible=progress>1.002?[]:names.filter(id=>entries[id].group.visible&&entries[id].state==='loaded');
     const surface=document.elementFromPoint?.(pointerClientX,pointerClientY);
     const scrolling=scrollState.scrolling||scrollState.snapping||Math.abs(scrollState.velocity)>=5;
     const settled=Math.abs(progress-targetProgress)<.0008&&scrollState.stable&&!scrolling;
@@ -280,7 +281,7 @@ export async function createWorld(canvas, { onReady, onError, onState, onQuality
     getDiagnostics(){return {quality,reduced,mode,progress,fov:camera.fov,postprocessing:!!composer,cinematic:!!cinematicPass?.enabled,bloom:bloomPass?{strength:bloomPass.strength,radius:bloomPass.radius,threshold:bloomPass.threshold}:null,motion:cinematicPass?{speed:cinematicPass.uniforms.uSpeed.value,impact:cinematicPass.uniforms.uImpact.value,flash:cinematicPass.uniforms.uFlash.value,motion:cinematicPass.uniforms.uMotion.value}:null,particleCount:journey.getParticleCount(),drawCalls:renderer.info.render.calls,gpu:{...renderer.info.memory}};},
     recoveryReady,isContextAvailable:()=>!disposed&&!renderer.getContext().isContextLost(),enter,exit:exitGame,restart,retry(){load(world,true);},control(payload,pressed){if(typeof payload==='string')control(payload,!!pressed);else control(payload?.key,!!payload?.pressed);},
     setScrollState(value={}){scrollState={...scrollState,...value};if(scrollState.scrolling||scrollState.snapping||Math.abs(scrollState.velocity)>=5)resetHover(250);},
-    setProgress(value){if(mode!=='showcase')return;const next=clamp(Number(value)||0,0,1);if(next>=.66)load('car');if(Math.abs(next-targetProgress)>.0008)resetHover(250);if(Math.abs(next-targetProgress)>.004)selected=null;targetProgress=next;},
+    setProgress(value){if(mode!=='showcase')return;const next=clamp(Number(value)||0,0,1.2);if(next>=.66)load('car');if(next>=.85)journey.loadPlaza?.();if(Math.abs(next-targetProgress)>.0008)resetHover(250);if(Math.abs(next-targetProgress)>.004)selected=null;targetProgress=next;},
     setPointer(x,y){pointerX=clamp(Number(x)||0,-1,1);pointerY=clamp(Number(y)||0,-1,1);},
     setQuality(value){quality=normalizeQuality(value);qualityMonitor.reset();journey.setQuality(quality);cinematicPass?.resetMotion();resize();emit();},
     setReducedMotion(value){reduced=!!value;if(reduced)cinematicPass?.resetMotion();game?.action?.('reduced',reduced);if(reduced&&destinationArrival.active){destinationArrival.cancel();lifecycle='await-control';clearInput();canvas.style.cursor=world==='car'?'default':'crosshair';emit();}},

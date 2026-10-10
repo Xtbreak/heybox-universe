@@ -1,11 +1,11 @@
-import {createContextRecovery} from './context-recovery.js?v=journey-26';
-import {createIdleWorldSnap} from './idle-world-snap.js?v=journey-26';
-import {resultSummary, resultTitle, formatRunTime} from './game-session-ui.js?v=journey-26';
-import {createGameAudio} from './game-audio.js?v=journey-26';
-import { createTitleDecode } from './title-decode.js?v=journey-26';
-import { initialQuality } from './journey-quality.js?v=journey-26';
-import { createScrollFx } from './scroll-fx.js?v=journey-26';
-import { createParticleMorph } from './particle-morph.js?v=journey-26';
+import {createContextRecovery} from './context-recovery.js?v=journey-27';
+import {createIdleWorldSnap} from './idle-world-snap.js?v=journey-27';
+import {resultSummary, resultTitle, formatRunTime} from './game-session-ui.js?v=journey-27';
+import {createGameAudio} from './game-audio.js?v=journey-27';
+import { createTitleDecode } from './title-decode.js?v=journey-27';
+import { initialQuality } from './journey-quality.js?v=journey-27';
+import { createScrollFx } from './scroll-fx.js?v=journey-27';
+import { createParticleMorph } from './particle-morph.js?v=journey-27';
 const audio=createGameAudio();
 const $=s=>document.querySelector(s);let world=null,ready=false,light=false,failed=false,queued=false,lastP=0,inGame=false,savedY=0,returnFocus=null,reduced=false,epilogueCovered=false;
 let recovering=false,hostGeneration=0,worldFactory=null;
@@ -135,7 +135,7 @@ const recovery=createContextRecovery({
  create:async(snapshot,token)=>{const host=await createHost(snapshot,token);if(!token.register(host))return host;world=host;await host.recoveryReady;return host;},
  status:(phase,host)=>{
   if(phase==='lost'||phase==='rebuilding'){recovering=true;releaseControls();audio.setPaused(true);worldSnap?.cancel();$('#runtime-notice').hidden=false;$('#runtime-notice').textContent=phase==='lost'?'图形连接中断 · 正在恢复，可按 Esc 返回章节':'正在重建图形与安全检查点 · 可按 Esc 返回章节';}
-  if(phase==='ready'){recovering=false;world=host;ready=true;light=false;failed=false;document.body.classList.remove('light');$('#runtime-notice').hidden=true;host.setPaused(document.hidden);state(host.getState());clearTimeout(timeout);status('世界已展开',100);$('#load-title').textContent='即刻启程';enter();if(!inGame)update();}
+  if(phase==='ready'){recovering=false;world=host;ready=true;light=false;failed=false;document.body.classList.remove('light');$('#runtime-notice').hidden=true;host.setPaused(document.hidden);state(host.getState());clearTimeout(timeout);status('世界已展开',100);enter();if(!inGame)update();}
  },
  fallback:(error,snapshot)=>{renderFailure(error);$('#runtime-notice').textContent='图形恢复未完成，已返回原章节静态页面。刷新页面可重新尝试。';}
 });
@@ -143,7 +143,7 @@ async function createHost(snapshot=null,token=null){
  const generation=++hostGeneration;const current=()=>generation===hostGeneration&&(!token||token.current());
  const host=await worldFactory($('#world'),{audio,recoverySnapshot:snapshot,signal:token?.signal,
   onFrame:s=>{if(!current())return;drawCombat(s);drawHover(s);drawTravel(s);renderAim(s);},
-  onReady:()=>{if(!current()||recovering)return;ready=true;light=false;failed=false;clearTimeout(timeout);document.body.classList.remove('light');$('#runtime-notice').hidden=true;status('世界已展开',100);$('#load-title').textContent='即刻启程';enter();requestAnimationFrame(()=>{if(!current()||performance.getEntriesByName('heybox-first-frame').length)return;performance.mark('heybox-first-frame');if(new URLSearchParams(location.search).has('measure'))console.info('HEYBOX first frame:',Math.round(performance.now()),'ms');});},
+  onReady:()=>{if(!current()||recovering)return;ready=true;light=false;failed=false;clearTimeout(timeout);document.body.classList.remove('light');$('#runtime-notice').hidden=true;status('世界已展开',100);enter();requestAnimationFrame(()=>{if(!current()||performance.getEntriesByName('heybox-first-frame').length)return;performance.mark('heybox-first-frame');if(new URLSearchParams(location.search).has('measure'))console.info('HEYBOX first frame:',Math.round(performance.now()),'ms');});},
   onState:s=>{if(current()&&!recovering)state(s);},
   onQualityChange:(value,details)=>{if(!current())return;quality=value;renderQuality();const notice=$('#runtime-notice');if(details.notify&&!qualityNoticeShown&&notice){qualityNoticeShown=true;notice.hidden=false;notice.textContent='检测到帧率偏低，已自动降低部分特效，让旅程保持流畅。';setTimeout(()=>{if(!recovering&&!failed)notice.hidden=true;},6500);}},
   onContextLost:(saved,source)=>{if(current())recovery.lost(source,saved);},
@@ -156,7 +156,7 @@ async function boot(){
  try{
   document.body.style.overflowY='hidden';status('点亮引擎',25);
   // The module graph is preloaded by HTML. Reuse it instead of fetching every file twice.
-  worldFactory=(await import('./open-adventure.js?v=journey-26')).createWorld;
+  worldFactory=(await import('./open-adventure.js?v=journey-27')).createWorld;
   status('连接游戏世界',88);world=await createHost();update();
  }catch(e){clearTimeout(timeout);renderFailure(e);}
 }
@@ -212,13 +212,10 @@ function renderSession(s){
   completedSessionKeys.add(key);const old=visitRecords[s.world]||{};
   visitRecords[s.world]={difficulty:Math.max(old.difficulty||0,Number(s.difficulty)||1),score:Math.max(old.score||0,Number(s.score)||0)};
   try{localStorage.setItem('heybox-expedition-v1',JSON.stringify(visitRecords));}catch{}
-  renderJournal();
  }
  const info=[];if(s.stageLabel)info.push(s.stageLabel);if(Number.isFinite(s.cargoIntegrity))info.push('货物完好 '+Math.round(s.cargoIntegrity)+'%');if(s.routeChoiceLabel||s.routeMode)info.push(s.routeChoiceLabel||(s.routeMode==='short'?'最短路线':'安全路线'));const elapsed=s.missionElapsed??s.deliveryTime;if(Number.isFinite(elapsed))info.push('任务 '+formatRunTime(elapsed));
  const strip=$('#session-detail');strip.hidden=s.world==='car'||s.mode!=='game'||!info.length||!!s.awaitingControl;strip.textContent=info.join(' · ');
 }
-function renderJournal(){document.querySelectorAll('[data-world-record]').forEach(el=>{const id=el.dataset.worldRecord,v=id==='car'?null:visitRecords[id];if(id==='car'){el.classList.remove('record-complete');el.textContent='五个区域 · 随时开玩';return;}el.classList.toggle('record-complete',!!v);el.textContent=v?'已完成 · 难度 '+v.difficulty+' / 最高得分 '+Math.round(v.score):'尚未完成 · 随时可以进入体验';});const count=$('#expedition-count');if(count)count.textContent=String(['helmet','robot'].filter(id=>visitRecords[id]).length).padStart(2,'0')+' / 02';}
-renderJournal();
 
 function renderQuality(){titleDecode.settings(quality,reduced);document.body.dataset.quality=quality;}
 renderQuality();
