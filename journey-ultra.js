@@ -1,4 +1,4 @@
-import { riftEnvelope } from './cinematic-pass.js?v=journey-22';
+import { riftEnvelope } from './cinematic-pass.js?v=journey-23';
 
 const smooth = (a, b, p) => { const t = Math.max(0, Math.min(1, (p - a) / (b - a))); return t*t*(3-2*t); };
 export function createJourneyUltra({ THREE: T, root, camera, entries, core, closingCore }) {

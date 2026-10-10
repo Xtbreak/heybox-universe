@@ -1,11 +1,8 @@
-export const QUALITY_LEVELS = ['low', 'standard', 'ultra'];
-export const QUALITY_LABELS = { low: '省性能画质', standard: '标准画质', ultra: '极致画质' };
+export const QUALITY_LEVELS = ['standard', 'ultra'];
 export const normalizeQuality = value => QUALITY_LEVELS.includes(value) ? value : 'standard';
+// No manual quality switch: desktop always starts at ultra; slow frames only downgrade the current visit.
 export function initialQuality(storage, touch) {
-  try {
-    const saved = storage?.getItem('heybox-quality');
-    if (QUALITY_LEVELS.includes(saved)) return saved;
-  } catch {}
+  try { storage?.removeItem('heybox-quality'); } catch {}
   return touch ? 'standard' : 'ultra';
 }
 

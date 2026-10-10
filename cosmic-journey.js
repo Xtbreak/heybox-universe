@@ -1,8 +1,9 @@
-import { createSpaceBackdrop } from './space-backdrop.js?v=journey-22';
-import { createJourneyUltra } from './journey-ultra.js?v=journey-22';
-import { createHeyboxCore } from './refined-heybox-core.js?v=journey-22';
-import { createJourneyParticles } from './journey-particles.js?v=journey-22';
+import { createSpaceBackdrop } from './space-backdrop.js?v=journey-23';
+import { createJourneyUltra } from './journey-ultra.js?v=journey-23';
+import { createHeyboxCore } from './refined-heybox-core.js?v=journey-23';
+import { createJourneyParticles } from './journey-particles.js?v=journey-23';
 
+const coarsePointer=globalThis.matchMedia?.('(pointer: coarse)');
 // A continuous, scene-space expedition. Imported GLB transforms are never modified.
 export function createCosmicJourney({ THREE, scene, camera, entries }) {
   const root = new THREE.Group(); root.name = 'cosmic-journey'; scene.add(root);
@@ -181,7 +182,7 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     closingCore.group.rotation.set(.075,.18,-.02);
     planet.rotation.y=reduced?0:t*.012;skyRing.rotation.z=reduced?0:t*.025;
     if(p>.90){closingCore.group.getWorldPosition(corePosition);}else corePosition.copy(cube.position);
-    backdrop.update({quality:options.quality,progress:p,time:t,reduced,width,height,pointerX,pointerY,desktop:!globalThis.matchMedia?.('(pointer: coarse)').matches,cameraZ:camera.position.z});
+    backdrop.update({quality:options.quality,progress:p,time:t,reduced,width,height,pointerX,pointerY,desktop:!coarsePointer?.matches,cameraZ:camera.position.z});
     ultraEffects.update({progress:p,time:t,dt,reduced,quality:options.quality,hoverTarget:hovered,hoverProgress:options.hoverProgress||0});
     particles.update({progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,hoverTarget:hovered,hoverProgress:options.hoverProgress||0,corePosition,coreOpen:p>.90?(1-smooth(.938,.993,p))*.75:open,flight,finaleMix});
     optics.center.copy(hovered&&entries[hovered]?.group?entries[hovered].group.position:p<.23?cube.position:focus);

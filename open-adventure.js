@@ -1,20 +1,20 @@
 import { EffectComposer } from './vendor/EffectComposer.js';
 import { RenderPass } from './vendor/RenderPass.js';
 import { UnrealBloomPass } from './vendor/UnrealBloomPass.js';
-import { createCinematicPass } from './cinematic-pass.js?v=journey-22';
-import { normalizeQuality, createQualityMonitor } from './journey-quality.js?v=journey-22';
+import { createCinematicPass } from './cinematic-pass.js?v=journey-23';
+import { normalizeQuality, createQualityMonitor } from './journey-quality.js?v=journey-23';
 import { OutputPass } from './vendor/OutputPass.js';
-import { createSpatialRefraction } from './spatial-refraction.js?v=journey-22';
+import { createSpatialRefraction } from './spatial-refraction.js?v=journey-23';
 import {createMiniatureCar} from './miniature-car.js?v=journey-19';
 import {createTexturePrewarm} from './texture-prewarm.js?v=journey-19';
-import {createDestinationArrival} from './destination-arrival.js?v=journey-22';
-import {createPortalEntry} from './portal-entry.js?v=journey-22';
+import {createDestinationArrival} from './destination-arrival.js?v=journey-23';
+import {createPortalEntry} from './portal-entry.js?v=journey-23';
 import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-19';
 import * as THREE from './vendor/three.module.js';
 import { MeshoptDecoder } from './vendor/meshopt_decoder.module.js';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { RoomEnvironment } from './vendor/RoomEnvironment.js';
-import { createCosmicJourney } from './cosmic-journey.js?v=journey-22';
+import { createCosmicJourney } from './cosmic-journey.js?v=journey-23';
 import { createGame as createFlight } from './flight-game.js?v=journey-19';
 import { createGame as createSandbox } from './sandbox-game.js?v=journey-19';
 import { createGame as createDriving } from './driving-game.js?v=journey-19';
@@ -54,7 +54,7 @@ export async function createWorld(canvas, { onReady, onError, onState, onQuality
     const ultra = homepage && quality === 'ultra';
     // Keep reflective surfaces below the glow threshold; HDR light sources stay bright.
     if(homepage){for(const item of showcaseLights)item.light.intensity=item.intensity*(ultra?.38:1);scene.environmentIntensity=ultra?.58:1;}
-    opticsPass?.updateOptics(journey.getOptics?.(), camera, width, height, homepage && !reduced && quality !== 'low');
+    opticsPass?.updateOptics(journey.getOptics?.(), camera, width, height, homepage && !reduced);
     cinematicPass?.configure(ultra, width, height);
     renderer.toneMappingExposure = homepage ? .95 : world === 'helmet' ? 1.25 : 1;
     if (bloomPass) {
@@ -62,7 +62,7 @@ export async function createWorld(canvas, { onReady, onError, onState, onQuality
       bloomPass.radius = homepage ? (ultra ? .65 : .35) : .45;
       bloomPass.threshold = homepage ? (ultra ? .8 : 1.2) : 1.05;
     }
-    const bloomAllowed = quality !== 'low' && (!playing || world === 'helmet');
+    const bloomAllowed = (!playing || world === 'helmet');
     if (composer && bloomAllowed) {
       try { renderPass.scene=target; renderPass.camera=camera; composer.render(); return; }
       catch (error) {
@@ -207,7 +207,7 @@ export async function createWorld(canvas, { onReady, onError, onState, onQuality
   function control(key,pressed){if(pressed&&awaitingControl&&world!=='robot'&&!gamePaused)takeControl();if(!pressed){keys.delete(key);return;}if(mode==='game'&&!gamePaused&&!paused&&!awaitingControl&&accepted.has(key))keys.add(key);}
   listen(globalThis,'keydown',event=>{if(event.code==='Escape'&&!event.defaultPrevented&&!editable(event)){if(mode==='showcase'&&lifecycle==='anticipate'){resetHover(250);emit('已取消进入');event.preventDefault();return;}if(mode==='travel'){exitGame();event.preventDefault();return;}if(mode==='game'&&!gamePaused){pauseGame('manual');event.preventDefault();return;}}if(mode==='game'&&awaitingControl&&world!=='robot'&&!gamePaused&&accepted.has(event.code)&&!editable(event))takeControl(event);if(mode!=='game'||gamePaused||paused||awaitingControl||editable(event)||(event.ctrlKey&&world!=='helmet')||event.metaKey||event.altKey)return;if(!accepted.has(event.code))return;event.preventDefault();controlMode='keyboard-mouse';control(event.code,true);});
   listen(globalThis,'keyup',event=>{if(!accepted.has(event.code))return;if(mode==='game'&&!gamePaused&&!paused&&!editable(event))event.preventDefault();control(event.code,false);});
-  function resize(){if(!hoverEntry.isExplicit)resetHover();const rect=canvas.getBoundingClientRect();width=Math.max(1,rect.width);height=Math.max(1,rect.height);const ratio=Math.min(globalThis.devicePixelRatio||1,quality==='low'?1:width<760?1.25:1.5);renderer.setPixelRatio(ratio);renderer.setSize(width,height,false);if(composer){composer.setPixelRatio?.(ratio);composer.setSize(width,height);}camera.aspect=width/height;camera.updateProjectionMatrix();game?.resize?.(width,height);}
+  function resize(){if(!hoverEntry.isExplicit)resetHover();const rect=canvas.getBoundingClientRect();width=Math.max(1,rect.width);height=Math.max(1,rect.height);const ratio=Math.min(globalThis.devicePixelRatio||1,width<760?1.25:1.5);renderer.setPixelRatio(ratio);renderer.setSize(width,height,false);if(composer){composer.setPixelRatio?.(ratio);composer.setSize(width,height);}camera.aspect=width/height;camera.updateProjectionMatrix();game?.resize?.(width,height);}
   const observer=new ResizeObserver(resize);observer.observe(canvas);resize();
   function updateModelHover(now){
     const visible=names.filter(id=>entries[id].group.visible&&entries[id].state==='loaded');
@@ -277,12 +277,12 @@ export async function createWorld(canvas, { onReady, onError, onState, onQuality
   listen(canvas,'webglcontextlost',handleContextLoss);
   ['helmet','robot'].forEach(id=>load(id));frame=requestAnimationFrame(safeTick);emit();
   const api={
-    getDiagnostics(){return {quality,reduced,mode,progress,fov:camera.fov,postprocessing:!!composer&&quality!=='low',cinematic:!!cinematicPass?.enabled,bloom:bloomPass?{strength:bloomPass.strength,radius:bloomPass.radius,threshold:bloomPass.threshold}:null,motion:cinematicPass?{speed:cinematicPass.uniforms.uSpeed.value,impact:cinematicPass.uniforms.uImpact.value,flash:cinematicPass.uniforms.uFlash.value,motion:cinematicPass.uniforms.uMotion.value}:null,particleCount:journey.getParticleCount(),drawCalls:renderer.info.render.calls,gpu:{...renderer.info.memory}};},
+    getDiagnostics(){return {quality,reduced,mode,progress,fov:camera.fov,postprocessing:!!composer,cinematic:!!cinematicPass?.enabled,bloom:bloomPass?{strength:bloomPass.strength,radius:bloomPass.radius,threshold:bloomPass.threshold}:null,motion:cinematicPass?{speed:cinematicPass.uniforms.uSpeed.value,impact:cinematicPass.uniforms.uImpact.value,flash:cinematicPass.uniforms.uFlash.value,motion:cinematicPass.uniforms.uMotion.value}:null,particleCount:journey.getParticleCount(),drawCalls:renderer.info.render.calls,gpu:{...renderer.info.memory}};},
     recoveryReady,isContextAvailable:()=>!disposed&&!renderer.getContext().isContextLost(),enter,exit:exitGame,restart,retry(){load(world,true);},control(payload,pressed){if(typeof payload==='string')control(payload,!!pressed);else control(payload?.key,!!payload?.pressed);},
     setScrollState(value={}){scrollState={...scrollState,...value};if(scrollState.scrolling||scrollState.snapping||Math.abs(scrollState.velocity)>=5)resetHover(250);},
     setProgress(value){if(mode!=='showcase')return;const next=clamp(Number(value)||0,0,1);if(next>=.66)load('car');if(Math.abs(next-targetProgress)>.0008)resetHover(250);if(Math.abs(next-targetProgress)>.004)selected=null;targetProgress=next;},
     setPointer(x,y){pointerX=clamp(Number(x)||0,-1,1);pointerY=clamp(Number(y)||0,-1,1);},
-    setQuality(value){quality=normalizeQuality(value);qualityMonitor.reset();journey.setQuality(quality);cinematicPass?.resetMotion();if(renderer.shadowMap)renderer.shadowMap.enabled=quality!=='low';resize();emit();},
+    setQuality(value){quality=normalizeQuality(value);qualityMonitor.reset();journey.setQuality(quality);cinematicPass?.resetMotion();resize();emit();},
     setReducedMotion(value){reduced=!!value;if(reduced)cinematicPass?.resetMotion();game?.action?.('reduced',reduced);if(reduced&&destinationArrival.active){destinationArrival.cancel();lifecycle='await-control';clearInput();canvas.style.cursor=world==='car'?'default':'crosshair';emit();}},
     setPaused(value){paused=contextLost||!!value;texturePrewarm.sync();audio?.setPaused(paused||gamePaused||awaitingControl);if(paused){clearInput();if(mode==='game')pauseGame('hidden');}last=performance.now();},
     action(name,payload){if(disposed)return;if(contextLost){if(name==='exit')exitGame({immediate:true});return;}const id=typeof payload==='string'?payload:payload?.world;if(name==='pause')pauseGame(payload);else if(name==='resume')resumeGame(payload);else if(name==='takeControl')takeControl(payload);else if(name==='continue'&&mode==='showcase')enter(names.includes(id)?id:world);else if(name==='retryCheckpoint'&&mode==='game'){clearInput();game?.action?.('retryCheckpoint');completionHandled=false;resumeGame();}else if(['freeExplore','explore'].includes(name)&&mode==='game'){if(game?.getState?.().freeExploreAvailable===false)return;clearInput();game?.action?.(world==='car'?'explore':'freeExplore');completionHandled=false;resumeGame();}else if(name==='enter')enter(names.includes(id)?id:world);else if(name==='exit')exitGame();else if(name==='restart')restart();else if(name==='nextDifficulty')nextDifficulty();else if(name==='retry')load(world,true);else if(name==='control')control(payload?.key,!!payload?.pressed);else if(name==='select'&&names.includes(id)&&mode==='showcase'){resetHover(250);selected=id;world=id;progress=targetProgress={helmet:.395,robot:.60,car:.84}[id];load(id,true);emit();}else if(name==='interact'&&mode==='showcase')enter(world);else if(mode==='game'&&!gamePaused&&!paused&&!awaitingControl){game.action?.(name,payload??{x:pointerX,y:pointerY});emit();}},

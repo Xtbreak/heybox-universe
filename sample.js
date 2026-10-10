@@ -2,8 +2,8 @@ import {createContextRecovery} from './context-recovery.js?v=journey-19';
 import {createIdleWorldSnap} from './idle-world-snap.js?v=journey-19';
 import {resultSummary, resultTitle, formatRunTime} from './game-session-ui.js?v=journey-19';
 import {createGameAudio} from './game-audio.js?v=journey-19';
-import { createTitleDecode } from './title-decode.js?v=journey-22';
-import { initialQuality, QUALITY_LEVELS, QUALITY_LABELS } from './journey-quality.js?v=journey-22';
+import { createTitleDecode } from './title-decode.js?v=journey-23';
+import { initialQuality } from './journey-quality.js?v=journey-23';
 const audio=createGameAudio();
 const $=s=>document.querySelector(s);let world=null,ready=false,light=false,failed=false,queued=false,lastP=0,inGame=false,savedY=0,returnFocus=null,reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let recovering=false,hostGeneration=0,worldFactory=null;
@@ -144,7 +144,7 @@ async function createHost(snapshot=null,token=null){
   onFrame:s=>{if(!current())return;drawCombat(s);drawHover(s);drawTravel(s);renderAim(s);},
   onReady:()=>{if(!current()||recovering)return;ready=true;light=false;failed=false;clearTimeout(timeout);document.body.classList.remove('light');$('#runtime-notice').hidden=true;status('世界已展开',100);$('#load-title').textContent='即刻启程';enter();requestAnimationFrame(()=>{if(!current()||performance.getEntriesByName('heybox-first-frame').length)return;performance.mark('heybox-first-frame');if(new URLSearchParams(location.search).has('measure'))console.info('HEYBOX first frame:',Math.round(performance.now()),'ms');});},
   onState:s=>{if(current()&&!recovering)state(s);},
-  onQualityChange:(value,details)=>{if(!current())return;quality=value;try{localStorage.setItem('heybox-quality',quality);}catch{}renderQuality();if(details.notify&&!qualityNoticeShown){qualityNoticeShown=true;$('#runtime-notice').hidden=false;$('#runtime-notice').textContent='已切换至标准画质，让旅程保持流畅。可随时在画质按钮中重新选择。';setTimeout(()=>{if(!recovering&&!failed)$('#runtime-notice').hidden=true;},6500);}},
+  onQualityChange:(value,details)=>{if(!current())return;quality=value;renderQuality();const notice=$('#runtime-notice');if(details.notify&&!qualityNoticeShown&&notice){qualityNoticeShown=true;notice.hidden=false;notice.textContent='检测到帧率偏低，已自动降低部分特效，让旅程保持流畅。';setTimeout(()=>{if(!recovering&&!failed)notice.hidden=true;},6500);}},
   onContextLost:(saved,source)=>{if(current())recovery.lost(source,saved);},
   onError:error=>{if(!current())return;if(recovering)recovery.fail(error);else renderFailure(error);}
  });
@@ -155,7 +155,7 @@ async function boot(){
  try{
   document.body.style.overflowY='hidden';status('点亮引擎',25);
   // The module graph is preloaded by HTML. Reuse it instead of fetching every file twice.
-  worldFactory=(await import('./open-adventure.js?v=journey-22')).createWorld;
+  worldFactory=(await import('./open-adventure.js?v=journey-23')).createWorld;
   status('连接游戏世界',88);world=await createHost();update();
  }catch(e){clearTimeout(timeout);renderFailure(e);}
 }
@@ -227,8 +227,8 @@ function renderSession(s){
 function renderJournal(){document.querySelectorAll('[data-world-record]').forEach(el=>{const id=el.dataset.worldRecord,v=id==='car'?null:visitRecords[id];if(id==='car'){el.classList.remove('record-complete');el.textContent='五个区域 · 随时开玩';return;}el.classList.toggle('record-complete',!!v);el.textContent=v?'已完成 · 难度 '+v.difficulty+' / 最高得分 '+Math.round(v.score):'尚未完成 · 随时可以进入体验';});const n=['helmet','robot'].filter(id=>visitRecords[id]).length;$('#expedition-count').textContent=String(n).padStart(2,'0')+' / 02';}
 renderJournal();
 
-function renderQuality(){titleDecode.settings(quality,reduced);document.querySelectorAll('[data-quality]').forEach(b=>{b.textContent=QUALITY_LABELS[quality];b.setAttribute('aria-label',QUALITY_LABELS[quality]+'，点击切换下一档');b.dataset.level=quality;b.setAttribute('aria-pressed',String(quality==='ultra'));document.body.dataset.quality=quality;});}
-document.querySelectorAll('[data-quality]').forEach(b=>b.onclick=()=>{quality=QUALITY_LEVELS[(QUALITY_LEVELS.indexOf(quality)+1)%QUALITY_LEVELS.length];world?.setQuality?.(quality);try{localStorage.setItem('heybox-quality',quality);}catch{}renderQuality();});renderQuality();
+function renderQuality(){titleDecode.settings(quality,reduced);document.body.dataset.quality=quality;}
+renderQuality();
 
 
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');

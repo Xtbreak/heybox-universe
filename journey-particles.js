@@ -1,4 +1,5 @@
-/** Surface-derived material transport. Every grain begins/ends on an actual triangle.
+
+const coarsePointer=globalThis.matchMedia?.('(pointer: coarse)');/** Surface-derived material transport. Every grain begins/ends on an actual triangle.
  * Asset-local erosion order is shared verbatim by the solid and particle shaders. */
 export const JOURNEY_TRANSITIONS = [
   { from:'core', to:'helmet', leave:[.065,.195], arrive:[.295,.367] },
@@ -156,7 +157,7 @@ fragmentShader:`uniform float uUltra,uProgress;varying float vAlpha,vSeed,vEnerg
     points.visible=!!from&&!!to&&index>=0;
     if(points.visible){
       drawCount=Math.min(quality==='ultra'?count:standardCount,from.samples.length,to.samples.length);
-      material.blending=quality==='ultra'?T.AdditiveBlending:T.NormalBlending;uniforms.uUltra.value=quality==='ultra'?1:0;uniforms.uAspect.value=(options.width||1280)/(options.height||800);uniforms.uPointer.value.set(options.pointerX||0,options.pointerY||0);uniforms.uField.value=quality==='ultra'&&!options.reduced&&!globalThis.matchMedia?.('(pointer: coarse)').matches?1:0;
+      material.blending=quality==='ultra'?T.AdditiveBlending:T.NormalBlending;uniforms.uUltra.value=quality==='ultra'?1:0;uniforms.uAspect.value=(options.width||1280)/(options.height||800);uniforms.uPointer.value.set(options.pointerX||0,options.pointerY||0);uniforms.uField.value=quality==='ultra'&&!options.reduced&&!coarsePointer?.matches?1:0;
       fillPositions(from,source);fillPositions(to,target);
       if(active!==index||from!==points.userData.from||to!==points.userData.to||points.userData.drawCount!==drawCount){for(let i=0;i<drawCount;i++){orders[i*2]=from.samples[i].order;orders[i*2+1]=to.samples[i].order;}geometry.attributes.aOrders.needsUpdate=true;active=index;points.userData.from=from;points.userData.to=to;points.userData.drawCount=drawCount;}
       geometry.attributes.position.needsUpdate=true;geometry.attributes.aTarget.needsUpdate=true;
