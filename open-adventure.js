@@ -1,26 +1,26 @@
 import { EffectComposer } from './vendor/EffectComposer.js';
 import { RenderPass } from './vendor/RenderPass.js';
 import { UnrealBloomPass } from './vendor/UnrealBloomPass.js';
-import { createCinematicPass } from './cinematic-pass.js?v=journey-27';
-import { normalizeQuality, createQualityMonitor } from './journey-quality.js?v=journey-27';
+import { createCinematicPass } from './cinematic-pass.js?v=journey-28';
+import { normalizeQuality } from './journey-quality.js?v=journey-28';
 import { OutputPass } from './vendor/OutputPass.js';
-import { createSpatialRefraction } from './spatial-refraction.js?v=journey-27';
-import {createMiniatureCar} from './miniature-car.js?v=journey-27';
-import {createTexturePrewarm} from './texture-prewarm.js?v=journey-27';
-import {createDestinationArrival} from './destination-arrival.js?v=journey-27';
-import {createPortalEntry} from './portal-entry.js?v=journey-27';
-import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-27';
+import { createSpatialRefraction } from './spatial-refraction.js?v=journey-28';
+import {createMiniatureCar} from './miniature-car.js?v=journey-28';
+import {createTexturePrewarm} from './texture-prewarm.js?v=journey-28';
+import {createDestinationArrival} from './destination-arrival.js?v=journey-28';
+import {createPortalEntry} from './portal-entry.js?v=journey-28';
+import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-28';
 import * as THREE from './vendor/three.module.js';
 import { MeshoptDecoder } from './vendor/meshopt_decoder.module.js';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { RoomEnvironment } from './vendor/RoomEnvironment.js';
-import { createCosmicJourney } from './cosmic-journey.js?v=journey-27';
-import { createGame as createFlight } from './flight-game.js?v=journey-27';
-import { createGame as createSandbox } from './sandbox-game.js?v=journey-27';
-import { createGame as createDriving } from './driving-game.js?v=journey-27';
+import { createCosmicJourney } from './cosmic-journey.js?v=journey-28';
+import { createGame as createFlight } from './flight-game.js?v=journey-28';
+import { createGame as createSandbox } from './sandbox-game.js?v=journey-28';
+import { createGame as createDriving } from './driving-game.js?v=journey-28';
 
 // One renderer, three independently owned worlds, and the original cinematic journey.
-export async function createWorld(canvas, { onReady, onError, onState, onQualityChange, audio = null, onFrame, onContextLost, recoverySnapshot = null, signal } = {}) {
+export async function createWorld(canvas, { onReady, onError, onState, audio = null, onFrame, onContextLost, recoverySnapshot = null, signal } = {}) {
   if(signal?.aborted)throw new Error('World creation cancelled');
   const names=['helmet','robot','car'];
   const providers={helmet:createFlight,robot:createSandbox,car:createDriving};
@@ -74,10 +74,6 @@ export async function createWorld(canvas, { onReady, onError, onState, onQuality
   };
   let disposed=false,ready=false,frame=0,mode='showcase',world='helmet',selected=null,progress=0,targetProgress=0,paused=false,gamePaused=false,pauseReason=null,controlMode='keyboard-mouse',reduced=false;
   let lifecycle='browse',sessionId=0,awaitingControl=false,controlRequested=false,restoreProgress=null,entryStarted=0,travelSession=0,entryFocus=null,returnPhase=null,returnElapsed=0,returnWorld=null,quality='standard';
-  const qualityMonitor = createQualityMonitor(({ fps, notify }) => {
-    quality='standard'; journey.setQuality('standard'); cinematicPass?.resetMotion(); resize();
-    onQualityChange?.('standard', { automatic:true, fps, notify }); emit();
-  });
   let previousRiftProgress=0;
   const impactCenter=new THREE.Vector3();
   const checkpoints=new Map(recoverySnapshot?.checkpoints||[]);let resumeVisit=false;
@@ -238,7 +234,6 @@ export async function createWorld(canvas, { onReady, onError, onState, onQuality
     if(hoverState.enter)commitEnter(hoverState.enter);
   }
   function tick(now){if(disposed||contextLost)return;frame=requestAnimationFrame(safeTick);const elapsed=(now-last)/1000,dt=clamp(elapsed,.001,.05);last=now;
-    qualityMonitor.sample(elapsed,quality==='ultra'&&ready&&mode==='showcase'&&!paused&&!gamePaused&&!document.hidden&&document.hasFocus());
     if(paused||gamePaused||document.hidden)return;time+=dt;
     if(mode==='showcase'&&quality==='ultra'&&!reduced&&previousRiftProgress>journey.riftEnd-.025&&previousRiftProgress<journey.riftEnd&&progress>=journey.riftEnd)cinematicPass?.flash();
     previousRiftProgress=progress;
@@ -283,7 +278,7 @@ export async function createWorld(canvas, { onReady, onError, onState, onQuality
     setScrollState(value={}){scrollState={...scrollState,...value};if(scrollState.scrolling||scrollState.snapping||Math.abs(scrollState.velocity)>=5)resetHover(250);},
     setProgress(value){if(mode!=='showcase')return;const next=clamp(Number(value)||0,0,1.2);if(next>=.66)load('car');if(next>=.85)journey.loadPlaza?.();if(Math.abs(next-targetProgress)>.0008)resetHover(250);if(Math.abs(next-targetProgress)>.004)selected=null;targetProgress=next;},
     setPointer(x,y){pointerX=clamp(Number(x)||0,-1,1);pointerY=clamp(Number(y)||0,-1,1);},
-    setQuality(value){quality=normalizeQuality(value);qualityMonitor.reset();journey.setQuality(quality);cinematicPass?.resetMotion();resize();emit();},
+    setQuality(value){quality=normalizeQuality(value);journey.setQuality(quality);cinematicPass?.resetMotion();resize();emit();},
     setReducedMotion(value){reduced=!!value;if(reduced)cinematicPass?.resetMotion();game?.action?.('reduced',reduced);if(reduced&&destinationArrival.active){destinationArrival.cancel();lifecycle='await-control';clearInput();canvas.style.cursor=world==='car'?'default':'crosshair';emit();}},
     setPaused(value){paused=contextLost||!!value;texturePrewarm.sync();audio?.setPaused(paused||gamePaused||awaitingControl);if(paused){clearInput();if(mode==='game')pauseGame('hidden');}last=performance.now();},
     action(name,payload){if(disposed)return;if(contextLost){if(name==='exit')exitGame({immediate:true});return;}const id=typeof payload==='string'?payload:payload?.world;if(name==='pause')pauseGame(payload);else if(name==='resume')resumeGame(payload);else if(name==='takeControl')takeControl(payload);else if(name==='continue'&&mode==='showcase')enter(names.includes(id)?id:world);else if(name==='retryCheckpoint'&&mode==='game'){clearInput();game?.action?.('retryCheckpoint');completionHandled=false;resumeGame();}else if(['freeExplore','explore'].includes(name)&&mode==='game'){if(game?.getState?.().freeExploreAvailable===false)return;clearInput();game?.action?.(world==='car'?'explore':'freeExplore');completionHandled=false;resumeGame();}else if(name==='enter')enter(names.includes(id)?id:world);else if(name==='exit')exitGame();else if(name==='restart')restart();else if(name==='nextDifficulty')nextDifficulty();else if(name==='retry')load(world,true);else if(name==='control')control(payload?.key,!!payload?.pressed);else if(name==='select'&&names.includes(id)&&mode==='showcase'){resetHover(250);selected=id;world=id;progress=targetProgress={helmet:.395,robot:.60,car:.84}[id];load(id,true);emit();}else if(name==='interact'&&mode==='showcase')enter(world);else if(mode==='game'&&!gamePaused&&!paused&&!awaitingControl){game.action?.(name,payload??{x:pointerX,y:pointerY});emit();}},

@@ -1,16 +1,16 @@
-import {createContextRecovery} from './context-recovery.js?v=journey-27';
-import {createIdleWorldSnap} from './idle-world-snap.js?v=journey-27';
-import {resultSummary, resultTitle, formatRunTime} from './game-session-ui.js?v=journey-27';
-import {createGameAudio} from './game-audio.js?v=journey-27';
-import { createTitleDecode } from './title-decode.js?v=journey-27';
-import { initialQuality } from './journey-quality.js?v=journey-27';
-import { createScrollFx } from './scroll-fx.js?v=journey-27';
-import { createParticleMorph } from './particle-morph.js?v=journey-27';
+import {createContextRecovery} from './context-recovery.js?v=journey-28';
+import {createIdleWorldSnap} from './idle-world-snap.js?v=journey-28';
+import {resultSummary, resultTitle, formatRunTime} from './game-session-ui.js?v=journey-28';
+import {createGameAudio} from './game-audio.js?v=journey-28';
+import { createTitleDecode } from './title-decode.js?v=journey-28';
+import { initialQuality } from './journey-quality.js?v=journey-28';
+import { createScrollFx } from './scroll-fx.js?v=journey-28';
+import { createParticleMorph } from './particle-morph.js?v=journey-28';
 const audio=createGameAudio();
 const $=s=>document.querySelector(s);let world=null,ready=false,light=false,failed=false,queued=false,lastP=0,inGame=false,savedY=0,returnFocus=null,reduced=false,epilogueCovered=false;
 let recovering=false,hostGeneration=0,worldFactory=null;
 let savedQuality;try{savedQuality=globalThis.localStorage;}catch{}
-let quality=initialQuality(savedQuality,matchMedia('(pointer: coarse)').matches||navigator.maxTouchPoints>0),qualityNoticeShown=false;
+let quality=initialQuality(savedQuality,matchMedia('(pointer: coarse)').matches||navigator.maxTouchPoints>0);
 let latestState={};let worldSnap=null;let currentMode='showcase',currentWorld='helmet',gamePaused=false,gameDead=false,lastInstruction='',pauseWasVisible=false;
 const coarse=matchMedia('(pointer: coarse)').matches;
 const titleDecode=createTitleDecode();
@@ -145,7 +145,6 @@ async function createHost(snapshot=null,token=null){
   onFrame:s=>{if(!current())return;drawCombat(s);drawHover(s);drawTravel(s);renderAim(s);},
   onReady:()=>{if(!current()||recovering)return;ready=true;light=false;failed=false;clearTimeout(timeout);document.body.classList.remove('light');$('#runtime-notice').hidden=true;status('世界已展开',100);enter();requestAnimationFrame(()=>{if(!current()||performance.getEntriesByName('heybox-first-frame').length)return;performance.mark('heybox-first-frame');if(new URLSearchParams(location.search).has('measure'))console.info('HEYBOX first frame:',Math.round(performance.now()),'ms');});},
   onState:s=>{if(current()&&!recovering)state(s);},
-  onQualityChange:(value,details)=>{if(!current())return;quality=value;renderQuality();const notice=$('#runtime-notice');if(details.notify&&!qualityNoticeShown&&notice){qualityNoticeShown=true;notice.hidden=false;notice.textContent='检测到帧率偏低，已自动降低部分特效，让旅程保持流畅。';setTimeout(()=>{if(!recovering&&!failed)notice.hidden=true;},6500);}},
   onContextLost:(saved,source)=>{if(current())recovery.lost(source,saved);},
   onError:error=>{if(!current())return;if(recovering)recovery.fail(error);else renderFailure(error);}
  });
@@ -156,7 +155,7 @@ async function boot(){
  try{
   document.body.style.overflowY='hidden';status('点亮引擎',25);
   // The module graph is preloaded by HTML. Reuse it instead of fetching every file twice.
-  worldFactory=(await import('./open-adventure.js?v=journey-27')).createWorld;
+  worldFactory=(await import('./open-adventure.js?v=journey-28')).createWorld;
   status('连接游戏世界',88);world=await createHost();update();
  }catch(e){clearTimeout(timeout);renderFailure(e);}
 }
