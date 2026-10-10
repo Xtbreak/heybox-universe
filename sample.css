@@ -175,7 +175,7 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
  .header-right{gap:6px}.header-right button{padding:10px;min-height:44px}
 }
 
-/* journey-28 · velocity-driven page layer, chapter dossiers and the epilogue. */
+/* journey-29 · velocity-driven page layer, chapter dossiers and the epilogue. */
 .giant-type{transform:translate3d(calc((var(--local,.5) - .5) * -26vw),0,0) skewX(calc(var(--vel,0) * -16deg));will-change:transform}
 .frame h1,.frame h2{transform:skewY(calc(var(--vel,0) * -2.2deg));transition:transform .25s}
 .body-copy .line,[data-lines] .line{display:block;overflow:hidden;padding-bottom:.08em}
@@ -276,7 +276,7 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
  .morph-stage{grid-template-columns:1fr}#morph-canvas{height:42vh}.morph-link b{font-size:16px}
  .epi-footer div{flex-direction:column}
 }
-/* journey-28: near-zero copy. Script-owned nodes stay in the DOM but out of sight. */
+/* journey-29: near-zero copy. Script-owned nodes stay in the DOM but out of sight. */
 .frame .label,.world-index,#speed-pill,.journey-readout,#render-mode,#model-hover,.passage-caption,footer,#load-title,#load-status,#charge-label,.loading .label{display:none!important}
 #model-hud{display:none!important}body:has(#retry-model:not([hidden])) #model-hud{display:flex!important}
 #model-hud #model-name,#model-hud #model-instruction{display:none}

@@ -252,10 +252,10 @@ export function createGameAudio(options = {}) {
   function loadTrack(name) {
     const track = TRACKS[name];
     if (!track || track.buffer || track.load || disposed || !ctx) return track?.load;
-    track.load = Promise.resolve(trackData(name)).then(async (data) => {
-      if (!data || disposed) return;
+    const pending = track.load = Promise.resolve(trackData(name)).then(async (data) => {
+      if (!data || disposed || track.load !== pending) return;
       const buffer = await ctx.decodeAudioData(data.slice(0));
-      if (disposed || !buffer?.duration) return;
+      if (disposed || track.load !== pending || !buffer?.duration) return;
       track.buffer = buffer;
       attachTrack(pad);
     }).catch((error) => {if (!disposed) track.error = String(error?.message || error);});
@@ -278,7 +278,8 @@ export function createGameAudio(options = {}) {
     pad.track = name;
     attachTrack(pad);
     if (!TRACKS[name].buffer) void loadTrack(name);
-    for (const other of Object.keys(TRACKS)) if (other !== name) void trackData(other);
+    // The in-game track is fetched only once an entry starts, and dropped again when the world closes.
+    if (scene === 'travel') void trackData('play');
   }
   function updateRecordedEngine(group, d) {
     if (!group?.recordedEngine) return;
@@ -562,6 +563,7 @@ export function createGameAudio(options = {}) {
     if (['off', 'none', 'exit', 'null'].includes(next)) next = null;
     if (next !== null && !SCENES[next]) return;
     if (scene === next) return;
+    if (next === 'showcase' && scene !== 'travel') {const play = TRACKS.play; play.buffer = play.load = play.data = null;}
     scene = next; dynamics = {speed: 0, rpm: 900, throttle: 0, skid: 0, boost: 0, intensity: 0};
     footstepClock = 0; lastGear = null; lastUpdate = null; cooldowns.clear();
     if (!enabled()) {stopRuntime(); return;}
