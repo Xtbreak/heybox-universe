@@ -1,0 +1,16 @@
+Recorded engine sound: "Car Engine Loop 96kHz, 4s" by qubodup.
+Source: https://opengameart.org/content/car-engine-loop-96khz-4s
+Download: https://opengameart.org/sites/default/files/engine-loop.7z
+Selected license: Creative Commons Attribution 3.0 Unported (CC BY 3.0).
+License: https://creativecommons.org/licenses/by/3.0/
+Author: https://opengameart.org/users/qubodup
+Original recording: Opel Astra 1.6_16V, recorded with a Zoom H2.
+Original recording page: https://freesound.org/people/qubodup/sounds/147243/
+
+Changes: 96 kHz/24-bit source converted to 44.1 kHz/16-bit stereo PCM;
+35 Hz high-pass and 8.5 kHz low-pass; DC offset removal; 80 ms circular
+crossfade for a seamless 3.92-second loop; peak normalization to 0.71.
+Runtime: restrained RPM playback-rate adjustment, filtered idle/load blend.
+The creator does not endorse this game. No additional restrictions apply to
+the sound asset. The original page also offers GPL alternatives; this use
+selects CC BY 3.0 only. Source and license verified October 10, 2026.

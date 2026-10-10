@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" color="#dbe5e9">
+  <title>小黑盒 · Heybox</title>
+  <rect width="512" height="512" rx="112" fill="#0c1116"/>
+  <g fill="#e5edef">
+    <path id="upper" d="M228 87Q228 80 234 84L387 172Q395 176 395 184V327Q395 335 388 339L346 364Q339 368 339 360V219Q339 211 332 207L291 183Q283 178 283 186V220Q283 228 275 228H236Q228 228 228 220Z"/>
+    <use href="#upper" transform="rotate(180 256 256)"/>
+  </g>
+</svg>

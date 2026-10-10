@@ -1,0 +1,46 @@
+Aster Coast Environment Asset Credits
+
+Source assets are CC0 public-domain assets from Poly Haven. Attribution is included voluntarily.
+Provider license: https://polyhaven.com/license
+CC0: https://creativecommons.org/publicdomain/zero/1.0/
+
+Modular Factory Facade — James Ray Cock
+https://polyhaven.com/a/modular_factory_facade
+License: CC0-1.0
+
+Modular Urban Apartments Facade — James Ray Cock
+https://polyhaven.com/a/modular_urban_apartments_facade
+License: CC0-1.0
+
+Roof Slates 02 — Rob Tuytel
+https://polyhaven.com/a/roof_slates_02
+License: CC0-1.0
+
+Island Tree 01 — Rob Tuytel, Rico Cilliers
+https://polyhaven.com/a/island_tree_01
+License: CC0-1.0
+
+Asphalt 02 — Rob Tuytel
+https://polyhaven.com/a/asphalt_02
+License: CC0-1.0
+
+Grass Ground — Charlotte Baglioni
+https://polyhaven.com/a/grass_ground
+License: CC0-1.0
+
+Rock Face 03 — Dario Barresi, Rico Cilliers
+https://polyhaven.com/a/rock_face_03
+License: CC0-1.0
+
+White Plaster Rough 01 — Rob Tuytel
+https://polyhaven.com/a/white_plaster_rough_01
+License: CC0-1.0
+
+Rectangular Paving — Dimitrios Savva
+https://polyhaven.com/a/rectangular_paving
+License: CC0-1.0
+
+Adaptations: assembled complete factory and apartment building prototypes using authored facade modules; added original rooflines, dormers, canopy and structural details; material-preserving static mesh merge; normal/tangent quantization; web texture compression; tree LOD decimation and transparent rendered impostors.
+No attribution implies artist endorsement.
+
+Performance adaptations (2026-10-09): retained source geometry/UVs, reduced color/normal textures and transparent impostors to 512px, packed roughness/occlusion textures to 256px; external roughness uses scalar material values.

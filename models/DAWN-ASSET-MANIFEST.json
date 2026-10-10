@@ -1,0 +1,140 @@
+{
+  "created": "2026-10-09",
+  "file": "dawn-ship.glb",
+  "name": "Dawn / 曙光号 rescue capital ship",
+  "sourceName": "Archimedes, from Proteron Ships",
+  "creator": "Viktor Hahn (OpenGameArt username: Unnamed)",
+  "source": "https://opengameart.org/content/proteron-ships",
+  "downloadSource": "https://opengameart.org/sites/default/files/gltf.zip",
+  "sourceArchiveMember": "gltf/archimedes.glb",
+  "sourceArchiveSha256": "c55b967f7c8a93a60149080c8eaae38134e9a191bfd7bef374810d618993b2c4",
+  "sourceAssetSha256": "1412301860d8dd6cd0ed71cdd6b4fe20d9f171b8d13d6e655aa2a420c8fbfbe4",
+  "license": "CC-BY-4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "licenseLegalCode": "https://creativecommons.org/licenses/by/4.0/legalcode.en",
+  "licenseNoticeFile": "DAWN-ASSET-ATTRIBUTION.txt",
+  "licenseEvidence": "https://opengameart.org/content/proteron-ships",
+  "attribution": "Archimedes from Proteron Ships by Viktor Hahn (OpenGameArt: Unnamed), CC BY 4.0. Source: https://opengameart.org/content/proteron-ships . License: https://creativecommons.org/licenses/by/4.0/ . Adapted as Dawn / 曙光号 for this demo: graphite/silver/ice-blue PBR livery, luminous viewport accents, subtle armor microbevels and weighted normals, centered 24-unit length and -Z-forward orientation. No endorsement implied.",
+  "requiredCreditPlacement": "Keep this credit in the demo credits and distribute DAWN-ASSET-ATTRIBUTION.txt with the GLB.",
+  "format": "glTF 2.0 binary, self-contained",
+  "bytes": 9160828,
+  "sha256": "82d32aaa524b3949d2cd39de3b655c6fd3b0b75681fd91500db6f5de20583649",
+  "sourceTriangles": 8076,
+  "triangles": 8326,
+  "meshes": 1,
+  "materials": 1,
+  "drawCalls": 1,
+  "animations": 0,
+  "forward": "-Z",
+  "up": "+Y",
+  "center": [
+    0,
+    0,
+    0
+  ],
+  "bounds": [
+    [
+      -4.998944282531738,
+      -1.7433799505233765,
+      -12.000000953674316
+    ],
+    [
+      4.998944282531738,
+      1.7433799505233765,
+      12.000000953674316
+    ]
+  ],
+  "dimensions": [
+    9.997888565063477,
+    3.486759901046753,
+    24.000001907348633
+  ],
+  "textures": {
+    "count": 4,
+    "dimensions": "2048x2048",
+    "types": [
+      "baseColor",
+      "normal",
+      "metallicRoughness",
+      "emissive"
+    ],
+    "storage": "embedded PNG"
+  },
+  "requiredExtensions": [],
+  "usedExtensions": [
+    "KHR_materials_emissive_strength"
+  ],
+  "decoderRequired": false,
+  "modifications": [
+    "Retained the complete artist-authored hull, twin bow forms, recessed structure, rear engine housings, window galleries and all four authored PBR maps.",
+    "Remapped violet armor to cool silver and neutral surfaces to graphite while retaining panel lines, weathering and material variation.",
+    "Remapped original emissive lighting to ice blue and added subtle emissive response to original blue viewport slots.",
+    "Added 0.022 source-unit two-segment, angle-limited armor microbevels, applied weighted normals and triangulation.",
+    "Baked 180-degree up-axis rotation, centered the bounds and normalized longitudinal extent to 24 units.",
+    "Repaired 18 zero-length bevel tangents, orthogonalized all 17,408 tangent frames by Gram–Schmidt against their normals with collapse fallback, preserving handedness; reencoded all four PNGs without unsupported metadata."
+  ],
+  "engineSockets": {
+    "positions": [
+      [
+        -2.2495226904238788,
+        -0.7498408968079595,
+        12
+      ],
+      [
+        -2.2495226904238788,
+        0.7498408968079595,
+        12
+      ],
+      [
+        2.2495226904238788,
+        -0.7498408968079595,
+        12
+      ],
+      [
+        2.2495226904238788,
+        0.7498408968079595,
+        12
+      ]
+    ],
+    "direction": [
+      0,
+      0,
+      1
+    ],
+    "outerRadius": 0.49989393120530634,
+    "recommendedPlumeRadius": 0.42,
+    "coordinateSpace": "Final centered 24-unit GLB / transport local space"
+  },
+  "previews": [
+    "dawn-ship-front.png",
+    "dawn-ship-rear.png",
+    "dawn-ship-top.png",
+    "dawn-ship-side.png"
+  ],
+  "previewMethod": "Blender 4.3.2 CPU Cycles, exact sanitized final GLB reimport, 64 samples, 1200x880, studio lighting. No image-generation or composited hull.",
+  "validation": {
+    "numErrors": 0,
+    "numWarnings": 0,
+    "numInfos": 0,
+    "numHints": 0,
+    "messages": [],
+    "truncated": false
+  },
+  "tangentFrameValidation": {
+    "tangents": 17408,
+    "originalZeroTangentsAlreadyRepaired": 18,
+    "nonOrthogonalTangentsCorrected": 95,
+    "collapsedProjectionFallbacks": 5,
+    "maxAbsNormalTangentDotBefore": 1.0,
+    "maxAbsNormalTangentDotAfter": 5.960464477539063e-08,
+    "handednessPreserved": true,
+    "sha256": "82d32aaa524b3949d2cd39de3b655c6fd3b0b75681fd91500db6f5de20583649"
+  },
+  "integration": [
+    "Load the GLB as a cached host-owned Object3D and pass it as assets.dawnShip.",
+    "Candidate creates only a hierarchy clone. Do not override embedded PBR colors/maps or dispose shared resources on game exit.",
+    "Optional assets.dawnEngineLayout uses the four listed sockets, assets.dawnEngineRadius=.42.",
+    "Provider normalizes the clone to max dimension24; model is already centered and 24 units long. No additional yaw required.",
+    "Keep the transport mission root/collision radii and all route/health/target/distance calculations unchanged."
+  ]
+}

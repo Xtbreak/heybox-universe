@@ -1,0 +1,31 @@
+Hippocrates from Proteron Ships by Viktor Hahn (Unnamed), CC BY 4.0. Source: https://opengameart.org/content/proteron-ships . License: https://creativecommons.org/licenses/by/4.0/ . Modified for this demo: graphite/silver/ice-blue livery, armor microbevels, weighted normals/tangents, recentering and -Z-forward GLB export. No endorsement implied.
+
+Original author notice:
+This work, made by Viktor Hahn (viktor.hahn@web.de), is licensed under the Creative Commons Attribution 4.0 International License. http://creativecommons.org/licenses/by/4.0/
+
+Full license legal code:
+https://creativecommons.org/licenses/by/4.0/legalcode.en
+https://creativecommons.org/licenses/by/4.0/legalcode.txt
+
+The license allows modification and redistribution, including commercial use, subject to its attribution and other conditions. The model is supplied without warranties; see the license text.
+
+
+Earlier and other models:
+3D asset credits
+
+Spitfire from Ultimate Spaceships Pack by Quaternius (CC0). Converted via the Malcolm Nixon asset port.
+Source: https://quaternius.com/packs/ultimatespaceships.html
+License: https://creativecommons.org/publicdomain/zero/1.0/
+Changes: Converted Blender source to standalone GLB; rotated 180 degrees about up axis for -Z forward; official blue livery selected; material metalness .45 and roughness .38.
+
+Car Concept by Eric Chadwick / Darmstadt Graphics Group GmbH, 2024, based on a public-domain concept by Unity Fan. CC BY 4.0. Adapted for this project: graphite/silver materials, normalized wheel pivots, centered/grounded hierarchy, sample logo surfaces removed.
+Source: https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept
+License: https://creativecommons.org/licenses/by/4.0/
+Changes: Flattened static hierarchy while preserving world geometry. Rebuilt wheel_fl/fr/rl/rr pivots with local X axle and local Y steering. Grounded tires and centered length. Graphite/silver paint and dark interior material colors applied preserving PBR maps. Replaced license plate with blank material; removed steering emblem; removed logo-bearing tire sidewall color and normal maps.
+
+Service Pistol by Mateusz Sadek / Poly Haven (CC0). One assembled wood-grip variant adapted for game use.
+Source: https://polyhaven.com/a/service_pistol
+License: https://creativecommons.org/publicdomain/zero/1.0/
+Changes: Selected wood-grip variant and its slide, hammer, trigger. Assembled empty magazine into grip. Removed duplicate taped variant, loose loaded magazine and loose bullet. Rotated muzzle to -Z. Packed textures into GLB.
+
+All three files are genuine artist-created meshes, not procedural geometry substitutes. Source copyright remains with the credited authors where applicable. No endorsement by the authors or brands is implied.

@@ -1,0 +1,507 @@
+{
+  "version": 2,
+  "created": "2026-10-09",
+  "name": "Aster Coast performance environment pack",
+  "unit": "meter",
+  "up": "+Y",
+  "buildingFront": "+Z",
+  "origin": "Horizontal bounds centered. Feet grounded at y=0.",
+  "models": {
+    "coastalFactory": {
+      "filename": "coastal-factory.glb",
+      "bytes": 2416164,
+      "sha256": "70c133e87c10988cda0acaca0d2a7d9d32cfa7e04f068ed940ea4549555ceb79",
+      "triangles": 36844,
+      "materialPrimitives": 10,
+      "materials": [
+        "modular_factory_facade_trim_01",
+        "modular_factory_facade_brick",
+        "modular_factory_facade_windows",
+        "modular_factory_facade_brick_doors",
+        "modular_factory_facade_windows_glass",
+        "modular_factory_facade_garage",
+        "Shadowed interiors",
+        "Zinc roof",
+        "Rooflight smoked glazing",
+        "Roof flashing"
+      ],
+      "extensionsRequired": [
+        "KHR_mesh_quantization"
+      ],
+      "imagesEmbedded": 16,
+      "dimensionsWHDepth": [
+        12.4,
+        9,
+        11.35
+      ],
+      "sources": [
+        "modular_factory_facade"
+      ],
+      "adaptation": "Complete building assembled from authored facade kit; original roof, dormer/canopy, structural detail additions; merged by material. Performance profile: original geometry retained; compressed and downsized texture images."
+    },
+    "coastalFacade": {
+      "filename": "coastal-facade.glb",
+      "bytes": 3821088,
+      "sha256": "3daf9f4e0b356120a0a366565b08f3968bf934f7b8e67d27d3b602b74732581b",
+      "triangles": 52553,
+      "materialPrimitives": 9,
+      "materials": [
+        "modular_urban_apartments_facade_trim_01",
+        "modular_urban_apartments_facade_plaster",
+        "modular_urban_apartments_facade_objects",
+        "modular_urban_apartments_facade_glass",
+        "modular_urban_apartments_facade_trim_02",
+        "Shadowed interiors",
+        "Blue slate roof",
+        "Roof flashing",
+        "Dormer pale plaster"
+      ],
+      "extensionsRequired": [
+        "KHR_mesh_quantization"
+      ],
+      "imagesEmbedded": 16,
+      "dimensionsWHDepth": [
+        9.66,
+        12.95,
+        9.66
+      ],
+      "sources": [
+        "modular_urban_apartments_facade",
+        "roof_slates_02"
+      ],
+      "adaptation": "Complete building assembled from authored facade kit; original roof, dormer/canopy, structural detail additions; merged by material. Performance profile: original geometry retained; compressed and downsized texture images."
+    },
+    "coastalTree": {
+      "filename": "coastal-tree.glb",
+      "bytes": 2517028,
+      "sha256": "6ec28b85c06ccdaec7e64857420314ddb2ef832c7887b5368c684cc6e838cf91",
+      "triangles": 26773,
+      "materialPrimitives": 3,
+      "materials": [
+        "island_tree_01_branches",
+        "island_tree_01",
+        "island_tree_01_leaves"
+      ],
+      "extensionsRequired": [
+        "KHR_mesh_quantization",
+        "KHR_texture_transform"
+      ],
+      "imagesEmbedded": 9,
+      "dimensionsWHDepth": [
+        4.75514984,
+        5.02744675,
+        4.81767941
+      ],
+      "sources": [
+        "island_tree_01"
+      ],
+      "adaptation": "Material-aware decimation with photographed PBR textures. Mid LOD reuses hero material names. Performance profile: original geometry retained; compressed and downsized texture images."
+    },
+    "coastalTreeMid": {
+      "filename": "coastal-tree-mid.glb",
+      "bytes": 352700,
+      "sha256": "9f4cb5b217e9ff9cf4052e5b4ecf4cc3c1d798a560ec392cd6b0f721296228b6",
+      "triangles": 4500,
+      "materialPrimitives": 3,
+      "materials": [
+        "island_tree_01_branches",
+        "island_tree_01",
+        "island_tree_01_leaves"
+      ],
+      "extensionsRequired": [
+        "KHR_mesh_quantization"
+      ],
+      "imagesEmbedded": 0,
+      "dimensionsWHDepth": [
+        4.75514984,
+        5.02744675,
+        4.81767941
+      ],
+      "sources": [
+        "island_tree_01"
+      ],
+      "materialBinding": "On instance clone, bind each material by exact material.name to corresponding coastalTree material. Do not mutate prototypes.",
+      "adaptation": "Material-aware decimation with photographed PBR textures. Mid LOD reuses hero material names. Performance profile: original geometry retained; compressed and downsized texture images."
+    }
+  },
+  "textures": {
+    "asphalt": {
+      "source": "asphalt_02",
+      "metres": 3.0,
+      "map": "asphalt_02_diff_1k.jpg",
+      "normalMap": "asphalt_02_nor_gl_1k.jpg",
+      "resolution": [
+        512,
+        512
+      ],
+      "mapColorSpace": "sRGB",
+      "normalRoughnessColorSpace": "linear",
+      "normalConvention": "OpenGL (+Y)",
+      "roughness": "Scalar material roughness; no separate roughness texture downloaded."
+    },
+    "ground": {
+      "source": "grass_ground",
+      "metres": 2.51,
+      "map": "grass_ground_diff_1k.jpg",
+      "normalMap": "grass_ground_nor_gl_1k.jpg",
+      "resolution": [
+        512,
+        512
+      ],
+      "mapColorSpace": "sRGB",
+      "normalRoughnessColorSpace": "linear",
+      "normalConvention": "OpenGL (+Y)",
+      "roughness": "Scalar material roughness; no separate roughness texture downloaded."
+    },
+    "cliff": {
+      "source": "rock_face_03",
+      "metres": 2.7,
+      "map": "rock_face_03_diff_1k.jpg",
+      "normalMap": "rock_face_03_nor_gl_1k.jpg",
+      "resolution": [
+        512,
+        512
+      ],
+      "mapColorSpace": "sRGB",
+      "normalRoughnessColorSpace": "linear",
+      "normalConvention": "OpenGL (+Y)",
+      "roughness": "Scalar material roughness; no separate roughness texture downloaded."
+    },
+    "plaster": {
+      "source": "white_plaster_rough_01",
+      "metres": 1.0,
+      "map": "white_plaster_rough_01_diff_1k.jpg",
+      "normalMap": "white_plaster_rough_01_nor_gl_1k.jpg",
+      "resolution": [
+        512,
+        512
+      ],
+      "mapColorSpace": "sRGB",
+      "normalRoughnessColorSpace": "linear",
+      "normalConvention": "OpenGL (+Y)",
+      "roughness": "Scalar material roughness; no separate roughness texture downloaded."
+    },
+    "paving": {
+      "source": "rectangular_paving",
+      "metres": 2.0,
+      "map": "rectangular_paving_diff_1k.jpg",
+      "normalMap": "rectangular_paving_nor_gl_1k.jpg",
+      "resolution": [
+        512,
+        512
+      ],
+      "mapColorSpace": "sRGB",
+      "normalRoughnessColorSpace": "linear",
+      "normalConvention": "OpenGL (+Y)",
+      "roughness": "Scalar material roughness; no separate roughness texture downloaded."
+    },
+    "roof": {
+      "source": "roof_slates_02",
+      "metres": 3.0,
+      "map": "roof_slates_02_diff_1k.jpg",
+      "normalMap": "roof_slates_02_nor_gl_1k.jpg",
+      "resolution": [
+        512,
+        512
+      ],
+      "mapColorSpace": "sRGB",
+      "normalRoughnessColorSpace": "linear",
+      "normalConvention": "OpenGL (+Y)",
+      "roughness": "Scalar material roughness; no separate roughness texture downloaded."
+    }
+  },
+  "impostors": {
+    "treeImpostor": {
+      "filename": "coastal-tree-impostor-front.png",
+      "bytes": 334500,
+      "sha256": "b6ac11977f35183b325a694ee3ef5d27d982c0fe4cb5e12e659319df650b5add",
+      "resolution": [
+        512,
+        512
+      ],
+      "format": "RGBA PNG, true alpha",
+      "colorSpace": "sRGB",
+      "physicalCardWH": [
+        5.42964249,
+        5.42964249
+      ],
+      "cardCenterYForGroundedFeet": 2.51372337,
+      "recommendedAlphaTest": 0.3,
+      "source": "island_tree_01",
+      "adaptation": "Orthographic source-model render in neutral soft daylight. Full foliage geometry, not the simplified LOD. Performance profile: original geometry retained; compressed and downsized texture images."
+    },
+    "treeImpostorSide": {
+      "filename": "coastal-tree-impostor-side.png",
+      "bytes": 324390,
+      "sha256": "bcd2aa2cdaa6adae565585262b0161a32a393c1434b6ff9efb3397a201a6b09d",
+      "resolution": [
+        512,
+        512
+      ],
+      "format": "RGBA PNG, true alpha",
+      "colorSpace": "sRGB",
+      "physicalCardWH": [
+        5.42964249,
+        5.42964249
+      ],
+      "cardCenterYForGroundedFeet": 2.51372337,
+      "recommendedAlphaTest": 0.3,
+      "source": "island_tree_01",
+      "adaptation": "Orthographic source-model render in neutral soft daylight. Full foliage geometry, not the simplified LOD. Performance profile: original geometry retained; compressed and downsized texture images."
+    }
+  },
+  "sources": {
+    "modular_factory_facade": {
+      "asset": "Modular Factory Facade",
+      "assetId": "modular_factory_facade",
+      "url": "https://polyhaven.com/a/modular_factory_facade",
+      "authors": {
+        "James Ray Cock": "All"
+      },
+      "spdx": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "providerLicenseUrl": "https://polyhaven.com/license",
+      "provider": "Poly Haven",
+      "attributionRequired": false
+    },
+    "modular_urban_apartments_facade": {
+      "asset": "Modular Urban Apartments Facade",
+      "assetId": "modular_urban_apartments_facade",
+      "url": "https://polyhaven.com/a/modular_urban_apartments_facade",
+      "authors": {
+        "James Ray Cock": "All"
+      },
+      "spdx": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "providerLicenseUrl": "https://polyhaven.com/license",
+      "provider": "Poly Haven",
+      "attributionRequired": false
+    },
+    "roof_slates_02": {
+      "asset": "Roof Slates 02",
+      "assetId": "roof_slates_02",
+      "url": "https://polyhaven.com/a/roof_slates_02",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "spdx": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "providerLicenseUrl": "https://polyhaven.com/license",
+      "provider": "Poly Haven",
+      "attributionRequired": false
+    },
+    "island_tree_01": {
+      "asset": "Island Tree 01",
+      "assetId": "island_tree_01",
+      "url": "https://polyhaven.com/a/island_tree_01",
+      "authors": {
+        "Rob Tuytel": "scanning, processing",
+        "Rico Cilliers": "cleanup, processing"
+      },
+      "spdx": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "providerLicenseUrl": "https://polyhaven.com/license",
+      "provider": "Poly Haven",
+      "attributionRequired": false
+    },
+    "asphalt_02": {
+      "asset": "Asphalt 02",
+      "assetId": "asphalt_02",
+      "url": "https://polyhaven.com/a/asphalt_02",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "spdx": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "providerLicenseUrl": "https://polyhaven.com/license",
+      "provider": "Poly Haven",
+      "attributionRequired": false
+    },
+    "grass_ground": {
+      "asset": "Grass Ground",
+      "assetId": "grass_ground",
+      "url": "https://polyhaven.com/a/grass_ground",
+      "authors": {
+        "Charlotte Baglioni": "All"
+      },
+      "spdx": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "providerLicenseUrl": "https://polyhaven.com/license",
+      "provider": "Poly Haven",
+      "attributionRequired": false
+    },
+    "rock_face_03": {
+      "asset": "Rock Face 03",
+      "assetId": "rock_face_03",
+      "url": "https://polyhaven.com/a/rock_face_03",
+      "authors": {
+        "Dario Barresi": "Photography",
+        "Rico Cilliers": "Processing"
+      },
+      "spdx": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "providerLicenseUrl": "https://polyhaven.com/license",
+      "provider": "Poly Haven",
+      "attributionRequired": false
+    },
+    "white_plaster_rough_01": {
+      "asset": "White Plaster Rough 01",
+      "assetId": "white_plaster_rough_01",
+      "url": "https://polyhaven.com/a/white_plaster_rough_01",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "spdx": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "providerLicenseUrl": "https://polyhaven.com/license",
+      "provider": "Poly Haven",
+      "attributionRequired": false
+    },
+    "rectangular_paving": {
+      "asset": "Rectangular Paving",
+      "assetId": "rectangular_paving",
+      "url": "https://polyhaven.com/a/rectangular_paving",
+      "authors": {
+        "Dimitrios Savva": "All"
+      },
+      "spdx": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "providerLicenseUrl": "https://polyhaven.com/license",
+      "provider": "Poly Haven",
+      "attributionRequired": false
+    }
+  },
+  "validation": {
+    "coastalFactory": {
+      "validator": "Khronos glTF Validator",
+      "errors": 0,
+      "warnings": 0
+    },
+    "coastalFacade": {
+      "validator": "Khronos glTF Validator",
+      "errors": 0,
+      "warnings": 0
+    },
+    "coastalTree": {
+      "validator": "Khronos glTF Validator",
+      "errors": 0,
+      "warnings": 0
+    },
+    "coastalTreeMid": {
+      "validator": "Khronos glTF Validator",
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "runtimeFiles": [
+    {
+      "filename": "coastal-tree.glb",
+      "bytes": 2517028,
+      "sha256": "6ec28b85c06ccdaec7e64857420314ddb2ef832c7887b5368c684cc6e838cf91"
+    },
+    {
+      "filename": "coastal-tree-mid.glb",
+      "bytes": 352700,
+      "sha256": "9f4cb5b217e9ff9cf4052e5b4ecf4cc3c1d798a560ec392cd6b0f721296228b6"
+    },
+    {
+      "filename": "coastal-factory.glb",
+      "bytes": 2416164,
+      "sha256": "70c133e87c10988cda0acaca0d2a7d9d32cfa7e04f068ed940ea4549555ceb79"
+    },
+    {
+      "filename": "coastal-facade.glb",
+      "bytes": 3821088,
+      "sha256": "3daf9f4e0b356120a0a366565b08f3968bf934f7b8e67d27d3b602b74732581b"
+    },
+    {
+      "filename": "white_plaster_rough_01_nor_gl_1k.jpg",
+      "bytes": 21475,
+      "sha256": "a66898d7d7ce29889b08f1f79c0976a81f575397a4b0789b945963681e1ad13f"
+    },
+    {
+      "filename": "white_plaster_rough_01_diff_1k.jpg",
+      "bytes": 59988,
+      "sha256": "730624b4ac0084b208a6d39526aa1596b6ea609b314d41322f3ed2f89404650c"
+    },
+    {
+      "filename": "roof_slates_02_nor_gl_1k.jpg",
+      "bytes": 69568,
+      "sha256": "a515c1334fa1e986ece91a90ea851f75b66c8d2d8ccaf8352cc411878971b90e"
+    },
+    {
+      "filename": "roof_slates_02_diff_1k.jpg",
+      "bytes": 76611,
+      "sha256": "c60fa379a9e4bf19bb93b12bbc551d63a9d4fcacac1be007dc4660b54f74090a"
+    },
+    {
+      "filename": "rock_face_03_nor_gl_1k.jpg",
+      "bytes": 78016,
+      "sha256": "a59119dffb61f78c859b617687e3e9852afc9934c0376f4f3530f5bf657293b2"
+    },
+    {
+      "filename": "rock_face_03_diff_1k.jpg",
+      "bytes": 60139,
+      "sha256": "7345d6531f30eaa1b807a75b16c01cbf63793ef15024c261e32aa6eff5ffd89d"
+    },
+    {
+      "filename": "rectangular_paving_nor_gl_1k.jpg",
+      "bytes": 17818,
+      "sha256": "576b3d0c4708a6b166f4d2a1efdb131bbde30a1d58dc2f29bdfa892ddc47549e"
+    },
+    {
+      "filename": "rectangular_paving_diff_1k.jpg",
+      "bytes": 28886,
+      "sha256": "99479fb057002c16ab78d562d281e8d8e58a92b6f75a484dcc6d7246e34c9d76"
+    },
+    {
+      "filename": "grass_ground_nor_gl_1k.jpg",
+      "bytes": 64611,
+      "sha256": "e3f473ce47d4dce0de77eda5ef2d5ea25b463844239520a5aa6b7a71c0c28d2b"
+    },
+    {
+      "filename": "grass_ground_diff_1k.jpg",
+      "bytes": 48536,
+      "sha256": "7b824b50977c70fb39233b2368442f5e496d192b8949437eb5e19d2e6d6a34d9"
+    },
+    {
+      "filename": "asphalt_02_nor_gl_1k.jpg",
+      "bytes": 54253,
+      "sha256": "4b0044e2c0c065d1d826739062941c97c8801713564b438a6cdfca265f775483"
+    },
+    {
+      "filename": "asphalt_02_diff_1k.jpg",
+      "bytes": 87018,
+      "sha256": "c71791e18dd8feada49ced32bc4922738866e13df67784e8c048c4c2c990d846"
+    },
+    {
+      "filename": "coastal-tree-impostor-side.png",
+      "bytes": 324390,
+      "sha256": "bcd2aa2cdaa6adae565585262b0161a32a393c1434b6ff9efb3397a201a6b09d"
+    },
+    {
+      "filename": "coastal-tree-impostor-front.png",
+      "bytes": 334500,
+      "sha256": "b6ac11977f35183b325a694ee3ef5d27d982c0fe4cb5e12e659319df650b5add"
+    }
+  ],
+  "runtimeBytes": 10432789,
+  "runtimeMegabytes": 10.433,
+  "technicalNotes": [
+    "All geometry positions and UVs remain Float32. Normal and tangent directions use glTF-normalized signed Int8 through KHR_mesh_quantization, supported natively by GLTFLoader without decoder.",
+    "Any offline CPU exporter must expand normalized BufferAttributes using getComponent/getX/Y/Z before writing Float32 arrays.",
+    "No Draco or Meshopt decoder, no external textures required by GLBs.",
+    "GLB prototypes are borrowed assets. Clone scene or materials only when modifying them. Mid tree uses hero materials by name on clones.",
+    "The textures are photogrammetric authored material maps; use white/neutral runtime baseColor to avoid unintended color multiplication.",
+    "Runtime filenames retain their source identifiers; external diffuse/normal JPGs and transparent impostors are now 512px.",
+    "Embedded GLB color/normal images are 512px; packed roughness/occlusion images are 256px. All authored geometry, UVs, material names and mesh transforms are preserved.",
+    "Provider uses the material-preserving 4500-triangle tree LOD for the nearby trees, with 20 nearby tree instances and crossed photographed impostors beyond. Full-detail tree GLB supplies the borrowed authored material library.",
+    "Asset URLs use ?v=coast-perf10 to invalidate earlier large cached variants."
+  ],
+  "optimizationDate": "2026-10-09",
+  "textureBudgetEstimate": {
+    "originalEnvironmentDecodedMipRGBA8MiB": 325.33,
+    "optimizedEnvironmentDecodedMipRGBA8MiB": 60.33,
+    "basis": "Decoded image dimensions \u00d7 4 bytes \u00d7 4/3 mip factor; estimate, not measured GPU residency. Excludes user car, render targets and generated fallback maps."
+  }
+}

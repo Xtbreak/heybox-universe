@@ -1,0 +1,165 @@
+{
+  "created": "2026-10-09",
+  "file": "flight-ship-v8.glb",
+  "name": "Hippocrates / Graphite Fighter",
+  "sourceName": "Hippocrates, from Proteron Ships",
+  "creator": "Viktor Hahn (OpenGameArt username: Unnamed)",
+  "source": "https://opengameart.org/content/proteron-ships",
+  "downloadSource": "https://opengameart.org/sites/default/files/gltf.zip",
+  "sourceArchiveMember": "gltf/hippocrates.glb",
+  "sourceArchiveSha256": "c55b967f7c8a93a60149080c8eaae38134e9a191bfd7bef374810d618993b2c4",
+  "sourceAssetSha256": "b5690a3e4532a94b0049975790a8aefe36923b21d03d122b325eb3bdb2bf53d4",
+  "license": "CC-BY-4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "licenseLegalCode": "https://creativecommons.org/licenses/by/4.0/legalcode.en",
+  "licenseNoticeFile": "FLIGHT-ASSET-ATTRIBUTION.txt",
+  "licenseEvidence": "https://opengameart.org/content/proteron-ships",
+  "attribution": "Hippocrates from Proteron Ships by Viktor Hahn (Unnamed), CC BY 4.0. Source: https://opengameart.org/content/proteron-ships . License: https://creativecommons.org/licenses/by/4.0/ . Modified for this demo: graphite/silver/ice-blue livery, armor microbevels, weighted normals/tangents, recentering and -Z-forward GLB export. No endorsement implied.",
+  "requiredCreditPlacement": "Keep the attribution above in the demo credits and distribute FLIGHT-ASSET-ATTRIBUTION.txt with the GLB.",
+  "format": "glTF 2.0 binary, self-contained",
+  "bytes": 9090760,
+  "sha256": "70711929e74ae9847f30f67be909d1ba8976149f220cb0a473b31fac4ada66ee",
+  "sourceTriangles": 6302,
+  "triangles": 12426,
+  "meshes": 1,
+  "materials": 1,
+  "drawCalls": 1,
+  "animations": 0,
+  "forward": "-Z",
+  "up": "+Y",
+  "center": [
+    0,
+    0,
+    0
+  ],
+  "bounds": [
+    [
+      -7.18311071395874,
+      -1.8255304098129272,
+      -7.300000190734863
+    ],
+    [
+      7.18311071395874,
+      1.8255304098129272,
+      7.300000190734863
+    ]
+  ],
+  "dimensions": [
+    14.36622142791748,
+    3.6510608196258545,
+    14.600000381469727
+  ],
+  "textures": {
+    "count": 4,
+    "dimensions": "2048x2048",
+    "types": [
+      "baseColor",
+      "normal",
+      "metallicRoughness",
+      "emissive"
+    ],
+    "storage": "embedded PNG"
+  },
+  "requiredExtensions": [],
+  "usedExtensions": [
+    "KHR_materials_emissive_strength"
+  ],
+  "decoderRequired": false,
+  "modifications": [
+    "Rotated 180 degrees about the up axis, then centered geometric bounds at origin.",
+    "Remapped authored violet/gray diffuse livery to graphite and cool silver while retaining panel-line and weathering detail.",
+    "Remapped authored emissive texture to ice blue.",
+    "Retained authored packed metallic/roughness and normal maps; normal intensity .55, emission intensity 2.4.",
+    "Added 0.028 model-unit armor bevels, two segments, angle-limited to 35 degrees; preserved panel shading with weighted normals.",
+    "Triangulated final geometry, exported tangents, supplied orthonormal tangents for 28 degenerate-UV bevel vertices.",
+    "Reencoded the normal PNG without nonstandard source metadata."
+  ],
+  "rawSockets": {
+    "engines": [
+      [
+        -1.8,
+        0,
+        7.05
+      ],
+      [
+        1.8,
+        0,
+        7.05
+      ]
+    ],
+    "engineOuterRadius": 0.745,
+    "engineRecommendedFlameRadius": 0.635,
+    "engineDirection": [
+      0,
+      0,
+      1
+    ],
+    "muzzles": [
+      [
+        -0.825,
+        0,
+        -7.3
+      ],
+      [
+        0.825,
+        0,
+        -7.3
+      ]
+    ],
+    "muzzleDirection": [
+      0,
+      0,
+      -1
+    ]
+  },
+  "normalizedToMax8_5": {
+    "scale": 0.5821917656103744,
+    "engines": [
+      [
+        -1.047945178098674,
+        0,
+        4.10445194755314
+      ],
+      [
+        1.047945178098674,
+        0,
+        4.10445194755314
+      ]
+    ],
+    "engineOuterRadius": 0.43373286537972894,
+    "engineRecommendedFlameRadius": 0.3696917711625878,
+    "muzzles": [
+      [
+        -0.4803082066285589,
+        0,
+        -4.249999888955734
+      ],
+      [
+        0.4803082066285589,
+        0,
+        -4.249999888955734
+      ]
+    ]
+  },
+  "previews": [
+    "flight-ship-v8-front.png",
+    "flight-ship-v8-rear.png",
+    "flight-ship-v8-top.png"
+  ],
+  "previewMethod": "Blender 4.3.2 CPU Cycles, exact final GLB reimport with embedded PBR maps, 48 samples, 1100x850.",
+  "validation": {
+    "numErrors": 0,
+    "numWarnings": 0,
+    "numInfos": 0,
+    "numHints": 0,
+    "messages": [],
+    "truncated": false
+  },
+  "integration": [
+    "Load flight-ship-v8.glb, not the old flight-ship.glb URL.",
+    "Preserve all embedded PBR maps and authored material colors. Avoid replacing with a flat material.",
+    "At max dimension 8.5 twin exhaust centers are x +/-1.04795, y 0, z +4.10445; glow radius about .37.",
+    "At max dimension 8.5 twin nose muzzle points are x +/-0.48031, y 0, z -4.25.",
+    "No distinct enemy GLB exported: clone this geometry/material and apply a restrained enemy tint if required, preserving attribution."
+  ]
+}

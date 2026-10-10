@@ -1,0 +1,10 @@
+Archimedes from Proteron Ships by Viktor Hahn (OpenGameArt: Unnamed), CC BY 4.0. Source: https://opengameart.org/content/proteron-ships . License: https://creativecommons.org/licenses/by/4.0/ . Adapted as Dawn / 曙光号 for this demo: graphite/silver/ice-blue PBR livery, luminous viewport accents, subtle armor microbevels and weighted normals, centered 24-unit length and -Z-forward orientation. No endorsement implied.
+
+Original author notice:
+This work, made by Viktor Hahn (viktor.hahn@web.de), is licensed under the Creative Commons Attribution 4.0 International License. http://creativecommons.org/licenses/by/4.0/
+
+License legal code:
+https://creativecommons.org/licenses/by/4.0/legalcode.en
+
+Preserve this notice with redistribution and keep the attribution in the demo credits.
+No other third-party model or texture contributes to Dawn. The player Hippocrates fighter is a separate, unchanged asset.

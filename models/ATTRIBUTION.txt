@@ -1,0 +1,15 @@
+3D asset credits / 3D 模型鸣谢
+
+RobotExpressive — Tomás Laulhé; modifications by Don McCurdy. CC0 1.0.
+https://creativecommons.org/publicdomain/zero/1.0/
+Source: https://github.com/mrdoob/three.js/blob/dev/examples/models/gltf/RobotExpressive/README.md
+
+Damaged Helmet — original by theblueturtle_ (2016), CC BY-NC 4.0; rebuild and glTF conversion by ctxwing (2018), CC BY 4.0.
+https://creativecommons.org/licenses/by-nc/4.0/
+https://creativecommons.org/licenses/by/4.0/
+Source: https://github.com/KhronosGroup/glTF-Sample-Assets/blob/main/Models/DamagedHelmet/README.md
+Noncommercial use only. Source GLB unchanged; site may apply lighting, pose, scale, and camera transformations.
+
+Toy Car — initial model by Guido Odendahl; extensions and scene composition by Eric Chadwick (2020). CC0 1.0.
+https://creativecommons.org/publicdomain/zero/1.0/
+Source: https://github.com/KhronosGroup/glTF-Sample-Assets/blob/main/Models/ToyCar/README.md

@@ -1,0 +1,6 @@
+Three.js local modules: r186, https://github.com/mrdoob/three.js/tree/r186
+License: THREE-LICENSE.txt
+Meshopt decoder: https://github.com/mrdoob/three.js/blob/r186/examples/jsm/libs/meshopt_decoder.module.js
+Meshoptimizer license: https://github.com/zeux/meshoptimizer/blob/v1.1/LICENSE.md
+License: MESHOPT-LICENSE.txt
+Retrieved: 2026-10-10

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101518"><meta name="description" content="小黑盒 · 从一件物体，到一个世界。材质与粒子的交互实验。">
+  <title>小黑盒 · 物质之间</title><link rel="stylesheet" href="./material-study.css">
+</head>
+<body>
+  <div class="studio" id="studio"><canvas id="material-canvas" aria-label="小黑盒金属标志随滚动解构，并重组为可驾驶飞船"></canvas><div class="studio-grain" aria-hidden="true"></div></div>
+  <header class="masthead" id="masthead"><a class="brand" href="./" aria-label="返回小黑盒主页">小黑盒<span>HEYBOX</span></a><span class="edition">MATERIAL STUDY <i>01 / 03</i></span><button class="sound" id="sound" aria-pressed="false" aria-label="开启声音">声音 <span>关闭</span></button></header>
+  <main id="scroll-story" aria-label="滚动探索物质的四个阶段">
+    <section aria-label="第一阶段，金属实体"><span class="sr-only">以真实的金属实体为起点。向下滚动。</span></section>
+    <section aria-label="第二阶段，表面解构"><span class="sr-only">从物体边缘出发，每一粒都来自真实表面。</span></section>
+    <section aria-label="第三阶段，粒子重组"><span class="sr-only">粒子沿着连续的路径汇聚，重组成第一艘飞船。</span></section>
+    <section aria-label="第四阶段，飞行世界"><span class="sr-only">停留在飞船上两秒，或长按启航按钮，进入可玩的飞行世界。</span></section>
+  </main>
+  <div class="editorial" id="editorial"><div class="chapter"><span id="chapter-number">01</span><span class="rule"></span><span id="chapter-label">起点 / THE OBJECT</span></div><h1 id="chapter-title">一切，从一件物体开始。</h1><p id="chapter-description">石墨黑的表面，银色的切面。<br>让好奇心，穿过它。</p><button id="launch" class="launch" aria-label="长按两秒进入飞行世界" hidden><span>长按 2 秒启航</span><i aria-hidden="true">↗</i></button></div>
+  <div class="object-note" id="object-note"><span class="note-line"></span><span id="object-label">01—A / GRAPHITE ALLOY</span><small id="object-detail">倒角 · 分层壳体 · 冰蓝导光</small></div>
+  <footer class="story-footer" id="story-footer"><span id="scroll-hint"><span class="scroll-mark" aria-hidden="true"></span>缓慢滚动，观察变化</span><span class="progress-track" aria-hidden="true"><i id="progress-line"></i></span><span class="stage-count" id="stage-count">01 — 04</span></footer>
+  <div id="charge-cursor" aria-hidden="true"><span>停留<br>启航</span></div>
+  <div class="loading" id="loading" role="status" aria-live="polite"><span class="loading-line"><i id="load-line"></i></span><span id="load-text">正在准备材质与飞船</span></div>
+  <div class="error" id="error" hidden role="alert"><h2>这次没有顺利加载。</h2><p id="error-text"></p><button onclick="location.reload()">重新载入</button><a href="./">返回主页</a></div>
+  <div class="sr-only" id="live-status" role="status" aria-live="polite"></div>
+  <noscript><div class="error">这个材质实验需要开启 JavaScript。<a href="./">返回主页</a></div></noscript>
+  <script type="module" src="./material-study.js?v=material-3"></script>
+</body>
+</html>

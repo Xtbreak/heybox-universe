@@ -1,0 +1,379 @@
+{
+  "created": "2026-10-09",
+  "assets": [
+    {
+      "created": "2026-10-09",
+      "file": "flight-ship-v8.glb",
+      "name": "Hippocrates / Graphite Fighter",
+      "sourceName": "Hippocrates, from Proteron Ships",
+      "creator": "Viktor Hahn (OpenGameArt username: Unnamed)",
+      "source": "https://opengameart.org/content/proteron-ships",
+      "downloadSource": "https://opengameart.org/sites/default/files/gltf.zip",
+      "sourceArchiveMember": "gltf/hippocrates.glb",
+      "sourceArchiveSha256": "c55b967f7c8a93a60149080c8eaae38134e9a191bfd7bef374810d618993b2c4",
+      "sourceAssetSha256": "b5690a3e4532a94b0049975790a8aefe36923b21d03d122b325eb3bdb2bf53d4",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "licenseLegalCode": "https://creativecommons.org/licenses/by/4.0/legalcode.en",
+      "licenseNoticeFile": "FLIGHT-ASSET-ATTRIBUTION.txt",
+      "licenseEvidence": "https://opengameart.org/content/proteron-ships",
+      "attribution": "Hippocrates from Proteron Ships by Viktor Hahn (Unnamed), CC BY 4.0. Source: https://opengameart.org/content/proteron-ships . License: https://creativecommons.org/licenses/by/4.0/ . Modified for this demo: graphite/silver/ice-blue livery, armor microbevels, weighted normals/tangents, recentering and -Z-forward GLB export. No endorsement implied.",
+      "requiredCreditPlacement": "Keep the attribution above in the demo credits and distribute FLIGHT-ASSET-ATTRIBUTION.txt with the GLB.",
+      "format": "glTF 2.0 binary, self-contained",
+      "bytes": 9090760,
+      "sha256": "70711929e74ae9847f30f67be909d1ba8976149f220cb0a473b31fac4ada66ee",
+      "sourceTriangles": 6302,
+      "triangles": 12426,
+      "meshes": 1,
+      "materials": 1,
+      "drawCalls": 1,
+      "animations": 0,
+      "forward": "-Z",
+      "up": "+Y",
+      "center": [
+        0,
+        0,
+        0
+      ],
+      "bounds": [
+        [
+          -7.18311071395874,
+          -1.8255304098129272,
+          -7.300000190734863
+        ],
+        [
+          7.18311071395874,
+          1.8255304098129272,
+          7.300000190734863
+        ]
+      ],
+      "dimensions": [
+        14.36622142791748,
+        3.6510608196258545,
+        14.600000381469727
+      ],
+      "textures": {
+        "count": 4,
+        "dimensions": "2048x2048",
+        "types": [
+          "baseColor",
+          "normal",
+          "metallicRoughness",
+          "emissive"
+        ],
+        "storage": "embedded PNG"
+      },
+      "requiredExtensions": [],
+      "usedExtensions": [
+        "KHR_materials_emissive_strength"
+      ],
+      "decoderRequired": false,
+      "modifications": [
+        "Rotated 180 degrees about the up axis, then centered geometric bounds at origin.",
+        "Remapped authored violet/gray diffuse livery to graphite and cool silver while retaining panel-line and weathering detail.",
+        "Remapped authored emissive texture to ice blue.",
+        "Retained authored packed metallic/roughness and normal maps; normal intensity .55, emission intensity 2.4.",
+        "Added 0.028 model-unit armor bevels, two segments, angle-limited to 35 degrees; preserved panel shading with weighted normals.",
+        "Triangulated final geometry, exported tangents, supplied orthonormal tangents for 28 degenerate-UV bevel vertices.",
+        "Reencoded the normal PNG without nonstandard source metadata."
+      ],
+      "rawSockets": {
+        "engines": [
+          [
+            -1.8,
+            0,
+            7.05
+          ],
+          [
+            1.8,
+            0,
+            7.05
+          ]
+        ],
+        "engineOuterRadius": 0.745,
+        "engineRecommendedFlameRadius": 0.635,
+        "engineDirection": [
+          0,
+          0,
+          1
+        ],
+        "muzzles": [
+          [
+            -0.825,
+            0,
+            -7.3
+          ],
+          [
+            0.825,
+            0,
+            -7.3
+          ]
+        ],
+        "muzzleDirection": [
+          0,
+          0,
+          -1
+        ]
+      },
+      "normalizedToMax8_5": {
+        "scale": 0.5821917656103744,
+        "engines": [
+          [
+            -1.047945178098674,
+            0,
+            4.10445194755314
+          ],
+          [
+            1.047945178098674,
+            0,
+            4.10445194755314
+          ]
+        ],
+        "engineOuterRadius": 0.43373286537972894,
+        "engineRecommendedFlameRadius": 0.3696917711625878,
+        "muzzles": [
+          [
+            -0.4803082066285589,
+            0,
+            -4.249999888955734
+          ],
+          [
+            0.4803082066285589,
+            0,
+            -4.249999888955734
+          ]
+        ]
+      },
+      "previews": [
+        "flight-ship-v8-front.png",
+        "flight-ship-v8-rear.png",
+        "flight-ship-v8-top.png"
+      ],
+      "previewMethod": "Blender 4.3.2 CPU Cycles, exact final GLB reimport with embedded PBR maps, 48 samples, 1100x850.",
+      "validation": {
+        "numErrors": 0,
+        "numWarnings": 0,
+        "numInfos": 0,
+        "numHints": 0,
+        "messages": [],
+        "truncated": false
+      },
+      "integration": [
+        "Load flight-ship-v8.glb, not the old flight-ship.glb URL.",
+        "Preserve all embedded PBR maps and authored material colors. Avoid replacing with a flat material.",
+        "At max dimension 8.5 twin exhaust centers are x +/-1.04795, y 0, z +4.10445; glow radius about .37.",
+        "At max dimension 8.5 twin nose muzzle points are x +/-0.48031, y 0, z -4.25.",
+        "No distinct enemy GLB exported: clone this geometry/material and apply a restrained enemy tint if required, preserving attribution."
+      ],
+      "key": "flightShip",
+      "active": true
+    },
+    {
+      "key": "legacyFlightShip",
+      "file": "flight-ship.glb",
+      "name": "Spitfire",
+      "creator": "Quaternius",
+      "source": "https://quaternius.com/packs/ultimatespaceships.html",
+      "downloadSource": "https://github.com/Malcolmnixon/Quaternius-Ultimate-Spaceships-Pack",
+      "sourceFiles": [
+        "https://raw.githubusercontent.com/Malcolmnixon/Quaternius-Ultimate-Spaceships-Pack/main/blender/Spitfire.blend",
+        "https://raw.githubusercontent.com/Malcolmnixon/Quaternius-Ultimate-Spaceships-Pack/main/addons/quaternius-ultimate-spaceships-pack/meshes/spitfire/textures/Spitfire_Blue.png"
+      ],
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "licenseEvidence": [
+        "https://quaternius.com/packs/ultimatespaceships.html",
+        "https://github.com/Malcolmnixon/Quaternius-Ultimate-Spaceships-Pack/blob/main/LICENSE"
+      ],
+      "attribution": "Spitfire from Ultimate Spaceships Pack by Quaternius (CC0). Converted via the Malcolm Nixon asset port.",
+      "forward": "-Z",
+      "up": "+Y",
+      "dimensions": [
+        10.523689,
+        3.055181,
+        7.53331
+      ],
+      "bounds": [
+        [
+          -5.261845,
+          -2.025361,
+          -4.393894
+        ],
+        [
+          5.261845,
+          1.029821,
+          3.139416
+        ]
+      ],
+      "triangles": 3512,
+      "meshes": 1,
+      "textures": "Embedded 2048×2048 artist-authored blue livery; silver/blue panel detail.",
+      "modifications": "Converted Blender source to standalone GLB; rotated 180 degrees about up axis for -Z forward; official blue livery selected; material metalness .45 and roughness .38.",
+      "preview": "flight-ship-preview.png",
+      "integration": "One mesh named Spitfire. Bounds not vertically centered. Scale to target wingspan; clone and preserve PBR map. Add thruster VFX at four aft nacelles. No animation clips.",
+      "bytes": 3809580,
+      "sha256": "08fea37bd39fe82b941f19a49c2238405462db84de43fdcad40a980a5240e0ee",
+      "requiredExtensions": [],
+      "format": "glTF 2.0 binary, self-contained GLB",
+      "decoderRequired": false,
+      "validation": {
+        "numErrors": 0,
+        "numWarnings": 0,
+        "numInfos": 0,
+        "warningCodes": {}
+      },
+      "active": false
+    },
+    {
+      "key": "car",
+      "file": "sports-car.glb",
+      "name": "Car Concept",
+      "creator": "Eric Chadwick, Darmstadt Graphics Group GmbH (2024); original public-domain concept by Unity Fan",
+      "source": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept",
+      "downloadSource": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/CarConcept/glTF-Binary/CarConcept.glb",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "licenseEvidence": [
+        "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/main/Models/CarConcept/LICENSE.md",
+        "https://github.com/KhronosGroup/glTF-Sample-Assets/blob/main/Models/CarConcept/metadata.json"
+      ],
+      "attribution": "Car Concept by Eric Chadwick / Darmstadt Graphics Group GmbH, 2024, based on a public-domain concept by Unity Fan. CC BY 4.0. Adapted for this project: graphite/silver materials, normalized wheel pivots, centered/grounded hierarchy, sample logo surfaces removed.",
+      "forward": "+Z",
+      "up": "+Y",
+      "dimensions": [
+        2.542321,
+        1.148896,
+        4.357387
+      ],
+      "bounds": [
+        [
+          -1.271408,
+          0,
+          -2.178693
+        ],
+        [
+          1.270913,
+          1.148896,
+          2.178693
+        ]
+      ],
+      "triangles": 213229,
+      "meshes": 96,
+      "textures": "11 embedded PNGs. PBR micro-normal, tread, interior, AO and metallic texture detail retained.",
+      "modifications": "Flattened static hierarchy while preserving world geometry. Rebuilt wheel_fl/fr/rl/rr pivots with local X axle and local Y steering. Grounded tires and centered length. Graphite/silver paint and dark interior material colors applied preserving PBR maps. Replaced license plate with blank material; removed steering emblem; removed logo-bearing tire sidewall color and normal maps.",
+      "preview": "sports-car-preview.png",
+      "wheelNodes": [
+        "wheel_fl",
+        "wheel_fr",
+        "wheel_rl",
+        "wheel_rr"
+      ],
+      "wheelRadiusApprox": 0.3838,
+      "rootTranslation": [
+        0,
+        0.00024124,
+        -0.23846179
+      ],
+      "wheelLocalPivots": {
+        "wheel_fl": [
+          0.975493,
+          0.383759,
+          1.485681
+        ],
+        "wheel_fr": [
+          -0.976675,
+          0.383759,
+          1.483968
+        ],
+        "wheel_rl": [
+          0.982514,
+          0.383759,
+          -1.314063
+        ],
+        "wheel_rr": [
+          -0.981705,
+          0.383759,
+          -1.314063
+        ]
+      },
+      "integration": "Root SportsCar. Wheel pivots are direct children and have no starting rotation. All wheel subparts including brake pads currently rotate together. Actual front wheel meshes preserve source steering angle. Keep child meshes/materials; avoid whole-model flat recolor. Use +Z motion.",
+      "bytes": 10321896,
+      "sha256": "4d6b957693cb148f706dc6f824a7629b2f6f221051e32b9849e970707cd4b93d",
+      "requiredExtensions": [
+        "KHR_texture_transform"
+      ],
+      "format": "glTF 2.0 binary, self-contained GLB",
+      "decoderRequired": false,
+      "validation": {
+        "numErrors": 0,
+        "numWarnings": 52,
+        "numInfos": 6,
+        "warningCodes": {
+          "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE": 52
+        }
+      }
+    },
+    {
+      "key": "weapon",
+      "file": "fps-pistol.glb",
+      "name": "Service Pistol",
+      "creator": "Mateusz Sadek / Poly Haven",
+      "source": "https://polyhaven.com/a/service_pistol",
+      "downloadSource": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/service_pistol/service_pistol_1k.gltf",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "licenseEvidence": [
+        "https://polyhaven.com/a/service_pistol",
+        "https://polyhaven.com/license"
+      ],
+      "attribution": "Service Pistol by Mateusz Sadek / Poly Haven (CC0). One assembled wood-grip variant adapted for game use.",
+      "forward": "-Z (muzzle)",
+      "up": "+Y",
+      "dimensions": [
+        0.03182438,
+        0.13067688,
+        0.22191706
+      ],
+      "bounds": [
+        [
+          -0.01612529,
+          -0.0521463,
+          -0.17376709
+        ],
+        [
+          0.01569909,
+          0.07853058,
+          0.04814997
+        ]
+      ],
+      "triangles": 9450,
+      "meshes": 5,
+      "textures": "Three embedded 1024×1024 JPEG PBR maps: base color, AO/roughness/metal, normal.",
+      "modifications": "Selected wood-grip variant and its slide, hammer, trigger. Assembled empty magazine into grip. Removed duplicate taped variant, loose loaded magazine and loose bullet. Rotated muzzle to -Z. Packed textures into GLB.",
+      "preview": "fps-pistol-preview.png",
+      "animatedPartNodes": [
+        "service_pistol_slide_a",
+        "service_pistol_hammer_a",
+        "service_pistol_trigger_a",
+        "service_pistol_magazine_empty"
+      ],
+      "integration": "Five independent mesh roots; group gltf.scene as weapon. Animate slide by parent-space +Z for kickback (muzzle points -Z). Natural length .222 m; hands/grip mesh is not included. No authored animation clips.",
+      "bytes": 2649684,
+      "sha256": "6d69bb900cfc2789fd4c1535e567b64776c01952d1cf7cb1c1b88376bbd3e560",
+      "requiredExtensions": [],
+      "format": "glTF 2.0 binary, self-contained GLB",
+      "decoderRequired": false,
+      "validation": {
+        "numErrors": 0,
+        "numWarnings": 5,
+        "numInfos": 0,
+        "warningCodes": {
+          "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE": 5
+        }
+      }
+    }
+  ],
+  "totalBytes": 16781160,
+  "runtime": "GLTFLoader with no Draco/Meshopt/KTX decoder. KHR_texture_transform on sports-car is supported directly by Three.js.",
+  "validationNote": "Khronos glTF Validator: zero errors in all files. Ship has zero warnings. Car and pistol only warn that tangents are generated at runtime for normal maps; Three.js supports this directly. Car also has six harmless unused texture-coordinate notices following trademark-map removal."
+}

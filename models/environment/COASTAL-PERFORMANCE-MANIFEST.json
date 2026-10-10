@@ -1,0 +1,736 @@
+[
+  {
+    "file": "coastal-tree.glb",
+    "oldBytes": 3868376,
+    "newBytes": 2517028,
+    "images": [
+      {
+        "name": "island_tree_01_branches_nor_gl_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "island_tree_01_branches_diff_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "island_tree_01_branches_arm_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          256,
+          256
+        ]
+      },
+      {
+        "name": "island_tree_01_nor_gl_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "island_tree_01_diff_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "island_tree_01_arm_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          256,
+          256
+        ]
+      },
+      {
+        "name": "island_tree_01_leaves_nor_gl_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "island_tree_01_leaves_diff_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "island_tree_01_leaves_arm_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          256,
+          256
+        ]
+      }
+    ],
+    "sha256": "6ec28b85c06ccdaec7e64857420314ddb2ef832c7887b5368c684cc6e838cf91"
+  },
+  {
+    "file": "coastal-tree-mid.glb",
+    "oldBytes": 352568,
+    "newBytes": 352700,
+    "images": [],
+    "sha256": "9f4cb5b217e9ff9cf4052e5b4ecf4cc3c1d798a560ec392cd6b0f721296228b6"
+  },
+  {
+    "file": "coastal-factory.glb",
+    "oldBytes": 5101304,
+    "newBytes": 2416164,
+    "images": [
+      {
+        "name": "modular_factory_facade_trim_01_nor_gl_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_factory_facade_trim_01_diff_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_factory_facade_trim_01_arm_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          256,
+          256
+        ]
+      },
+      {
+        "name": "modular_factory_facade_brick_nor_gl_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_factory_facade_brick_diff_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_factory_facade_brick_arm_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          256,
+          256
+        ]
+      },
+      {
+        "name": "modular_factory_facade_windows_nor_gl_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_factory_facade_windows_diff_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_factory_facade_windows_arm_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          256,
+          256
+        ]
+      },
+      {
+        "name": "modular_factory_facade_doors_nor_gl_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_factory_facade_doors_diff_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_factory_facade_doors_arm_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          256,
+          256
+        ]
+      },
+      {
+        "name": "modular_factory_facade_windows_diff_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_factory_facade_garage_nor_gl_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_factory_facade_garage_diff_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_factory_facade_garage_arm_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          256,
+          256
+        ]
+      }
+    ],
+    "sha256": "70c133e87c10988cda0acaca0d2a7d9d32cfa7e04f068ed940ea4549555ceb79"
+  },
+  {
+    "file": "coastal-facade.glb",
+    "oldBytes": 6138560,
+    "newBytes": 3821088,
+    "images": [
+      {
+        "name": "modular_urban_apartments_facade_trim_01_nor_gl_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_urban_apartments_facade_trim_01_diff_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_urban_apartments_facade_trim_01_arm_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          256,
+          256
+        ]
+      },
+      {
+        "name": "modular_urban_apartments_facade_plaster_nor_gl_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_urban_apartments_facade_plaster_diff_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_urban_apartments_facade_plaster_arm_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          256,
+          256
+        ]
+      },
+      {
+        "name": "modular_urban_apartments_facade_objects_nor_gl_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_urban_apartments_facade_objects_diff_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_urban_apartments_facade_objects_arm_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          256,
+          256
+        ]
+      },
+      {
+        "name": "modular_urban_apartments_facade_objects_diff_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_urban_apartments_facade_trim_02_nor_gl_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_urban_apartments_facade_trim_02_diff_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "modular_urban_apartments_facade_trim_02_arm_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          256,
+          256
+        ]
+      },
+      {
+        "name": "roof_slates_02_nor_gl_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "roof_slates_02_diff_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "roof_slates_02_rough_1k",
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          256,
+          256
+        ]
+      }
+    ],
+    "sha256": "3daf9f4e0b356120a0a366565b08f3968bf934f7b8e67d27d3b602b74732581b"
+  },
+  {
+    "file": "white_plaster_rough_01_nor_gl_1k.jpg",
+    "oldBytes": 166028,
+    "newBytes": 21475,
+    "images": [
+      {
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      }
+    ],
+    "sha256": "a66898d7d7ce29889b08f1f79c0976a81f575397a4b0789b945963681e1ad13f"
+  },
+  {
+    "file": "white_plaster_rough_01_diff_1k.jpg",
+    "oldBytes": 422060,
+    "newBytes": 59988,
+    "images": [
+      {
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      }
+    ],
+    "sha256": "730624b4ac0084b208a6d39526aa1596b6ea609b314d41322f3ed2f89404650c"
+  },
+  {
+    "file": "roof_slates_02_nor_gl_1k.jpg",
+    "oldBytes": 358157,
+    "newBytes": 69568,
+    "images": [
+      {
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      }
+    ],
+    "sha256": "a515c1334fa1e986ece91a90ea851f75b66c8d2d8ccaf8352cc411878971b90e"
+  },
+  {
+    "file": "roof_slates_02_diff_1k.jpg",
+    "oldBytes": 355476,
+    "newBytes": 76611,
+    "images": [
+      {
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      }
+    ],
+    "sha256": "c60fa379a9e4bf19bb93b12bbc551d63a9d4fcacac1be007dc4660b54f74090a"
+  },
+  {
+    "file": "rock_face_03_nor_gl_1k.jpg",
+    "oldBytes": 430559,
+    "newBytes": 78016,
+    "images": [
+      {
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      }
+    ],
+    "sha256": "a59119dffb61f78c859b617687e3e9852afc9934c0376f4f3530f5bf657293b2"
+  },
+  {
+    "file": "rock_face_03_diff_1k.jpg",
+    "oldBytes": 344723,
+    "newBytes": 60139,
+    "images": [
+      {
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      }
+    ],
+    "sha256": "7345d6531f30eaa1b807a75b16c01cbf63793ef15024c261e32aa6eff5ffd89d"
+  },
+  {
+    "file": "rectangular_paving_nor_gl_1k.jpg",
+    "oldBytes": 146290,
+    "newBytes": 17818,
+    "images": [
+      {
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      }
+    ],
+    "sha256": "576b3d0c4708a6b166f4d2a1efdb131bbde30a1d58dc2f29bdfa892ddc47549e"
+  },
+  {
+    "file": "rectangular_paving_diff_1k.jpg",
+    "oldBytes": 192726,
+    "newBytes": 28886,
+    "images": [
+      {
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      }
+    ],
+    "sha256": "99479fb057002c16ab78d562d281e8d8e58a92b6f75a484dcc6d7246e34c9d76"
+  },
+  {
+    "file": "grass_ground_nor_gl_1k.jpg",
+    "oldBytes": 514555,
+    "newBytes": 64611,
+    "images": [
+      {
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      }
+    ],
+    "sha256": "e3f473ce47d4dce0de77eda5ef2d5ea25b463844239520a5aa6b7a71c0c28d2b"
+  },
+  {
+    "file": "grass_ground_diff_1k.jpg",
+    "oldBytes": 323258,
+    "newBytes": 48536,
+    "images": [
+      {
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      }
+    ],
+    "sha256": "7b824b50977c70fb39233b2368442f5e496d192b8949437eb5e19d2e6d6a34d9"
+  },
+  {
+    "file": "asphalt_02_nor_gl_1k.jpg",
+    "oldBytes": 480807,
+    "newBytes": 54253,
+    "images": [
+      {
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      }
+    ],
+    "sha256": "4b0044e2c0c065d1d826739062941c97c8801713564b438a6cdfca265f775483"
+  },
+  {
+    "file": "asphalt_02_diff_1k.jpg",
+    "oldBytes": 513645,
+    "newBytes": 87018,
+    "images": [
+      {
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      }
+    ],
+    "sha256": "c71791e18dd8feada49ced32bc4922738866e13df67784e8c048c4c2c990d846"
+  },
+  {
+    "file": "coastal-tree-impostor-side.png",
+    "oldBytes": 1580104,
+    "newBytes": 324390,
+    "images": [
+      {
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      }
+    ],
+    "sha256": "bcd2aa2cdaa6adae565585262b0161a32a393c1434b6ff9efb3397a201a6b09d"
+  },
+  {
+    "file": "coastal-tree-impostor-front.png",
+    "oldBytes": 1606164,
+    "newBytes": 334500,
+    "images": [
+      {
+        "before": [
+          1024,
+          1024
+        ],
+        "after": [
+          512,
+          512
+        ]
+      }
+    ],
+    "sha256": "b6ac11977f35183b325a694ee3ef5d27d982c0fe4cb5e12e659319df650b5add"
+  }
+]

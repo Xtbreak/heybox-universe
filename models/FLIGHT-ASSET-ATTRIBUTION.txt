@@ -1,0 +1,10 @@
+Hippocrates from Proteron Ships by Viktor Hahn (Unnamed), CC BY 4.0. Source: https://opengameart.org/content/proteron-ships . License: https://creativecommons.org/licenses/by/4.0/ . Modified for this demo: graphite/silver/ice-blue livery, armor microbevels, weighted normals/tangents, recentering and -Z-forward GLB export. No endorsement implied.
+
+Original author notice:
+This work, made by Viktor Hahn (viktor.hahn@web.de), is licensed under the Creative Commons Attribution 4.0 International License. http://creativecommons.org/licenses/by/4.0/
+
+Full license legal code:
+https://creativecommons.org/licenses/by/4.0/legalcode.en
+https://creativecommons.org/licenses/by/4.0/legalcode.txt
+
+The license allows modification and redistribution, including commercial use, subject to its attribution and other conditions. The model is supplied without warranties; see the license text.
