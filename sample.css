@@ -63,7 +63,6 @@ body.game-paused #drive-map-panel{opacity:.35}body.game-paused #drive-map-panel 
 @media(max-width:760px){#session-detail{top:152px;font-size:10px;max-width:70vw}.expedition-summary{max-width:90vw;margin:14px 0}.expedition-summary strong{font-size:21px}#control-hint{font-size:11px;padding:12px 15px}}
 @media(pointer:coarse){#touch-pad button{min-width:44px;min-height:44px}}
 
-
 /* 松风原野 uses a quiet, warm field guide over a miniature landscape. */
 .roaming .vignette{opacity:.08}.roaming .noise{opacity:0}
 .roaming .play-top{background:linear-gradient(#f4eedce6,transparent);color:#283a34}
@@ -95,7 +94,6 @@ body[data-entry-world="robot"].traveling .passage-caption small{color:#91d9c4}
 .play-stats,.play-bottom,#ability-status,#play-mission,#squad-status,#weapon-rack,.play-top>div:first-child,#context-prompt,#touch-pad{transition:opacity .28s ease-out}
 .arriving .play-stats,.arriving .play-bottom,.arriving #ability-status,.arriving #play-mission,.arriving #squad-status,.arriving #weapon-rack,.arriving .play-top>div:first-child,.arriving #context-prompt,.arriving #touch-pad{opacity:0;pointer-events:none}
 .arriving .play-menu>:not(#exit-game){visibility:hidden}.arriving .play-top{background:transparent}
-
 
 /* Toy park: scene-first exhibit labels. Scoped to world 03 only. */
 .roaming{--toy-ink:#593724;--toy-paper:#fff0d6;--toy-line:#79442a30}
@@ -161,7 +159,6 @@ html{overflow-x:clip}.giant-type{max-width:100%;overflow:hidden}
 body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
 @keyframes title-glitch{0%,16%,21%,39%,44%,100%{transform:none;text-shadow:0 4px 45px #080b1040}18%,41%{transform:translateX(2px);text-shadow:-2px 0 #73e2ff,2px 0 #fc5bcd}}
 
-
 /* The closing gallery has its own lower screen band on phones and tablets. */
 @media(max-width:800px){
  #arrival .copy{top:12svh;margin-left:6vw;width:86%;padding-bottom:12px}
@@ -174,9 +171,6 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
  #arrival .official{margin:12px 0;font-size:10px}#arrival .credits-link{font-size:9px}
  .header-right{gap:6px}.header-right button{padding:10px;min-height:44px}
 }
-
-/* journey-29 · velocity-driven page layer, chapter dossiers and the epilogue. */
-.giant-type{transform:translate3d(calc((var(--local,.5) - .5) * -26vw),0,0) skewX(calc(var(--vel,0) * -16deg));will-change:transform}
 .frame h1,.frame h2{transform:skewY(calc(var(--vel,0) * -2.2deg));transition:transform .25s}
 .body-copy .line,[data-lines] .line{display:block;overflow:hidden;padding-bottom:.08em}
 .body-copy .line>span,[data-lines] .line>span{display:inline-block;transform:translate3d(0,110%,0) rotate(2deg);opacity:0;transition:transform .9s cubic-bezier(.16,1,.3,1),opacity .6s;transition-delay:calc(var(--i,0) * 110ms + 120ms)}
@@ -199,34 +193,6 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
 .stat-grid span{font-size:12px;color:#b8cfdb}
 .stat-grid small{font-size:9px;line-height:1.6;color:#6f8a99;letter-spacing:.5px}
 
-/* World dossiers */
-.dossier .copy{top:13svh;width:min(540px,40vw)}
-.dossier .copy :is(h2,li,.brief-stats){text-shadow:0 2px 18px #02060acc}
-.dossier h2{font-size:clamp(40px,4.3vw,70px);margin-bottom:22px}
-.mission-steps{list-style:none;margin:0 0 22px;padding:0;display:grid;gap:0;max-width:520px;counter-reset:none}
-.mission-steps li{display:grid;grid-template-columns:38px 1fr auto;align-items:baseline;gap:10px;padding:9px 0;border-bottom:1px solid #b6e7fa16;font-size:13px;color:#dcecf4;opacity:0;transform:translateX(-18px);transition:opacity .6s,transform .8s cubic-bezier(.16,1,.3,1)}
-.mission-steps li:nth-child(1){transition-delay:.15s}.mission-steps li:nth-child(2){transition-delay:.23s}.mission-steps li:nth-child(3){transition-delay:.31s}.mission-steps li:nth-child(4){transition-delay:.39s}.mission-steps li:nth-child(5){transition-delay:.47s}
-.in-view .mission-steps li{opacity:1;transform:none}
-.mission-steps b{font:500 10px monospace;color:var(--ice);letter-spacing:1px}
-.mission-steps small{font-size:10px;color:#7590a0;text-align:right}
-
-
-
-.in-view 
-
-
-
-.brief-stats{display:flex;flex-wrap:wrap;gap:6px 20px;margin-bottom:22px;font-size:10px;color:#86a0ae;letter-spacing:.5px}
-.brief-stats b{font-size:20px;font-weight:400;color:#d8eff9;margin-right:6px;font-variant-numeric:tabular-nums}
-#park-guide .label,#park-guide .mission-steps b{color:#e8b889}
-.park-map{width:100%;max-width:470px;height:auto;margin:-6px 0 12px;overflow:visible}
-.park-map polyline{fill:none;stroke:#e8b88988;stroke-width:1.4;stroke-dasharray:4 5;stroke-dashoffset:300;transition:stroke-dashoffset 2.4s ease}
-.in-view .park-map polyline{stroke-dashoffset:0}
-.park-map circle{fill:#0b141c;stroke:#f2c79b;stroke-width:1.5}
-
-#park-guide 
-
-@media(max-height:760px) and (min-width:901px){.dossier .copy{top:16svh}.dossier h2{font-size:clamp(34px,3.6vw,54px);margin-bottom:12px}.mission-steps li{padding:6px 0}.mission-steps{margin-bottom:14px}.brief-stats{margin-bottom:14px}}
 /* Finale */
 #arrival .copy{top:12svh}
 .recap-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:520px;margin:4px 0 4px}
@@ -240,19 +206,9 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
 #epilogue{position:relative;z-index:3;padding:22vh 0 0;color:var(--text);background:linear-gradient(180deg,transparent,#05080cd0 18vh,#04070bf2 60vh,#030509);overflow:hidden}
 .in-epilogue footer,.in-epilogue .journey-readout,.in-epilogue #model-hud{opacity:0;visibility:hidden}
 
-
-
-
 .epi-block{margin:0 7vw 14vh;max-width:900px}
 .epi-block h2{font-size:clamp(46px,6vw,98px)}
 .epi-block .body-copy{max-width:520px}
-
-
-
-
-
-
-
 
 .morph-stage{position:relative;display:grid;grid-template-columns:1.25fr 1fr;align-items:center;gap:4vw;margin:0 7vw 16vh;min-height:520px;pointer-events:auto}
 #morph-canvas{width:100%;height:min(62vh,560px);display:block;border:1px solid #b6e7fa14;background:radial-gradient(ellipse at center,#0b1620,#04070b 70%)}
@@ -267,16 +223,13 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
 .epi-footer div{display:flex;justify-content:space-between;gap:20px;border-top:1px solid #b6e7fa22;padding-top:18px;margin-top:20px;font-size:10px;letter-spacing:1px;color:#6e8593}
 .epi-footer a{pointer-events:auto;color:#a8c6d6}
 @media(max-width:900px){
- .manifest .copy{width:86%;top:16svh}.stat-grid{grid-template-columns:repeat(2,1fr)}.stat-grid div{padding-bottom:14px}.stat-grid div:nth-child(2){border-right:0}
- .dossier .copy{top:11svh;width:86%}.dossier h2{font-size:34px;margin-bottom:14px}.mission-steps li{font-size:11px;padding:6px 0}.mission-steps small{display:none}
- .brief-stats b{font-size:15px}
- .park-map{max-width:330px}.recap-row b{font-size:11px}
+ .manifest .copy{width:86%;top:16svh}.stat-grid{grid-template-columns:repeat(2,1fr)}.stat-grid div{padding-bottom:14px}.stat-grid div:nth-child(2){border-right:0}.recap-row b{font-size:11px}
  #speed-pill{top:74px;height:24px;width:calc(120px + var(--speed,0) * 80px)}
  
  .morph-stage{grid-template-columns:1fr}#morph-canvas{height:42vh}.morph-link b{font-size:16px}
  .epi-footer div{flex-direction:column}
 }
-/* journey-29: near-zero copy. Script-owned nodes stay in the DOM but out of sight. */
+/* journey-30: near-zero copy. Script-owned nodes stay in the DOM but out of sight. */
 .frame .label,.world-index,#speed-pill,.journey-readout,#render-mode,#model-hover,.passage-caption,footer,#load-title,#load-status,#charge-label,.loading .label{display:none!important}
 #model-hud{display:none!important}body:has(#retry-model:not([hidden])) #model-hud{display:flex!important}
 #model-hud #model-name,#model-hud #model-instruction{display:none}
@@ -286,3 +239,5 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
 #together h2{font-size:clamp(40px,4.6vw,76px);text-shadow:0 4px 30px #1a0d06cc}
 #together .giant-type{color:#ffcf9f0a}
 .morph-link{grid-template-columns:42px 1fr}
+/* journey-30: one short frame per world; the camera plateau no longer spans two screens of still scrolling. */
+#equipment,#companion,#drive{height:118svh;min-height:800px}

@@ -1,11 +1,11 @@
-import {createContextRecovery} from './context-recovery.js?v=journey-29';
-import {createIdleWorldSnap} from './idle-world-snap.js?v=journey-29';
-import {resultSummary, resultTitle, formatRunTime} from './game-session-ui.js?v=journey-29';
-import {createGameAudio} from './game-audio.js?v=journey-29';
-import { createTitleDecode } from './title-decode.js?v=journey-29';
-import { initialQuality } from './journey-quality.js?v=journey-29';
-import { createScrollFx } from './scroll-fx.js?v=journey-29';
-import { createParticleMorph } from './particle-morph.js?v=journey-29';
+import {createContextRecovery} from './context-recovery.js?v=journey-30';
+import {createIdleWorldSnap} from './idle-world-snap.js?v=journey-30';
+import {resultSummary, resultTitle, formatRunTime} from './game-session-ui.js?v=journey-30';
+import {createGameAudio} from './game-audio.js?v=journey-30';
+import { createTitleDecode } from './title-decode.js?v=journey-30';
+import { initialQuality } from './journey-quality.js?v=journey-30';
+import { createScrollFx } from './scroll-fx.js?v=journey-30';
+import { createParticleMorph } from './particle-morph.js?v=journey-30';
 const audio=createGameAudio();
 const $=s=>document.querySelector(s);let world=null,ready=false,light=false,failed=false,queued=false,lastP=0,inGame=false,savedY=0,returnFocus=null,reduced=false,epilogueCovered=false;
 let recovering=false,hostGeneration=0,worldFactory=null;
@@ -155,11 +155,11 @@ async function boot(){
  try{
   document.body.style.overflowY='hidden';status('点亮引擎',25);
   // The module graph is preloaded by HTML. Reuse it instead of fetching every file twice.
-  worldFactory=(await import('./open-adventure.js?v=journey-29')).createWorld;
+  worldFactory=(await import('./open-adventure.js?v=journey-30')).createWorld;
   status('连接游戏世界',88);world=await createHost();update();
  }catch(e){clearTimeout(timeout);renderFailure(e);}
 }
-function update(){queued=false;if(inGame)return;const total=Math.max(1,document.documentElement.scrollHeight-innerHeight),frames=[...document.querySelectorAll('.frame')],measurements=frames.map(s=>({rect:s.getBoundingClientRect(),height:s.offsetHeight})),navLinks=[...document.querySelectorAll('.side-nav a')],navTops=navLinks.map(a=>$(a.getAttribute('href')).getBoundingClientRect().top);$('.scroll-meter i').style.width=Math.max(0,Math.min(1,scrollY/total))*100+'%';let active=0,p=0;frames.forEach((s,i)=>{const r=measurements[i].rect,h=innerHeight,v=Math.max(0,Math.min(1,(r.bottom-h*.2)/(h*.5),(h-r.top)/(h*.55))),copy=s.querySelector('.copy');copy.style.setProperty('--opacity',v);copy.style.visibility=v<.03?'hidden':'visible';if(r.top<=h*.2){active=i;const span=s.classList.contains('finale')?Math.max(1,Math.min(measurements[i].height-h*.8,total-(r.top+scrollY)+h*.2)):measurements[i].height;const t=Math.max(0,Math.min(1,(-r.top+h*.2)/span));p=Number(s.dataset.p)+(Number(s.dataset.end)-Number(s.dataset.p))*t;}});lastP=p;world?.setProgress(p);let nav=0;navTops.forEach((top,i)=>{if(top<innerHeight*.4)nav=i;});navLinks.forEach((a,i)=>a.classList.toggle('active',i===nav));const frame=frames[active];titleDecode.settings(quality,reduced);titleDecode.show(frame);const phase=frame.querySelector('.label').textContent.split('/').pop().trim();$('#chapter-status').textContent=phase;$('#journey-phase').textContent=phase;$('#journey-percent').textContent=String(Math.round(p*100)).padStart(2,'0')+'%';document.body.classList.toggle('transit-mode',!frame.classList.contains('landing')&&!frame.classList.contains('finale'));document.body.style.setProperty('--journey-progress',p);const charge=Math.max(0,Math.min(1,p/.12));$('.charge-orbit').style.setProperty('--charge',charge);$('#charge-value').textContent=String(Math.round(charge*100)).padStart(2,'0');$('#charge-label').textContent=charge>.98?'跃迁核心已激活':'跃迁核心正在充能';}
+function update(){queued=false;if(inGame)return;const total=Math.max(1,document.documentElement.scrollHeight-innerHeight),frames=[...document.querySelectorAll('.frame')],measurements=frames.map(s=>({rect:s.getBoundingClientRect(),height:s.offsetHeight})),navLinks=[...document.querySelectorAll('.side-nav a')],navTops=navLinks.map(a=>$(a.getAttribute('href')).getBoundingClientRect().top);$('.scroll-meter i').style.width=Math.max(0,Math.min(1,scrollY/total))*100+'%';let active=0,p=0;frames.forEach((s,i)=>{const r=measurements[i].rect,h=innerHeight,v=Math.max(0,Math.min(1,(r.bottom-h*.2)/(h*.5),(h*.8-r.top)/(h*.4))),copy=s.querySelector('.copy');copy.style.setProperty('--opacity',v);copy.style.visibility=v<.03?'hidden':'visible';if(r.top<=h*.2){active=i;const span=s.classList.contains('finale')?Math.max(1,Math.min(measurements[i].height-h*.8,total-(r.top+scrollY)+h*.2)):measurements[i].height;const t=Math.max(0,Math.min(1,(-r.top+h*.2)/span));p=Number(s.dataset.p)+(Number(s.dataset.end)-Number(s.dataset.p))*t;}});lastP=p;world?.setProgress(p);let nav=0;navTops.forEach((top,i)=>{if(top<innerHeight*.4)nav=i;});navLinks.forEach((a,i)=>a.classList.toggle('active',i===nav));const frame=frames[active];titleDecode.settings(quality,reduced);titleDecode.show(frame);const phase=frame.querySelector('.label').textContent.split('/').pop().trim();$('#chapter-status').textContent=phase;$('#journey-phase').textContent=phase;$('#journey-percent').textContent=String(Math.round(p*100)).padStart(2,'0')+'%';document.body.classList.toggle('transit-mode',!frame.classList.contains('landing')&&!frame.classList.contains('finale'));document.body.style.setProperty('--journey-progress',p);const charge=Math.max(0,Math.min(1,p/.12));$('.charge-orbit').style.setProperty('--charge',charge);$('#charge-value').textContent=String(Math.round(charge*100)).padStart(2,'0');$('#charge-label').textContent=charge>.98?'跃迁核心已激活':'跃迁核心正在充能';}
 window.addEventListener('scroll',()=>{if(recovering&&!inGame&&Math.abs(scrollY-savedY)>2)recovery.cancelResume();if(!queued){queued=true;requestAnimationFrame(update);}},{passive:true});window.addEventListener('resize',update);window.addEventListener('pointermove',e=>{if(!inGame)world?.setPointer(e.clientX/innerWidth*2-1,1-e.clientY/innerHeight*2);},{passive:true});document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseControls();world?.setPaused(worldPaused());});window.addEventListener('pagehide',()=>{hostGeneration++;recovery.dispose();world?.dispose();world=null;},{once:true});
 $('#world').addEventListener('webglcontextrestored',()=>{if(world?.isContextAvailable?.())recovery.restored();});
 for(const type of ['wheel','touchstart'])window.addEventListener(type,()=>{if(recovering)cancelRecoveryVisit();},{passive:true});

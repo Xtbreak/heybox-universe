@@ -1,5 +1,5 @@
-import { createGame } from './flight-game.js?v=journey-29';
-import { createGameAudio } from './game-audio.js?v=journey-29';
+import { createGame } from './flight-game.js?v=journey-30';
+import { createGameAudio } from './game-audio.js?v=journey-30';
 
 /** Standalone adapter: the host owns renderer, camera and source GLTF resources.
  * The existing rescue provider clones the ship; this adapter never disposes it.
