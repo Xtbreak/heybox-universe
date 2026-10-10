@@ -1,7 +1,8 @@
-import { createSpaceBackdrop } from './space-backdrop.js?v=journey-24';
-import { createJourneyUltra } from './journey-ultra.js?v=journey-24';
-import { createHeyboxCore } from './refined-heybox-core.js?v=journey-24';
-import { createJourneyParticles } from './journey-particles.js?v=journey-24';
+import { createSpaceBackdrop } from './space-backdrop.js?v=journey-25';
+import { createJourneyUltra } from './journey-ultra.js?v=journey-25';
+import { createHeyboxCore } from './refined-heybox-core.js?v=journey-25';
+import { createJourneyParticles } from './journey-particles.js?v=journey-25';
+import { createIceVault } from './ice-vault.js?v=journey-25';
 
 const coarsePointer=globalThis.matchMedia?.('(pointer: coarse)');
 // A continuous, scene-space expedition. Imported GLB transforms are never modified.
@@ -109,6 +110,7 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     o.material=Array.isArray(o.material)?o.material.map(clone):clone(o.material);});
     return value=>{g.visible=value>0.0001;for(const [m,base,depthWrite] of mats){m.opacity=base*value;m.depthWrite=depthWrite&&value>.995;}};}
   const worldFades=names.map(n=>fadingGroup(worlds[n].g)),sceneryFades=[orbitalScenery,lunarScenery,highway].map(fadingGroup),finaleFade=fadingGroup(finale);finale.add(closingCore.group);
+  const iceVault=createIceVault({THREE});finale.add(iceVault.group);iceVault.group.position.copy(closingCore.group.position);iceVault.group.scale.copy(closingCore.group.scale).multiplyScalar(1.45);iceVault.group.rotation.set(.075,.18,-.02);
   const windowFade=(p,a,b,c,d)=>smooth(a,b,p)*(1-smooth(c,d,p));
   const nodes=[
     [0, 0,.3,9, 1.1,.1,0,42], [.065, -.35,.55,7.9, 1.25,.14,0,43], [.12, -.55,.7,6.6, .7,.1,-.5,45],
@@ -180,6 +182,7 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     finaleFade(smooth(.91,.965,p));for(let i=0;i<finalRings.length;i++)finalRings[i].rotation.z=reduced?0:t*.1;
     closingCore.update((1-smooth(.938,.993,p))*.75,t,{reduced,ultra,opacity:1});
     closingCore.group.rotation.set(.075,.18,-.02);
+    iceVault.update({grow:smooth(.955,.995,p),alpha:smooth(.94,.965,p),time:t,pointerX,pointerY,visible:!narrow&&root.visible});
     planet.rotation.y=reduced?0:t*.012;skyRing.rotation.z=reduced?0:t*.025;
     if(p>.90){closingCore.group.getWorldPosition(corePosition);}else corePosition.copy(cube.position);
     backdrop.update({quality:options.quality,progress:p,time:t,reduced,width,height,pointerX,pointerY,desktop:!coarsePointer?.matches,cameraZ:camera.position.z});
@@ -190,5 +193,5 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     optics.radius=hovered?.20:.25;
     active=p<.49?'helmet':p<.715?'robot':'car';return active;
   }
-  return {root,update,setQuality(value){ultraEffects.setQuality(value);backdrop.setQuality(value);particles.setQuality?.(value);},getRift:p=>ultraEffects.rift(p),riftEnd:ultraEffects.end,getParticleCount:()=>particles.getCount(),ready:Promise.all([heyboxCore.ready,closingCore.ready]),getOptics:()=>optics,getWorld:()=>active,setVisible(value){root.visible=!!value;particles.setVisible?.(!!value);},samplePose(progress){return sample(clamp(progress)).slice();},dispose(){backdrop.dispose();ultraEffects.dispose();particles.dispose();closingCore.dispose();heyboxCore.dispose();for(const [g,parent] of originalParents)if(parent)parent.add(g);root.removeFromParent();resources.forEach(r=>r.dispose?.());resources.clear();}};
+  return {root,update,setQuality(value){ultraEffects.setQuality(value);backdrop.setQuality(value);particles.setQuality?.(value);},getRift:p=>ultraEffects.rift(p),riftEnd:ultraEffects.end,getParticleCount:()=>particles.getCount(),ready:Promise.all([heyboxCore.ready,closingCore.ready]),getOptics:()=>optics,getWorld:()=>active,setVisible(value){root.visible=!!value;particles.setVisible?.(!!value);},samplePose(progress){return sample(clamp(progress)).slice();},dispose(){backdrop.dispose();ultraEffects.dispose();particles.dispose();iceVault.dispose();closingCore.dispose();heyboxCore.dispose();for(const [g,parent] of originalParents)if(parent)parent.add(g);root.removeFromParent();resources.forEach(r=>r.dispose?.());resources.clear();}};
 }

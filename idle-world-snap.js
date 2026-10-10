@@ -26,7 +26,7 @@ export function createIdleWorldSnap({
   idleDelay = Math.min(600, Math.max(stableDelay + 50, Number(idleDelay) || 300));
 
   // These poses put the cinematic titles over the intended camera composition.
-  // The last section uses its *reachable* bottom; sample.js maps that to p = 1.
+  // The last section uses its p = 1 position (or the reachable bottom).
   const poses = { dive: .19, warp: .285, equipment: .395, drift: .495,
     companion: .600, 'time-rift': .715, drive: .835 };
   const epsilon = 1;
@@ -139,7 +139,8 @@ export function createIdleWorldSnap({
       const start = Number(section.dataset.p), end = Number(section.dataset.end);
       if (!(height > 0 && end > start)) return null;
       const progress = poses[section.id] ?? (start + end) / 2;
-      const anchor = index === 0 ? 0 : index === all.length - 1 ? endY :
+      // The journey may be followed by a free-scrolling epilogue; never magnet into it.
+      const anchor = index === 0 ? 0 : index === all.length - 1 ? Math.min(endY, top - vh + height) :
         top - vh * .2 + (progress - start) / (end - start) * height;
       return { id: section.id, y: clampY(anchor), top, height };
     }).filter(Boolean);
