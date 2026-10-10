@@ -1,23 +1,23 @@
 import { EffectComposer } from './vendor/EffectComposer.js';
 import { RenderPass } from './vendor/RenderPass.js';
 import { UnrealBloomPass } from './vendor/UnrealBloomPass.js';
-import { createCinematicPass } from './cinematic-pass.js?v=journey-25';
-import { normalizeQuality, createQualityMonitor } from './journey-quality.js?v=journey-25';
+import { createCinematicPass } from './cinematic-pass.js?v=journey-26';
+import { normalizeQuality, createQualityMonitor } from './journey-quality.js?v=journey-26';
 import { OutputPass } from './vendor/OutputPass.js';
-import { createSpatialRefraction } from './spatial-refraction.js?v=journey-25';
-import {createMiniatureCar} from './miniature-car.js?v=journey-25';
-import {createTexturePrewarm} from './texture-prewarm.js?v=journey-25';
-import {createDestinationArrival} from './destination-arrival.js?v=journey-25';
-import {createPortalEntry} from './portal-entry.js?v=journey-25';
-import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-25';
+import { createSpatialRefraction } from './spatial-refraction.js?v=journey-26';
+import {createMiniatureCar} from './miniature-car.js?v=journey-26';
+import {createTexturePrewarm} from './texture-prewarm.js?v=journey-26';
+import {createDestinationArrival} from './destination-arrival.js?v=journey-26';
+import {createPortalEntry} from './portal-entry.js?v=journey-26';
+import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-26';
 import * as THREE from './vendor/three.module.js';
 import { MeshoptDecoder } from './vendor/meshopt_decoder.module.js';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { RoomEnvironment } from './vendor/RoomEnvironment.js';
-import { createCosmicJourney } from './cosmic-journey.js?v=journey-25';
-import { createGame as createFlight } from './flight-game.js?v=journey-25';
-import { createGame as createSandbox } from './sandbox-game.js?v=journey-25';
-import { createGame as createDriving } from './driving-game.js?v=journey-25';
+import { createCosmicJourney } from './cosmic-journey.js?v=journey-26';
+import { createGame as createFlight } from './flight-game.js?v=journey-26';
+import { createGame as createSandbox } from './sandbox-game.js?v=journey-26';
+import { createGame as createDriving } from './driving-game.js?v=journey-26';
 
 // One renderer, three independently owned worlds, and the original cinematic journey.
 export async function createWorld(canvas, { onReady, onError, onState, onQualityChange, audio = null, onFrame, onContextLost, recoverySnapshot = null, signal } = {}) {

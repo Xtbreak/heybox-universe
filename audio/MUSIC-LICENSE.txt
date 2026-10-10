@@ -1,0 +1,15 @@
+Background music (CC0 1.0 Public Domain Dedication)
+
+journey.m4a — "Calm Ambient 1 (Synthwave 4k)"
+  Author: The Cynic Project / cynicmusic.com / pixelsphere.org
+  Source: https://opengameart.org/content/calm-ambient-1-synthwave-4k
+  License: CC0 1.0 — https://creativecommons.org/publicdomain/zero/1.0/
+  Changes: transcoded from MP3 to AAC (.m4a).
+
+play.m4a — "Synthwave House Loop"
+  Author: Fupi
+  Source: https://opengameart.org/content/synthwave-house-loop
+  License: CC0 1.0 — https://creativecommons.org/publicdomain/zero/1.0/
+  Changes: transcoded from OGG to AAC (.m4a).
+
+Attribution is not required by CC0; it is given here as a courtesy.

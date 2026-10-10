@@ -1,11 +1,11 @@
-import {createContextRecovery} from './context-recovery.js?v=journey-25';
-import {createIdleWorldSnap} from './idle-world-snap.js?v=journey-25';
-import {resultSummary, resultTitle, formatRunTime} from './game-session-ui.js?v=journey-25';
-import {createGameAudio} from './game-audio.js?v=journey-25';
-import { createTitleDecode } from './title-decode.js?v=journey-25';
-import { initialQuality } from './journey-quality.js?v=journey-25';
-import { createScrollFx } from './scroll-fx.js?v=journey-25';
-import { createParticleMorph } from './particle-morph.js?v=journey-25';
+import {createContextRecovery} from './context-recovery.js?v=journey-26';
+import {createIdleWorldSnap} from './idle-world-snap.js?v=journey-26';
+import {resultSummary, resultTitle, formatRunTime} from './game-session-ui.js?v=journey-26';
+import {createGameAudio} from './game-audio.js?v=journey-26';
+import { createTitleDecode } from './title-decode.js?v=journey-26';
+import { initialQuality } from './journey-quality.js?v=journey-26';
+import { createScrollFx } from './scroll-fx.js?v=journey-26';
+import { createParticleMorph } from './particle-morph.js?v=journey-26';
 const audio=createGameAudio();
 const $=s=>document.querySelector(s);let world=null,ready=false,light=false,failed=false,queued=false,lastP=0,inGame=false,savedY=0,returnFocus=null,reduced=false,epilogueCovered=false;
 let recovering=false,hostGeneration=0,worldFactory=null;
@@ -156,7 +156,7 @@ async function boot(){
  try{
   document.body.style.overflowY='hidden';status('点亮引擎',25);
   // The module graph is preloaded by HTML. Reuse it instead of fetching every file twice.
-  worldFactory=(await import('./open-adventure.js?v=journey-25')).createWorld;
+  worldFactory=(await import('./open-adventure.js?v=journey-26')).createWorld;
   status('连接游戏世界',88);world=await createHost();update();
  }catch(e){clearTimeout(timeout);renderFailure(e);}
 }
@@ -168,18 +168,10 @@ window.addEventListener('keydown',event=>{if(recovering&&['Escape','PageDown','P
 document.addEventListener('click',event=>{if(recovering&&event.target?.closest?.('a[href^="#"]'))cancelRecoveryVisit();});
 boot();requestAnimationFrame(update);
 
-// Audio unlock rides on an ordinary trusted interaction; there is no start gate.
-let soundMuted=false;const soundLevels={master:.65,music:.35,effects:.8};
-try{const saved=JSON.parse(localStorage.getItem('heybox-audio')||'null');if(saved){soundMuted=!!saved.muted;for(const k of Object.keys(soundLevels))if(Number.isFinite(saved[k]))soundLevels[k]=Math.max(0,Math.min(1,saved[k]));}}catch{}
-audio.setVolumes(soundLevels);audio.setMuted(soundMuted);
-function audioUI(){const s=audio.getState();$('#audio-toggle').textContent=soundMuted?'声音已静音':s.available===false?'声音不可用':s.unlocked?'声音已启用':'声音待启用';$('#audio-toggle').setAttribute('aria-pressed',String(soundMuted));$('#audio-status').textContent=soundMuted?'音乐与音效已静音':s.available===false?'此浏览器未提供音频支持':s.needsGesture?'点击画面或按键以启用声音':s.unlocked?'随场景与操作实时变化':'点击画面或按键以启用声音';}
-function saveAudio(){try{localStorage.setItem('heybox-audio',JSON.stringify({...soundLevels,muted:soundMuted}));}catch{}audioUI();}
-async function unlockSound(){try{await audio.unlock();}catch{}audioUI();}
-document.addEventListener('pointerdown',unlockSound,{passive:true});document.addEventListener('keydown',e=>{if(!e.repeat)unlockSound();});
-let audioButtonWasUnlocked=false;$('#audio-toggle').addEventListener('pointerdown',()=>{audioButtonWasUnlocked=!!audio.getState().unlocked;});$('#audio-toggle').addEventListener('keydown',()=>{audioButtonWasUnlocked=!!audio.getState().unlocked;});$('#audio-toggle').onclick=()=>{soundMuted=audioButtonWasUnlocked?!soundMuted:false;audio.setMuted(soundMuted);unlockSound();saveAudio();};
-for(const kind of Object.keys(soundLevels)){const input=$('#volume-'+kind);input.value=Math.round(soundLevels[kind]*100);input.oninput=()=>{soundLevels[kind]=Number(input.value)/100;audio.setVolumes(soundLevels);saveAudio();};}
-$('#audio-settings').addEventListener('toggle',()=>{if($('#audio-settings').open&&currentMode==='game'&&!gamePaused)world?.action('pause','audio');});
-document.addEventListener('visibilitychange',()=>audio.setPaused(document.hidden||gamePaused||recovering||failed));window.addEventListener('pagehide',()=>audio.dispose(),{once:true});audioUI();
+// Sound is always on: the first trusted gesture anywhere unlocks it, and there is no mute control.
+async function unlockSound(){try{await audio.unlock();}catch{}}
+for(const type of ['pointerdown','pointerup','click','touchend'])document.addEventListener(type,unlockSound,{passive:true,capture:true});document.addEventListener('keydown',e=>{if(!e.repeat)unlockSound();},{capture:true});
+document.addEventListener('visibilitychange',()=>audio.setPaused(document.hidden||gamePaused||recovering||failed));window.addEventListener('pagehide',()=>audio.dispose(),{once:true});
 
 // Map controls remain separate from driving input.
 $('#drive-map-toggle').onclick=()=>{
@@ -225,7 +217,7 @@ function renderSession(s){
  const info=[];if(s.stageLabel)info.push(s.stageLabel);if(Number.isFinite(s.cargoIntegrity))info.push('货物完好 '+Math.round(s.cargoIntegrity)+'%');if(s.routeChoiceLabel||s.routeMode)info.push(s.routeChoiceLabel||(s.routeMode==='short'?'最短路线':'安全路线'));const elapsed=s.missionElapsed??s.deliveryTime;if(Number.isFinite(elapsed))info.push('任务 '+formatRunTime(elapsed));
  const strip=$('#session-detail');strip.hidden=s.world==='car'||s.mode!=='game'||!info.length||!!s.awaitingControl;strip.textContent=info.join(' · ');
 }
-function renderJournal(){document.querySelectorAll('[data-world-record]').forEach(el=>{const id=el.dataset.worldRecord,v=id==='car'?null:visitRecords[id];if(id==='car'){el.classList.remove('record-complete');el.textContent='五个区域 · 随时开玩';return;}el.classList.toggle('record-complete',!!v);el.textContent=v?'已完成 · 难度 '+v.difficulty+' / 最高得分 '+Math.round(v.score):'尚未完成 · 随时可以进入体验';});const n=['helmet','robot'].filter(id=>visitRecords[id]).length;$('#expedition-count').textContent=String(n).padStart(2,'0')+' / 02';}
+function renderJournal(){document.querySelectorAll('[data-world-record]').forEach(el=>{const id=el.dataset.worldRecord,v=id==='car'?null:visitRecords[id];if(id==='car'){el.classList.remove('record-complete');el.textContent='五个区域 · 随时开玩';return;}el.classList.toggle('record-complete',!!v);el.textContent=v?'已完成 · 难度 '+v.difficulty+' / 最高得分 '+Math.round(v.score):'尚未完成 · 随时可以进入体验';});const count=$('#expedition-count');if(count)count.textContent=String(['helmet','robot'].filter(id=>visitRecords[id]).length).padStart(2,'0')+' / 02';}
 renderJournal();
 
 function renderQuality(){titleDecode.settings(quality,reduced);document.body.dataset.quality=quality;}

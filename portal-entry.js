@@ -81,7 +81,7 @@ export function createPortalEntry({THREE:T,scene,camera,reduced=false,duration=1
     const wheels=[];for(const x of [-.46,.46])for(const z of [-.43,.43]){const pivot=new T.Group();pivot.position.set(x,.235,z);g.add(pivot);mesh(wheelGeo,rubber,pivot);mesh(hubGeo,hubMat,pivot);for(let i=0;i<12;i++){const a=i*Math.PI/6,t=mesh(wheelTreads,rubber,pivot,0,Math.cos(a)*.235,Math.sin(a)*.235);t.rotation.x=a;}wheels.push(pivot);}
     return {g,wheels};
   }
-  const lead=jeep(plaza),leadCar=lead.g,wheels=lead.wheels;
+  const lead=jeep(plaza),leadCar=lead.g,wheels=lead.wheels;leadCar.visible=false;
   const shadow=mesh(own(new T.CircleGeometry(.8,24)),mat(0x854a2b,.19,{depthWrite:false}),leadCar,0,.008,0);shadow.rotation.x=-Math.PI/2;shadow.scale.set(.75,1.05,1);
   // Accents follow source matrices, but never change source transforms/materials.
   const anchored=new T.Group();anchored.matrixAutoUpdate=false;accents.add(anchored);
@@ -143,7 +143,7 @@ export function createPortalEntry({THREE:T,scene,camera,reduced=false,duration=1
     if(i%3)toyCone(toy,0,0,0,.55);else brick(toy,0,0,0,.55);
   }
   const miniature=part('car','starting-red-rc-jeep',0,-.51,.62,.35,1,(g,k)=>{g.position.z=.62-k*2.25;g.scale.setScalar(range(0,.2,k));});
-  const previewJeep=jeep(miniature,.48),previewWheels=previewJeep.wheels;
+  const previewJeep=jeep(miniature,.48),previewWheels=previewJeep.wheels;miniature.visible=false;
   // A fixed GPU point pool bridges the digital homepage into physical stagelets.
   // No sprites, DOM layers, timers, source mutations or picking surfaces are added.
   const particleCount=224,particlePositions=new Float32Array(particleCount*3),particleColors=new Float32Array(particleCount*3),particleSeeds=[];

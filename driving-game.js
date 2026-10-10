@@ -1,7 +1,7 @@
-import { createMiniatureLandscape } from './miniature-landscape.js?v=journey-25';
-import { createMiniatureCar } from './miniature-car.js?v=journey-25';
-import { createPlaygroundProps } from './miniature-playground-props.js?v=journey-25';
-import { CAR, clamp, wrap, damp, footprintContact, buildSolidIndex, createDynamics, integrateCar, integrateVertical } from './miniature-driving-physics.js?v=journey-25';
+import { createMiniatureLandscape } from './miniature-landscape.js?v=journey-26';
+import { createMiniatureCar } from './miniature-car.js?v=journey-26';
+import { createPlaygroundProps } from './miniature-playground-props.js?v=journey-26';
+import { CAR, clamp, wrap, damp, footprintContact, buildSolidIndex, createDynamics, integrateCar, integrateVertical } from './miniature-driving-physics.js?v=journey-26';
 
 /* TOYBOX. An original orange toy landscape for responsive, unrestricted driving.
  * All world/car/effect resources belong to this provider. The showcase model is never modified.

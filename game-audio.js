@@ -19,11 +19,8 @@ const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 const number = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
 const midi = (note) => 440 * 2 ** ((note - 69) / 12);
 const SCENES = {
-  showcase: {bpm: 64, root: 38, chords: [[0, 7, 14, 17], [-2, 5, 12, 16], [-5, 2, 9, 14], [-7, 0, 7, 12]], cutoff: 1250, pad: .055, wet: .75},
-  helmet:   {bpm: 102, root: 45, chords: [[0, 7, 12, 14], [-3, 4, 9, 16], [-5, 2, 7, 14], [-2, 5, 10, 17]], cutoff: 1800, pad: .042, wet: .56},
-  robot:    {bpm: 94, root: 28, chords: [[0, 7, 12, 15], [0, 7, 10, 14], [-3, 4, 9, 12], [-2, 5, 10, 13]], cutoff: 740, pad: .038, wet: .28},
-  car:      {bpm: 120, root: 38, chords: [[0, 7, 12, 15], [-5, 2, 7, 10], [-2, 5, 10, 14], [-7, 0, 5, 12]], cutoff: 2100, pad: .033, wet: .32},
-  travel:   {bpm: 78, root: 38, chords: [[0, 7, 14, 19], [2, 9, 16, 21], [5, 12, 19, 24], [7, 14, 21, 26]], cutoff: 2400, pad: .052, wet: .85},
+  showcase: {track: 'journey'}, travel: {track: 'journey'},
+  helmet: {track: 'play'}, robot: {track: 'play'}, car: {track: 'play'},
 };
 const ALIASES = {
   gun: 'shot', gunshot: 'shot', shoot: 'shot', fire: 'shot', pistol: 'shot', rifle: 'shot',
@@ -52,7 +49,7 @@ export function createGameAudio(options = {}) {
     return Constructor ? new Constructor({latencyHint: 'interactive'}) : null;
   });
   const available = !!options.contextFactory || !!(globalThis.AudioContext || globalThis.webkitAudioContext);
-  const volumes = {master: .82, music: .48, effects: .78};
+  const volumes = {master: .85, music: .7, effects: .72};
   for (const key of Object.keys(volumes)) if (options.volumes?.[key] != null) volumes[key] = clamp(number(options.volumes[key], volumes[key]));
   let ctx = null, graph = null, noise = null, impulse = null;
   let engineBuffer = null, engineLoad = null, engineAssetStatus = 'idle', engineAssetError = null;
@@ -63,7 +60,12 @@ export function createGameAudio(options = {}) {
   let scene = 'showcase', unlocked = false, disposed = false, paused = false, muted = !!options.muted;
   let hidden = !!doc?.hidden, lastError = null, resumePromise = null, suspendPromise = null;
   let timer = null, suspendTimer = null, lifecycle = 0, running = false;
-  let pad = null, ambience = null, score = {step: 0, next: 0, chord: -1};
+  let pad = null, ambience = null;
+  // CC0 recordings: calm synthwave for the journey, a driving synthwave loop inside worlds.
+  const TRACKS = {
+    journey: {url: new URL('./audio/journey.m4a', import.meta.url).href, gain: .78},
+    play: {url: new URL('./audio/play.m4a', import.meta.url).href, gain: .5},
+  };
   let dynamics = {speed: 0, rpm: 900, throttle: 0, skid: 0, boost: 0, intensity: 0};
   let lastGear = null, footstepClock = 0, lastUpdate = null;
   const groups = new Set(), cooldowns = new Map();
@@ -148,6 +150,7 @@ export function createGameAudio(options = {}) {
   function retire(group, fade = .05) {
     if (!group || group.cleaned || group.retiring) return;
     group.retiring = true;
+    if (group.source && TRACKS[group.track]) TRACKS[group.track].offset = group.startOffset + (now() - group.startedAt);
     ramp(group.gain.gain, 0, fade);
     group.end = now() + fade + .015;
     for (const source of group.sources) safeStop(source, group.end);
@@ -235,23 +238,47 @@ export function createGameAudio(options = {}) {
     addSource(group, source);
     return {source, gain, filter: low};
   }
-  function startPad() {
-    if (!SCENES[scene]) return;
-    const config = SCENES[scene];
-    pad = makeGroup('loop', now(), Infinity, {gain: 0, music: true, wet: config.wet});
-    pad.parts = [];
-    for (let i = 0; i < 4; i++) {
-      const a = continuous(pad, 'triangle', midi(config.root + config.chords[0][i] + 12), config.pad, config.cutoff);
-      const b = continuous(pad, 'sine', midi(config.root + config.chords[0][i] + 12), config.pad * .55, config.cutoff);
-      a.source.detune.value = i % 2 ? -5.5 : 4.5; b.source.detune.value = i % 2 ? 3 : -3;
-      pad.parts.push(a, b);
+  function trackData(name) {
+    const track = TRACKS[name];
+    if (!track.data && fetchAsset && !disposed) {
+      track.data = fetchAsset(track.url, {signal: assetAbort?.signal, credentials: 'same-origin'}).then((response) => {
+        if (!response.ok) throw new Error(`Music HTTP ${response.status}`);
+        return response.arrayBuffer();
+      });
+      track.data.catch(() => {});
     }
-    const drift = ctx.createOscillator(), driftGain = makeGain(8);
-    drift.frequency.value = scene === 'robot' ? .09 : .065;
-    drift.connect(driftGain);
-    for (const part of pad.parts) driftGain.connect(part.source.detune);
-    pad.nodes.push(driftGain); addSource(pad, drift);
-    ramp(pad.gain.gain, 1, .8);
+    return track.data;
+  }
+  function loadTrack(name) {
+    const track = TRACKS[name];
+    if (!track || track.buffer || track.load || disposed || !ctx) return track?.load;
+    track.load = Promise.resolve(trackData(name)).then(async (data) => {
+      if (!data || disposed) return;
+      const buffer = await ctx.decodeAudioData(data.slice(0));
+      if (disposed || !buffer?.duration) return;
+      track.buffer = buffer;
+      attachTrack(pad);
+    }).catch((error) => {if (!disposed) track.error = String(error?.message || error);});
+    return track.load;
+  }
+  function attachTrack(group) {
+    const track = TRACKS[group?.track];
+    if (!track?.buffer || group !== pad || group.retiring || group.cleaned || group.source || !audible()) return;
+    const source = ctx.createBufferSource();
+    source.buffer = track.buffer; source.loop = true; source.connect(group.gain);
+    group.source = source; group.startedAt = now(); group.startOffset = (track.offset || 0) % track.buffer.duration;
+    group.sources.push(source); group.nodes.push(source);
+    source.start(now(), group.startOffset);
+    ramp(group.gain.gain, track.gain, 1.4);
+  }
+  function startPad() {
+    const name = SCENES[scene]?.track;
+    if (!name) return;
+    pad = makeGroup('loop', now(), Infinity, {gain: 0, music: true, wet: .08});
+    pad.track = name;
+    attachTrack(pad);
+    if (!TRACKS[name].buffer) void loadTrack(name);
+    for (const other of Object.keys(TRACKS)) if (other !== name) void trackData(other);
   }
   function updateRecordedEngine(group, d) {
     if (!group?.recordedEngine) return;
@@ -313,7 +340,7 @@ export function createGameAudio(options = {}) {
       ambience.skid.filter.type = 'bandpass'; ambience.skid.filter.Q.value = 2.5;
       ambience.tire = continuous(ambience, 'triangle', 590, 0, 2400);
     } else if (scene === 'helmet') {
-      ambience.engine = continuous(ambience, 'sawtooth', 47, .075, 350);
+      ambience.engine = continuous(ambience, 'sawtooth', 47, .04, 300);
       ambience.exhaust = continuous(ambience, 'sine', 91, .055, 440);
       ambience.wind = continuous(ambience, 'noise', 0, .045, 620);
       ambience.turbine = continuous(ambience, 'sine', 430, .012, 1800);
@@ -321,62 +348,14 @@ export function createGameAudio(options = {}) {
       ambience.wind = continuous(ambience, 'noise', 0, .023, 390);
       ambience.hum = continuous(ambience, 'sine', 54, .021, 300);
     } else {
-      ambience.wind = continuous(ambience, 'noise', 0, .1, 1100);
-      ambience.engine = continuous(ambience, 'triangle', 37, .08, 550);
+      ambience.wind = continuous(ambience, 'noise', 0, .045, 1100);
+      ambience.engine = continuous(ambience, 'triangle', 37, .035, 550);
     }
     ramp(ambience.gain.gain, 1, .35);
-  }
-  function playMusicStep(step, at) {
-    const config = SCENES[scene];
-    if (!config) return;
-    const chordIndex = Math.floor(step / 32) % config.chords.length, chord = config.chords[chordIndex];
-    if (chordIndex !== score.chord) {
-      score.chord = chordIndex;
-      pad?.parts?.forEach((part, index) => {
-        tune(part.source.frequency, midi(config.root + chord[Math.floor(index / 2)] + 12), .9);
-      });
-    }
-    const bar = step % 16, isQuiet = scene === 'showcase' || scene === 'travel';
-    const arpEvery = isQuiet ? 8 : scene === 'robot' ? 4 : 2;
-    if (step % arpEvery === 0) {
-      const index = [0, 2, 1, 3, 2, 1, 3, 1][Math.floor(step / arpEvery) % 8];
-      const frequency = midi(config.root + chord[index] + (isQuiet ? 36 : 24));
-      const voice = makeGroup('music', at, 1.9, {gain: isQuiet ? .54 : .43, pan: Math.sin(step * .7) * .5, wet: .9});
-      tone(voice, at, 1.5, frequency, {type: 'sine', gain: .072, attack: .016});
-      tone(voice, at, .6, frequency * 2.003, {type: 'triangle', gain: .013, attack: .01, filter: 3200});
-      tone(voice, at + .24, 1.35, frequency, {gain: .017, attack: .018});
-    }
-    if (isQuiet) return;
-    if (bar === 0 || bar === 8 || (scene === 'car' && (bar === 4 || bar === 12))) {
-      const voice = makeGroup('music', at, .5, {gain: .48, wet: .08});
-      tone(voice, at, .26, 105, {to: 38, gain: .28});
-      burst(voice, at, .025, {frequency: 1300, gain: .035});
-    }
-    if (bar === 4 || bar === 12) {
-      const voice = makeGroup('music', at, .25, {gain: scene === 'car' ? .36 : .23, wet: .2});
-      burst(voice, at, .16, {frequency: 2000, type: 'highpass', gain: .17});
-      tone(voice, at, .09, 180, {to: 100, type: 'triangle', gain: .1});
-    }
-    if (step % 2 === 0 && scene !== 'robot') {
-      const voice = makeGroup('music', at, .15, {gain: .23, pan: bar % 4 ? -.22 : .22, wet: .16});
-      burst(voice, at, bar % 4 === 2 ? .09 : .045, {frequency: 5800, type: 'highpass', gain: .12});
-    }
-    if (step % (scene === 'robot' ? 4 : 2) === 0) {
-      const voice = makeGroup('music', at, .3, {gain: .42, wet: .08});
-      tone(voice, at, .24, midi(config.root + (bar >= 12 ? chord[1] - 12 : 0)), {type: 'triangle', gain: .13, filter: 340});
-    }
   }
   function schedule() {
     if (!running || !audible()) return;
     prune();
-    if (!SCENES[scene]) return;
-    const t = now(), stepLength = 60 / SCENES[scene].bpm / 4;
-    // Never catch up missed minutes after backgrounding or a main-thread stall.
-    if (score.next < t - .2) score.next = t + .02;
-    let budget = 8;
-    while (score.next < t + .15 && budget-- > 0) {
-      playMusicStep(score.step++, score.next); score.next += stepLength;
-    }
   }
   function stopScheduler() {if (timer !== null) {clearInterval(timer); timer = null;}}
   function clearSuspendTimer() {if (suspendTimer !== null) {clearTimeout(suspendTimer); suspendTimer = null;}}
@@ -388,7 +367,6 @@ export function createGameAudio(options = {}) {
     disconnect(graph.room); disconnect(graph.musicSend); disconnect(graph.effectsSend);
     graph.room = ctx.createConvolver(); graph.room.buffer = impulse;
     graph.musicSend.connect(graph.room); graph.effectsSend.connect(graph.room); graph.room.connect(graph.wet);
-    score = {step: 0, next: now() + .045, chord: -1};
     startPad(); startAmbience(); running = true;
     ramp(graph.master.gain, volumes.master, .12);
     schedule(); timer = setInterval(schedule, 80);
@@ -590,7 +568,7 @@ export function createGameAudio(options = {}) {
     if (running && audible()) {
       for (const group of groups) if (group.kind === 'loop' || group.kind === 'music') retire(group, .14);
       pad = null; ambience = null;
-      score = {step: 0, next: now() + .04, chord: -1}; startPad(); startAmbience();
+      startPad(); startAmbience();
     } else if (unlocked) void resumePreviouslyUnlocked();
   }
   function update(state = {}, dt) {
@@ -628,7 +606,7 @@ export function createGameAudio(options = {}) {
       const thrust = clamp(d.throttle + d.speed / 700 + d.boost * .3);
       tune(a.engine.source.frequency, 39 + thrust * 58 + d.boost * 17);
       tune(a.engine.filter.frequency, 260 + thrust * 540);
-      tune(a.engine.gain.gain, .045 + thrust * .08);
+      tune(a.engine.gain.gain, .025 + thrust * .045);
       tune(a.exhaust.source.frequency, 78 + thrust * 112);
       tune(a.wind.gain.gain, .025 + thrust * .11);
       tune(a.wind.filter.frequency, 470 + thrust * 1250);
@@ -675,7 +653,7 @@ export function createGameAudio(options = {}) {
     else if (audible() && running) status = 'running';
     else if (unlocked) status = 'suspended';
     return {available, unlocked: unlocked && !disposed, status, scene, paused, muted, hidden,
-      engineAssetStatus, engineAssetError, volumes: {...volumes}, contextState: ctx?.state || 'not-created', error: lastError,
+      music: pad?.source ? pad.track : null, engineAssetStatus, engineAssetError, volumes: {...volumes}, contextState: ctx?.state || 'not-created', error: lastError,
       needsGesture: !disposed && available && enabled() && (!unlocked || ctx?.state !== 'running'),
       activeVoices: [...groups].filter((group) => !group.cleaned && !group.retiring).length,
       running: running && audible()};
@@ -705,6 +683,7 @@ export function createGameAudio(options = {}) {
     if (disposed) return disposal || Promise.resolve();
     disposed = true; unlocked = false; running = false; ++lifecycle;
     assetAbort?.abort(); engineBuffer = null; engineLoad = null;
+    for (const track of Object.values(TRACKS)) {track.buffer = null; track.load = null; track.data = null;}
     stopScheduler(); clearSuspendTimer();
     doc?.removeEventListener?.('visibilitychange', visibilityChanged);
     win?.removeEventListener?.('pagehide', pageHidden); win?.removeEventListener?.('pageshow', pageShown);

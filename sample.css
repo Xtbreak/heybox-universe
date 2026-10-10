@@ -15,7 +15,7 @@
 .pause-card{max-height:88svh;overflow-y:auto}.game-paused #context-prompt{visibility:hidden}#pause-controls{max-height:30svh;overflow:auto}.play-menu button:disabled{opacity:.35;cursor:default}#weapon-rack button.active[title]{border-bottom-width:2px}
 /* Integrated sound desk and the branded preload emblem. */
 .boot-emblem{width:112px;height:112px;position:relative;z-index:2;filter:drop-shadow(0 0 23px #b8dfee35);animation:brand-float 4s ease-in-out infinite}.boot-emblem img{width:100%;height:100%}@keyframes brand-float{50%{transform:translateY(-8px) rotateY(16deg)}}
-#audio-tools{position:fixed;bottom:25px;left:5vw;z-index:40;display:flex;gap:6px;align-items:center;font-size:10px;letter-spacing:1px}#audio-tools button,#audio-tools summary{border:1px solid #a6c8dd40;border-radius:4px;background:#08131de8;color:#b5cfdf;padding:9px 11px;cursor:pointer;list-style:none}#audio-tools summary::-webkit-details-marker{display:none}.audio-panel{position:absolute;bottom:42px;left:0;width:235px;border:1px solid #b6d7e633;background:#08121ef5;padding:20px;border-radius:7px;box-shadow:0 15px 40px #0007;backdrop-filter:blur(15px)}.audio-panel p{margin:0 0 19px;color:#e5f5ff;font-size:13px}.audio-panel label{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:15px 0;font-size:11px}.audio-panel input{width:125px;accent-color:#bbdfef}.audio-panel small{color:#7795a8;font-size:9px;line-height:1.8;display:block}.exploring #audio-tools{bottom:20px;left:20px}.exploring .play-bottom{padding-left:190px;padding-right:170px}.exploring #audio-tools button{font-size:9px}.play-stats{max-width:55%}#ability-status{max-width:32%;line-height:1.7}#play-mission{max-width:43%;font-size:11px}#combat-overlay{z-index:-1}.audio-panel input:focus-visible{outline:2px solid #c7ecff}#audio-tools summary:focus-visible{outline:2px solid #c7ecff}@media(max-width:760px){#audio-tools{left:5vw;bottom:49px;font-size:8px}.exploring #audio-tools{bottom:8px;left:5vw}.exploring .play-bottom{padding-left:5vw;padding-right:5vw}#audio-tools button,#audio-tools summary{font-size:8px;padding:7px 8px}.audio-panel{width:210px}.audio-panel input{width:115px}.play-stats{max-width:62%}#play-mission{max-width:55%;font-size:9px}}
+.play-stats{max-width:55%}#ability-status{max-width:32%;line-height:1.7}#play-mission{max-width:43%;font-size:11px}#combat-overlay{z-index:-1}@media(max-width:760px){.exploring .play-bottom{padding-left:5vw;padding-right:5vw}.play-stats{max-width:62%}#play-mission{max-width:55%;font-size:9px}}
 #drive-map{pointer-events:auto;cursor:crosshair}#drive-mission{position:absolute;right:5vw;bottom:280px;font-size:9px;padding:8px 12px;pointer-events:auto}@media(pointer:coarse){#drive-mission{top:310px;bottom:auto;font-size:8px}}@media(max-width:760px){#drive-mission{right:5vw}}body.game-paused #drive-map,body.game-paused #drive-mission{pointer-events:none;opacity:.3}
 #squad-status{position:absolute;top:210px;left:5vw;max-width:42%;padding:10px 13px;border-left:2px solid #80bccb70;background:linear-gradient(90deg,#051119b0,transparent);font-size:10px;line-height:1.9;color:#b1cbd6;white-space:pre-line;text-shadow:0 1px 4px #000;pointer-events:none}#next-difficulty{background:#bddde9;color:#07111b;border-color:#def6ff}.game-paused #squad-status{visibility:hidden}@media(max-width:760px){#squad-status{top:210px;left:5vw;max-width:62%;font-size:8px;padding:7px 9px}}@media(pointer:coarse){#squad-status{max-height:105px;overflow:hidden}}
 
@@ -175,7 +175,7 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
  .header-right{gap:6px}.header-right button{padding:10px;min-height:44px}
 }
 
-/* journey-25 · velocity-driven page layer, chapter dossiers and the epilogue. */
+/* journey-26 · velocity-driven page layer, chapter dossiers and the epilogue. */
 .giant-type{transform:translate3d(calc((var(--local,.5) - .5) * -26vw),0,0) skewX(calc(var(--vel,0) * -16deg));will-change:transform}
 .frame h1,.frame h2{transform:skewY(calc(var(--vel,0) * -2.2deg));transition:transform .25s}
 .body-copy .line,[data-lines] .line{display:block;overflow:hidden;padding-bottom:.08em}
@@ -246,17 +246,14 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
 .epi-block{margin:0 7vw 14vh;max-width:900px}
 .epi-block h2{font-size:clamp(46px,6vw,98px)}
 .epi-block .body-copy{max-width:520px}
-.feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin:0 7vw 18vh;background:#b6e7fa1a;border:1px solid #b6e7fa1a}
-.feature-grid article{position:relative;background:#05090dee;padding:34px 26px 30px;min-height:260px;display:flex;flex-direction:column;opacity:0;transform:translateY(40px);transition:opacity .8s,transform 1s cubic-bezier(.16,1,.3,1),background .4s;pointer-events:auto}
-.feature-grid article:nth-child(2){transition-delay:.1s}.feature-grid article:nth-child(3){transition-delay:.2s}.feature-grid article:nth-child(4){transition-delay:.3s}
-.feature-grid.in-view article{opacity:1;transform:none}
-.feature-grid article:hover{background:#0b1720}
-.feature-grid article:after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,#7dd3f5,#e8b6ff);transform:scaleX(0);transform-origin:left;transition:transform .5s}
-.feature-grid article:hover:after{transform:scaleX(1)}
-.feature-grid i{font:normal 10px monospace;color:#77a6bf;letter-spacing:2px}
-.feature-grid h3{font-size:34px;font-weight:800;letter-spacing:-1px;margin:28px 0 14px}
-.feature-grid p{font-size:12px;line-height:1.85;color:#93a9b5;margin:0 0 auto}
-.feature-grid small{margin-top:26px;font-size:8px;letter-spacing:3px;color:#56707f}
+.friend-feed{display:flex;flex-direction:column;gap:14px;max-width:560px;margin:0 auto 18vh;padding:0 7vw;box-sizing:content-box}
+.friend-feed article{display:flex;gap:16px;align-items:flex-start;opacity:0;transform:translateY(34px);transition:opacity .8s,transform 1s cubic-bezier(.16,1,.3,1)}
+.friend-feed article:nth-child(2){margin-left:12%;transition-delay:.15s}.friend-feed article:nth-child(3){margin-left:4%;transition-delay:.3s}
+.friend-feed.in-view article{opacity:1;transform:none}
+.friend-feed i{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:17px;color:#fff;background:hsl(var(--hue) 62% 46%);box-shadow:0 0 0 3px #05090d,0 0 0 4px hsl(var(--hue) 70% 60% / .5),0 0 26px hsl(var(--hue) 80% 55% / .45)}
+.friend-feed div{background:#0b1720e8;border:1px solid #b6e7fa22;border-radius:4px 18px 18px 18px;padding:12px 18px}
+.friend-feed b{display:block;font-size:11px;color:#8fb3c6;letter-spacing:1px;margin-bottom:5px}
+.friend-feed p{margin:0;font-size:15px;color:#e6f4fa;line-height:1.6}
 .morph-stage{position:relative;display:grid;grid-template-columns:1.25fr 1fr;align-items:center;gap:4vw;margin:0 7vw 16vh;min-height:520px;pointer-events:auto}
 #morph-canvas{width:100%;height:min(62vh,560px);display:block;border:1px solid #b6e7fa14;background:radial-gradient(ellipse at center,#0b1620,#04070b 70%)}
 .morph-links{display:flex;flex-direction:column}
@@ -275,7 +272,7 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
  .arsenal{gap:5px}.arsenal div{padding:9px 8px}.arsenal b{font-size:11px}.arsenal small{display:none}.brief-stats b{font-size:15px}
  .park-map{max-width:330px}.recap-row b{font-size:11px}
  #speed-pill{top:74px;height:24px;width:calc(120px + var(--speed,0) * 80px)}
- .feature-grid{grid-template-columns:1fr 1fr}.feature-grid article{min-height:200px;padding:24px 18px}.feature-grid h3{font-size:24px;margin:18px 0 10px}
+ .friend-feed p{font-size:13px}
  .morph-stage{grid-template-columns:1fr}#morph-canvas{height:42vh}.morph-link b{font-size:16px}
  .epi-footer div{flex-direction:column}
 }
