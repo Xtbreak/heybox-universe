@@ -1,4 +1,4 @@
-/** Model-specific, owned scene-space entry sets. Caller owns the cancellable 2s dwell. */
+/** Model-specific, owned scene-space entry sets. Caller owns the cancellable 1s dwell. */
 export function createPortalEntry({THREE:T,scene,camera,reduced=false,duration=1.85,onTravel}={}) {
   if(!T||!scene||!camera)throw new Error('Portal entry requires THREE, scene and camera.');
   const owned=new Set(),own=x=>(owned.add(x),x),V=(x=0,y=0,z=0)=>new T.Vector3(x,y,z);
@@ -108,7 +108,7 @@ export function createPortalEntry({THREE:T,scene,camera,reduced=false,duration=1
   const warmLights=mat(0xffe3a8,.65,{depthWrite:false,blending:T.AdditiveBlending,toneMapped:false});
   const carDust=new T.Group();carDust.name='warm-car-road-dust';accents.add(carDust);
   const dustMat=mat(0xfccf92,.12,{depthWrite:false}),dust=[];for(let i=0;i<8;i++){const m=mesh(hillGeo,dustMat,carDust);dust.push(m);}
-  // Bounded, owned 3D stagelets: visible throughout the two-second dwell.
+  // Bounded, owned 3D stagelets: visible throughout the one-second dwell.
   // They share the arrival frame, but never borrow or mutate game model assets.
   const anticipation=new T.Group();anticipation.name='owned-contextual-anticipation';anticipation.visible=false;scene.add(anticipation);
   const previewGroups={},previewParts=[];

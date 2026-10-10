@@ -1,6 +1,6 @@
 // Intent belongs to a model visit, not to one animation frame. A short camera /
 // stability settle may defer a visit; active scrolling must disable it entirely.
-export function createModelHoverEntry({duration=2000,stableDuration=250,intentDuration=1200}={}) {
+export function createModelHoverEntry({duration=1000,stableDuration=250,intentDuration=1200}={}) {
  let target=null,started=0,cooldownUntil=0,progress=0,stableSince=null,armed=false,explicit=false,intentUntil=-Infinity;
  const clear=()=>{target=null;started=0;progress=0;armed=false;explicit=false;intentUntil=-Infinity;};
  const empty=eligible=>({target:null,progress:0,enter:null,eligible});

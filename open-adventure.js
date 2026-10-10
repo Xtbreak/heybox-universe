@@ -1,20 +1,20 @@
 import { EffectComposer } from './vendor/EffectComposer.js';
 import { RenderPass } from './vendor/RenderPass.js';
 import { UnrealBloomPass } from './vendor/UnrealBloomPass.js';
-import { createCinematicPass } from './cinematic-pass.js?v=journey-23';
-import { normalizeQuality, createQualityMonitor } from './journey-quality.js?v=journey-23';
+import { createCinematicPass } from './cinematic-pass.js?v=journey-24';
+import { normalizeQuality, createQualityMonitor } from './journey-quality.js?v=journey-24';
 import { OutputPass } from './vendor/OutputPass.js';
-import { createSpatialRefraction } from './spatial-refraction.js?v=journey-23';
+import { createSpatialRefraction } from './spatial-refraction.js?v=journey-24';
 import {createMiniatureCar} from './miniature-car.js?v=journey-19';
 import {createTexturePrewarm} from './texture-prewarm.js?v=journey-19';
-import {createDestinationArrival} from './destination-arrival.js?v=journey-23';
-import {createPortalEntry} from './portal-entry.js?v=journey-23';
-import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-19';
+import {createDestinationArrival} from './destination-arrival.js?v=journey-24';
+import {createPortalEntry} from './portal-entry.js?v=journey-24';
+import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-24';
 import * as THREE from './vendor/three.module.js';
 import { MeshoptDecoder } from './vendor/meshopt_decoder.module.js';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { RoomEnvironment } from './vendor/RoomEnvironment.js';
-import { createCosmicJourney } from './cosmic-journey.js?v=journey-23';
+import { createCosmicJourney } from './cosmic-journey.js?v=journey-24';
 import { createGame as createFlight } from './flight-game.js?v=journey-19';
 import { createGame as createSandbox } from './sandbox-game.js?v=journey-19';
 import { createGame as createDriving } from './driving-game.js?v=journey-19';
@@ -25,7 +25,7 @@ export async function createWorld(canvas, { onReady, onError, onState, onQuality
   const names=['helmet','robot','car'];
   const providers={helmet:createFlight,robot:createSandbox,car:createDriving};
   const files={helmet:'flight-ship-v8.glb',robot:'RobotExpressive.glb'};
-  const instructions={helmet:'悬停星舰 2 秒，进入深空救援',robot:'悬停作战装置 2 秒，突入空间设施',car:'悬停遥控车 2 秒，驶入玩具公园'};
+  const instructions={helmet:'悬停星舰 1 秒，进入深空救援',robot:'悬停作战装置 1 秒，突入空间设施',car:'悬停遥控车 1 秒，驶入玩具公园'};
   const gameInstructions={helmet:'鼠标引导航向 / 自动巡航 · W 提速 / S 刹停 · A D 侧移 · 左键开火 · Space 上升 / Ctrl 下降 · 1–3 武器 · Shift 加速 · R 目标信息 · F 诱饵',robot:'WASD 移动 · 鼠标瞄准 · 左键开火 / 右键或 Z 举枪瞄准 · R 换弹 · E 互动 · Q 投掷 · Space 跳跃 · 1/2 武器',car:'WASD / 方向键自由驾驶 · Space 手刹 · R 脱困 · C 镜头 · H 鸣笛'};
   const clamp=THREE.MathUtils.clamp;
   let renderer;
@@ -130,7 +130,7 @@ export async function createWorld(canvas, { onReady, onError, onState, onQuality
     return activateControl();
   }
   function resumeGame(event){if(disposed||mode!=='game'||document.hidden)return;clearInput();gamePaused=false;awaitingControl=true;lifecycle='await-control';texturePrewarm.sync();pauseReason=null;last=performance.now();audio?.setPaused(true);takeControl(event);emit();}
-  function emit(statusText){if(disposed)return;const entry=entries[world],state=game?.getState?.()||{};const loaded=names.filter(id=>entries[id].state==='loaded').length;onState?.({...state,...lifecycleState(),mode,world,paused:gamePaused,pauseReason,controlMode,pointerLocked:pointerLocked(),pointerLockAvailable:!pointerLockFailed&&!!canvas.requestPointerLock,instruction:destinationArrival.active?'正在抵达 · 场景稳定后接管':awaitingControl?(world==='robot'?'点击画面接管 · 首次点击不会开火':world==='car'?'移动鼠标、按方向键或轻触画面开始漫游':'移动鼠标、按方向键或轻触画面接管 · 接管前计时暂停'):state.instruction||(mode==='game'?gameInstructions[world]:mode==='travel'?'正在穿越 · 随时可以返回':instructions[world]),modelStatus:entry.state,loadedModels:loaded,totalModels:3,assetProgress:loaded/3,statusText:statusText??state.statusText??state.status??(entry.state==='error'?'模型加载未完成 · 点击重试':entry.state!=='loaded'?'正在载入真实 3D 模型':mode==='travel'?'正在进入世界':'悬停模型 2 秒进入 · 移开取消')});}
+  function emit(statusText){if(disposed)return;const entry=entries[world],state=game?.getState?.()||{};const loaded=names.filter(id=>entries[id].state==='loaded').length;onState?.({...state,...lifecycleState(),mode,world,paused:gamePaused,pauseReason,controlMode,pointerLocked:pointerLocked(),pointerLockAvailable:!pointerLockFailed&&!!canvas.requestPointerLock,instruction:destinationArrival.active?'正在抵达 · 场景稳定后接管':awaitingControl?(world==='robot'?'点击画面接管 · 首次点击不会开火':world==='car'?'移动鼠标、按方向键或轻触画面开始漫游':'移动鼠标、按方向键或轻触画面接管 · 接管前计时暂停'):state.instruction||(mode==='game'?gameInstructions[world]:mode==='travel'?'正在穿越 · 随时可以返回':instructions[world]),modelStatus:entry.state,loadedModels:loaded,totalModels:3,assetProgress:loaded/3,statusText:statusText??state.statusText??state.status??(entry.state==='error'?'模型加载未完成 · 点击重试':entry.state!=='loaded'?'正在载入真实 3D 模型':mode==='travel'?'正在进入世界':'悬停模型 1 秒进入 · 移开取消')});}
   function disposeModel(object){const geometries=new Set(),materials=new Set(),textures=new Set(),skeletons=new Set();object.traverse(node=>{if(node.geometry)geometries.add(node.geometry);if(node.skeleton)skeletons.add(node.skeleton);for(const material of Array.isArray(node.material)?node.material:node.material?[node.material]:[]){materials.add(material);for(const value of Object.values(material))if(value?.isTexture)textures.add(value);}});skeletons.forEach(s=>s.dispose());geometries.forEach(g=>g.dispose());textures.forEach(t=>{t.dispose();t.source?.data?.close?.();});materials.forEach(m=>m.dispose());}
   function playAnimation(name,once=false){const entry=entries.robot,clip=entry.clips.find(c=>c.name===name);if(!entry.mixer||!clip)return;const action=entry.mixer.clipAction(clip);if(entry.animation===action&&action.isRunning())return;entry.animation?.fadeOut(.18);action.reset().setLoop(once?THREE.LoopOnce:THREE.LoopRepeat,once?1:Infinity);action.clampWhenFinished=once;action.fadeIn(.18).play();entry.animation=action;}
   const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);

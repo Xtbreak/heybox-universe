@@ -1,7 +1,7 @@
-import { createSpaceBackdrop } from './space-backdrop.js?v=journey-23';
-import { createJourneyUltra } from './journey-ultra.js?v=journey-23';
-import { createHeyboxCore } from './refined-heybox-core.js?v=journey-23';
-import { createJourneyParticles } from './journey-particles.js?v=journey-23';
+import { createSpaceBackdrop } from './space-backdrop.js?v=journey-24';
+import { createJourneyUltra } from './journey-ultra.js?v=journey-24';
+import { createHeyboxCore } from './refined-heybox-core.js?v=journey-24';
+import { createJourneyParticles } from './journey-particles.js?v=journey-24';
 
 const coarsePointer=globalThis.matchMedia?.('(pointer: coarse)');
 // A continuous, scene-space expedition. Imported GLB transforms are never modified.
@@ -71,7 +71,7 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     ring(r,.085,silver,back);ring(r+.15,.013,ice,back);
     const inner=ring(r-.13,.022,ice,back);portalSpinners.push(inner);
     for(let i=0;i<16;i++){const a=i/16*Math.PI*2;const b=box(i%4===0?.13:.05,.26,.18,i%4===0?ice:dark,back,[Math.sin(a)*(r+.05),Math.cos(a)*(r+.05),.03]);b.rotation.z=-a;}
-    glow(back,r*3,[0,0,-.2],.21);label(g,'悬停 2 秒  ↗',[0,-2.35,.5],2.5);
+    glow(back,r*3,[0,0,-.2],.21);label(g,'悬停 1 秒  ↗',[0,-2.35,.5],2.5);
     const floor=mesh(new THREE.CylinderGeometry(2.35,2.5,.18,64),black,g,[0,-1.8,-.1]);const floorR=ring(2.37,.018,ice,g,[0,-1.69,-.1]);floorR.rotation.x=Math.PI/2;
     return g;
   }
@@ -93,7 +93,7 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
   const highway=group(root,[2,-2.05,-338]);box(7,.18,87,black,highway,[0,0,-29]);
   for(const x of [-3.2,3.2])box(.035,.05,87,ice,highway,[x,.11,-29]);
   for(let i=0;i<24;i++){box(.06,.025,1.6,i%3===0?ice:silver,highway,[0,.12,8-i*3.3]);if(i%3===0){for(const x of [-3.8,3.8]){box(.21,7,.35,silver,highway,[x,3.4,-i*3.3]);box(.035,6.7,.04,ice,highway,[x-.14,3.4,.21-i*3.3]);}box(7.8,.2,.35,silver,highway,[0,6.9,-i*3.3]);}}
-  const finale=group(root,[0,0,-428]);const finalRings=[];for(let i=0;i<3;i++){const g=group(finale,[(i-1)*5.3,0,0]);ring(2.37,.06,silver,g);const r=ring(2.54,.018,ice,g);finalRings.push(r);glow(g,7,[0,0,-1],.16);label(g,'悬停 2 秒  ↗',[0,-2.7,.5],2.6);}
+  const finale=group(root,[0,0,-428]);const finalRings=[];for(let i=0;i<3;i++){const g=group(finale,[(i-1)*5.3,0,0]);ring(2.37,.06,silver,g);const r=ring(2.54,.018,ice,g);finalRings.push(r);glow(g,7,[0,0,-1],.16);label(g,'悬停 1 秒  ↗',[0,-2.7,.5],2.6);}
   const finalOrbit=ring(12,.013,faint,finale);finalOrbit.rotation.x=1.03;
   const closingCore=createHeyboxCore({THREE});
   closingCore.group.name='finale-closing-blackbox';closingCore.group.position.set(0,5,-10);closingCore.group.scale.setScalar(.82);
