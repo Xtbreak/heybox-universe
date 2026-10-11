@@ -1,8 +1,8 @@
-import { createSpaceBackdrop } from './space-backdrop.js?v=journey-35';
-import { createJourneyUltra } from './journey-ultra.js?v=journey-35';
-import { createHeyboxCore } from './refined-heybox-core.js?v=journey-35';
-import { createJourneyParticles } from './journey-particles.js?v=journey-35';
-import { createCommunityPlaza } from './community-plaza.js?v=journey-35';
+import { createSpaceBackdrop } from './space-backdrop.js?v=journey-36';
+import { createJourneyUltra } from './journey-ultra.js?v=journey-36';
+import { createHeyboxCore } from './refined-heybox-core.js?v=journey-36';
+import { createJourneyParticles } from './journey-particles.js?v=journey-36';
+import { createCommunityPlaza } from './community-plaza.js?v=journey-36';
 
 const coarsePointer=globalThis.matchMedia?.('(pointer: coarse)');
 // A continuous, scene-space expedition. Imported GLB transforms are never modified.
@@ -32,8 +32,16 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
   // The actual app mark becomes a split, bevelled, hollow 3D gateway.
   const heyboxCore=createHeyboxCore({THREE}),cube=heyboxCore.group;
   root.add(cube);cube.position.set(1.55,.2,0);
-  const HERO_OPEN=.4;let introStart=null;
+  const HERO_OPEN=.4;let introStart=null,heroOpenAt=null,lastT=0,tiltX=0,tiltY=0;
   const heroLight=new THREE.PointLight(0xa8e4ff,0,9,1.6);root.add(heroLight);
+  // Light shafts leak from behind the closed box and flare when it bursts open.
+  const shaftMaterial=keep(new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,uniforms:{uI:{value:0}},
+    vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader:'varying vec2 vUv;uniform float uI;void main(){float across=pow(1.-abs(vUv.x*2.-1.),2.4),along=pow(1.-vUv.y,1.7)*smoothstep(0.,.08,vUv.y);gl_FragColor=vec4(vec3(.6,.86,1.)*across*along*uI,1.);}'}));
+  const shafts=group(root);shafts.name='hero-light-shafts';
+  for(let i=0;i<16;i++){const len=5+random()*7,g=keep(new THREE.PlaneGeometry(.12+random()*.5,len));g.translate(0,len/2,0);const m=new THREE.Mesh(g,shaftMaterial);m.rotation.z=i/16*Math.PI*2+random()*.3;shafts.add(m);}
+  // The three worlds burst out of the box once, as a teaser.
+  const teaser={helmet:[-2.4,1.2,2.4,.42],robot:[2.5,.9,2,.4],car:[.1,-1.5,2.6,.32]};
   // The shared GPU particle layer owns the background stars and travel dust.
   // Nebular scattering is additive and mostly transparent, leaving silhouettes readable.
   for(let i=0;i<10;i++){const g=glow(root,35+random()*45,[(random()-.5)*90,(random()-.5)*60,-35-i*47],.045);g.scale.y*=.5;}
@@ -169,15 +177,23 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     const fov=(ultra&&!reduced?THREE.MathUtils.lerp(pose[6],52+18*ultraEffects.rift(p),ultraEffects.rift(p)):pose[6])+(mobile?5+17*indoor:0);if(Math.abs(fov-lastFov)>.01 || Math.abs(camera.fov-fov)>.01 || camera.far<900){camera.fov=fov;camera.far=Math.max(camera.far,900);camera.updateProjectionMatrix();lastFov=fov;}
     // Landing pose: after the model arrives the box cracks open and its throat ignites
     // with a flash, then holds that hero pose until scrolling takes it the rest of the way.
-    if(introStart===null&&heyboxCore.status!=='loading')introStart=t;
-    const since=introStart===null?-1:t-introStart,intro=reduced?1:smooth(.25,1.7,since),flash=reduced?0:Math.exp(-(((since-1.35)/.38)**2));
-    const travel=smooth(.035,.18,p),open=Math.max(HERO_OPEN*intro,travel);cube.visible=p<.205;
-    const glow=1+flash*2.4+(reduced?0:.18*Math.sin(t*1.6))*intro*(1-travel);
-    heroLight.intensity=(intro*(1-travel)*(5+3*Math.sin(t*1.6))+flash*30)*(cube.visible?1:0);heroLight.position.set(cube.position.x,cube.position.y,cube.position.z-.4);
-    cube.position.set(1.55*(1-travel),(.14+(reduced?0:Math.sin(t*.45)*.045))*(1-open),0);
-    // A bounded presentation angle keeps the brand readable, even after a long idle.
-    cube.rotation.set(.095*(1-travel),(.26+(reduced?0:Math.sin(t*.19)*.028))*(1-travel),-.03*(1-travel));
-    heyboxCore.update(open,t,{reduced,ultra,opacity:1,glow});
+    // Opening ritual: the box arrives closed, centred and close, light leaking from its seams.
+    // The first gesture (or a short idle) bursts it open; it then glides aside for the title.
+    lastT=t;if(introStart===null&&heyboxCore.status!=='loading')introStart=t;if(heroOpenAt===null&&p>.012)heroOpenAt=t;
+    const since=introStart===null?-1:t-introStart,intro=reduced?1:smooth(0,1.3,since),burst=heroOpenAt===null?-1:reduced?9:t-heroOpenAt;
+    const opened=smooth(0,.85,burst),settle=smooth(.1,1.5,burst),flash=burst<0?0:Math.exp(-(((burst-.14)/.22)**2));
+    const travel=smooth(.035,.18,p),open=Math.max(.045*intro+(HERO_OPEN-.045)*opened,travel),hero=1-travel;cube.visible=p<.205;
+    tiltX=THREE.MathUtils.damp(tiltX,reduced?0:pointerX,3.5,Math.max(0,dt));tiltY=THREE.MathUtils.damp(tiltY,reduced?0:pointerY,3.5,Math.max(0,dt));
+    const pulse=reduced?0:Math.sin(t*(heroOpenAt===null?2.4:1.6));
+    const glow=(1+flash*3+(.2+.25*(1-opened))*pulse)*intro;
+    cube.position.set((1.1+(mobile?.45:.95)*settle)*hero,(.1+.04*settle+(reduced?0:Math.sin(t*.45)*.045))*(1-open),(mobile?1:2.1)*(1-settle)*hero);
+    cube.scale.setScalar(1+(.12*(1-settle)-.25*(1-intro))*hero);
+    // A bounded presentation angle keeps the brand readable; the pointer tilts it.
+    cube.rotation.set((.095-tiltY*.22)*hero,(.26*settle+(reduced?0:Math.sin(t*.19)*.028)+tiltX*.38)*hero,-.03*hero);
+    heroLight.intensity=(intro*hero*(5+3*pulse)*(1+opened)+flash*45)*(cube.visible?1:0);heroLight.position.set(cube.position.x+tiltX*.9,cube.position.y+tiltY*.6,cube.position.z-.5);
+    shafts.visible=cube.visible&&intro>0;shafts.position.set(cube.position.x,cube.position.y,cube.position.z-.55);shafts.rotation.z=reduced?0:t*.05;
+    shafts.scale.setScalar(.6+.5*opened+flash*.6);shaftMaterial.uniforms.uI.value=intro*hero*(.16+.07*pulse+.14*opened+flash*1.2);
+    heyboxCore.update(open,t,{reduced,ultra,opacity:intro,glow});
     for(let i=0;i<tunnels.length;i++){const q=tunnels[i],w=tunnelWindows[i],alpha=windowFade(p,...w);q.g.visible=alpha>.0001;
       q.mat.uniforms.time.value=reduced?0:t;q.mat.uniforms.strength.value=alpha*(.12+flight*.10);}
     plaza.update({progress:p,time:t,dt,reduced,camera,quality:options.quality});
@@ -190,15 +206,18 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
       g.scale.setScalar(name==='car'?1.38:name==='robot'?1.05:1.07);
       worldFades[i](i===0?windowFade(p,.265,.30,.475,.51):i===1?windowFade(p,.47,.51,.67,.70):windowFade(p,.70,.75,.895,.915));portalSpinners[i].rotation.z=reduced?0:t*(i%2?-.1:.12);
     }
+    const tease=burst>.12&&burst<1.75&&p<.05&&!reduced?(burst-.12)/1.6:-1,reveal=[];
+    if(tease>=0)for(const name of names){const g=entries[name]?.group,d=teaser[name];if(!g||!entries[name].object)continue;const u=tease,e=1-(1-u)**3;
+      g.visible=true;reveal.push(name);g.position.set(cube.position.x+d[0]*e,cube.position.y+d[1]*e,cube.position.z+d[2]*e);g.rotation.set(.3*e,(name==='car'?-.6:name==='helmet'?Math.PI-1:-.2)+u*3.2,0);g.scale.setScalar(d[3]*Math.sin(Math.PI*Math.min(1,u*1.08))**.7);}
     sceneryFades[0](windowFade(p,.255,.29,.51,.56));sceneryFades[1](windowFade(p,.465,.50,.67,.70));sceneryFades[2](windowFade(p,.70,.745,.925,.95));
     planet.rotation.y=reduced?0:t*.012;skyRing.rotation.z=reduced?0:t*.025;
     backdrop.update({quality:options.quality,progress:pj,time:t,reduced,width,height,pointerX,pointerY,desktop:!coarsePointer?.matches,cameraZ:camera.position.z});
     ultraEffects.update({progress:pj,time:t,dt,reduced,quality:options.quality,hoverTarget:hovered,hoverProgress:options.hoverProgress||0});
-    particles.update({progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,hoverTarget:hovered,hoverProgress:options.hoverProgress||0,flight});
+    particles.update({reveal,progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,hoverTarget:hovered,hoverProgress:options.hoverProgress||0,flight});
     optics.center.copy(hovered&&entries[hovered]?.group?entries[hovered].group.position:p<.23?cube.position:focus);
-    optics.strength=reduced?0:Math.max(windowFade(p,.045,.10,.15,.205)*.65,intro*(1-travel)*.3+flash*.5,hovered?clamp(options.hoverProgress)*.55:0,flight*.16);
+    optics.strength=reduced?0:Math.max(windowFade(p,.045,.10,.15,.205)*.65,intro*hero*.3+flash*.6,hovered?clamp(options.hoverProgress)*.55:0,flight*.16);
     optics.radius=hovered?.20:.25;
     active=p<.49?'helmet':p<.715?'robot':'car';return active;
   }
-  return {root,update,setQuality(value){ultraEffects.setQuality(value);backdrop.setQuality(value);particles.setQuality?.(value);},getRift:p=>ultraEffects.rift(p),riftEnd:ultraEffects.end,getParticleCount:()=>particles.getCount(),loadPlaza:()=>plaza.load(),ready:heyboxCore.ready,getOptics:()=>optics,getIndoor:()=>indoorMix,getWorld:()=>active,setVisible(value){root.visible=!!value;particles.setVisible?.(!!value);},samplePose(progress){return sample(clampRail(progress)).slice();},dispose(){plaza.dispose();backdrop.dispose();ultraEffects.dispose();particles.dispose();tableCore.dispose();heyboxCore.dispose();for(const [g,parent] of originalParents)if(parent)parent.add(g);root.removeFromParent();resources.forEach(r=>r.dispose?.());resources.clear();}};
+  return {root,update,setQuality(value){ultraEffects.setQuality(value);backdrop.setQuality(value);particles.setQuality?.(value);},getRift:p=>ultraEffects.rift(p),riftEnd:ultraEffects.end,getParticleCount:()=>particles.getCount(),loadPlaza:()=>plaza.load(),ready:heyboxCore.ready,getOptics:()=>optics,getIndoor:()=>indoorMix,getWorld:()=>active,openHero(instant=false){if(heroOpenAt!==null)return false;heroOpenAt=instant?-1e3:lastT;return true;},getHeroCenter:()=>cube.position,setVisible(value){root.visible=!!value;particles.setVisible?.(!!value);},samplePose(progress){return sample(clampRail(progress)).slice();},dispose(){plaza.dispose();backdrop.dispose();ultraEffects.dispose();particles.dispose();tableCore.dispose();heyboxCore.dispose();for(const [g,parent] of originalParents)if(parent)parent.add(g);root.removeFromParent();resources.forEach(r=>r.dispose?.());resources.clear();}};
 }

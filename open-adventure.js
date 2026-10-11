@@ -1,28 +1,28 @@
 import { EffectComposer } from './vendor/EffectComposer.js';
 import { RenderPass } from './vendor/RenderPass.js';
 import { UnrealBloomPass } from './vendor/UnrealBloomPass.js';
-import { createCinematicPass } from './cinematic-pass.js?v=journey-35';
-import { normalizeQuality } from './journey-quality.js?v=journey-35';
+import { createCinematicPass } from './cinematic-pass.js?v=journey-36';
+import { normalizeQuality } from './journey-quality.js?v=journey-36';
 import { OutputPass } from './vendor/OutputPass.js';
-import { createSpatialRefraction } from './spatial-refraction.js?v=journey-35';
-import {createMiniatureCar} from './miniature-car.js?v=journey-35';
-import {createToyShip} from './toy-ship.js?v=journey-35';
-import {createTexturePrewarm} from './texture-prewarm.js?v=journey-35';
-import {createDestinationArrival} from './destination-arrival.js?v=journey-35';
-import {createPortalEntry} from './portal-entry.js?v=journey-35';
-import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-35';
+import { createSpatialRefraction } from './spatial-refraction.js?v=journey-36';
+import {createMiniatureCar} from './miniature-car.js?v=journey-36';
+import {createToyShip} from './toy-ship.js?v=journey-36';
+import {createTexturePrewarm} from './texture-prewarm.js?v=journey-36';
+import {createDestinationArrival} from './destination-arrival.js?v=journey-36';
+import {createPortalEntry} from './portal-entry.js?v=journey-36';
+import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-36';
 import * as THREE from './vendor/three.module.js';
 import { MeshoptDecoder } from './vendor/meshopt_decoder.module.js';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { RoomEnvironment } from './vendor/RoomEnvironment.js';
-import { createCosmicJourney } from './cosmic-journey.js?v=journey-35';
+import { createCosmicJourney } from './cosmic-journey.js?v=journey-36';
 
 // One renderer, three independently owned worlds, and the original cinematic journey.
 export async function createWorld(canvas, { onReady, onError, onState, audio = null, onFrame, onContextLost, recoverySnapshot = null, signal } = {}) {
   if(signal?.aborted)throw new Error('World creation cancelled');
   const names=['helmet','robot','car'];
   // Game code and game-only models load when an entry starts and are released on exit; only gallery models stay resident.
-  const gameModules={helmet:'./flight-game.js?v=journey-35',robot:'./sandbox-game.js?v=journey-35',car:'./driving-game.js?v=journey-35'};
+  const gameModules={helmet:'./flight-game.js?v=journey-36',robot:'./sandbox-game.js?v=journey-36',car:'./driving-game.js?v=journey-36'};
   const gameExtras={robot:['weapon','./models/fps-pistol.glb']};
   const files={robot:'RobotExpressive.glb'};
   const instructions={helmet:'悬停星舰 1 秒，进入深空救援',robot:'悬停作战装置 1 秒，突入空间设施',car:'悬停遥控车 1 秒，驶入玩具公园'};
@@ -77,7 +77,7 @@ export async function createWorld(canvas, { onReady, onError, onState, audio = n
   let disposed=false,ready=false,frame=0,mode='showcase',world='helmet',selected=null,progress=0,targetProgress=0,paused=false,gamePaused=false,pauseReason=null,controlMode='keyboard-mouse',reduced=false;
   let lifecycle='browse',sessionId=0,awaitingControl=false,controlRequested=false,restoreProgress=null,entryStarted=0,travelSession=0,entryFocus=null,returnPhase=null,returnElapsed=0,returnWorld=null,quality='standard';
   let previousRiftProgress=0;
-  const impactCenter=new THREE.Vector3();
+  const impactCenter=new THREE.Vector3();const root3dCenter=v=>{const c=journey.getHeroCenter?.();if(c)v.copy(c).applyMatrix4(journey.root.matrixWorld);return v;};
   const checkpoints=new Map(recoverySnapshot?.checkpoints||[]);let resumeVisit=false;
   let resolveRecovery,rejectRecovery;const recoveryReady=new Promise((resolve,reject)=>{resolveRecovery=resolve;rejectRecovery=reject;});recoveryReady.catch(()=>{});
   let scrollState={stable:true,scrolling:false,snapping:false,velocity:0},pointerIntent=false,intentAnchor=null,hoverFootprint=null;
@@ -166,7 +166,7 @@ export async function createWorld(canvas, { onReady, onError, onState, audio = n
   function buildGame(expectedSession=travelSession,{arrival=false}={}){if(disposed||contextLost||mode!=='travel'||expectedSession!==sessionId)return false;clearInput();completionHandled=false;gamePaused=false;pauseReason=null;journey.setVisible(false);gameScene=new THREE.Scene();gameScene.background=new THREE.Color('#02070d');gameScene.environment=world==='car'?null:environment.texture;gameScene.environmentIntensity=world==='robot'?.3:world==='car'?.5:.4;if(world!=='car'){gameScene.add(new THREE.HemisphereLight(0xb8def4,0x111526,world==='robot'?.85:1.5));for(const [color,intensity,x,y,z] of [[0xe4f6ff,world==='robot'?1.5:2.8,-7,14,5],[0x69bde8,world==='robot'?.5:2,9,5,-9]]){const light=new THREE.DirectionalLight(color,intensity);light.position.set(x,y,z);gameScene.add(light);}}const object=entries[world].object;visitSnapshot={object,parent:object.parent,nodes:takeTransforms(object)};camera.fov=52;camera.near=.1;camera.far=1600;camera.up.set(0,1,0);camera.updateProjectionMatrix();try{if(!entries[world].create)throw new Error(`${world} game is not loaded`);game=entries[world].create({THREE,scene:gameScene,camera,model:object,playAnimation,emit:text=>emit(text),width,height,reduced,assets,difficulty:world==='robot'?robotDifficulty:1,sound:(name,params)=>audio?.play(name,params)});if(resumeVisit&&checkpoints.has(world)){const restored=game.restore?.(checkpoints.get(world));if(restored===false){if(recoverySnapshot)throw new Error('Recovery checkpoint rejected');checkpoints.delete(world);console.warn('[open-adventure] saved progress rejected; starting a fresh safe session');}if(world==='robot')robotDifficulty=game.getState?.().difficulty||robotDifficulty;}resumeVisit=false;mode='game';lifecycle='await-control';awaitingControl=true;controlRequested=false;game?.setPaused?.(true);texturePrewarm.sync();audio?.setScene(world);audio?.setPaused(true);lastEmit=time;game.resize?.(width,height);canvas.style.cursor=world==='robot'?'crosshair':'default';if(arrival){destinationArrival.begin({world,reduced});lifecycle='arrival';canvas.style.cursor='wait';}const state=game.getState?.()||{};if(state.dead||state.lost)pauseGame('dead');else if(state.completed||state.won){completionHandled=true;pauseGame('completed');}emit();resolveRecovery();}catch(error){rejectRecovery(error);destroyGame();exitGame({immediate:true});onError?.(error);}}
   function restart(){if(mode!=='game'||disposed)return;releaseLock();clearInput();checkpoints.delete(world);resumeVisit=false;destroyGame();mode='travel';travelSession=++sessionId;buildGame();}
   function nextDifficulty(){if(mode!=='game'||disposed)return;const state=game?.getState?.();if(!state?.completed||!state.nextDifficultyAvailable)return;releaseLock();clearInput();completionHandled=false;checkpoints.delete(world);if(world==='robot'){robotDifficulty++;destroyGame();mode='travel';travelSession=++sessionId;buildGame();}else{game?.action?.(world==='car'?'nextChallenge':'nextDifficulty');gamePaused=false;awaitingControl=true;lifecycle='await-control';pauseReason=null;game?.setPaused?.(true);}emit('已进入更高难度 · 点击接管后开始');}
-  function canvasClick(payload={}){if(mode==='travel'){if(entries[world].state==='error'||entries[world].gameState==='error')prepare(world,true);return;}if(mode==='game'){if(gamePaused||paused||awaitingControl||suppressPrimaryUntilRelease)return;game.action?.('click',{x:pointerX,y:pointerY,...payload});emit();return;}scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);pointer.set(pointerX,pointerY);raycaster.setFromCamera(pointer,camera);const visible=progress>.9?[]:names.filter(id=>entries[id].group.visible&&entries[id].state==='loaded'),hits=raycaster.intersectObjects(visible.map(id=>entries[id].group),true);if(!hits.length)return;let object=hits[0].object;while(object&&!visible.some(id=>entries[id].group===object))object=object.parent;const id=visible.find(id=>entries[id].group===object);if(id&&!(hoverState.target===id&&hoverState.progress>0))enter(id);}
+  function canvasClick(payload={}){if(mode==='travel'){if(entries[world].state==='error'||entries[world].gameState==='error')prepare(world,true);return;}if(mode==='game'){if(gamePaused||paused||awaitingControl||suppressPrimaryUntilRelease)return;game.action?.('click',{x:pointerX,y:pointerY,...payload});emit();return;}scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);pointer.set(pointerX,pointerY);raycaster.setFromCamera(pointer,camera);const visible=progress>.9||progress<.25?[]:names.filter(id=>entries[id].group.visible&&entries[id].state==='loaded'),hits=raycaster.intersectObjects(visible.map(id=>entries[id].group),true);if(!hits.length)return;let object=hits[0].object;while(object&&!visible.some(id=>entries[id].group===object))object=object.parent;const id=visible.find(id=>entries[id].group===object);if(id&&!(hoverState.target===id&&hoverState.progress>0))enter(id);}
   const readPointer=event=>{const rect=canvas.getBoundingClientRect();pointerClientX=event.clientX;pointerClientY=event.clientY;pointerX=clamp((event.clientX-rect.left)/Math.max(1,rect.width)*2-1,-1,1);pointerY=clamp(1-(event.clientY-rect.top)/Math.max(1,rect.height)*2,-1,1);const within=event.clientX>=rect.left&&event.clientX<=rect.left+rect.width&&event.clientY>=rect.top&&event.clientY<=rect.top+rect.height;const hit=document.elementFromPoint?.(event.clientX,event.clientY);showcasePointer=within&&(!hit||hit===canvas)&&event.pointerType!=='touch';pointerActive=within&&(!hit||hit===canvas)&&mode==='game'&&!gamePaused&&!paused;return rect;};
   const capture=id=>{try{canvas.setPointerCapture?.(id);captured.add(id);}catch{}};
   const startDown=event=>{down={pointerType:event.pointerType,x:event.clientX,y:event.clientY,moved:0,id:event.pointerId,time:performance.now(),wasHeld:false,touchLook:mode==='game'&&(world==='helmet'||world==='robot')&&event.pointerType==='touch'};pointerDownX=pointerX;pointerDownY=pointerY;pointerDragging=false;pointerDragX=0;if(mode==='game'){pointerDown=!down.touchLook;pointerPressed=pointerDown;if(down.touchLook)pointerRightDown=true;capture(event.pointerId);}};
@@ -216,7 +216,7 @@ export async function createWorld(canvas, { onReady, onError, onState, audio = n
   const observer=new ResizeObserver(resize);observer.observe(canvas);resize();
   function updateModelHover(now){
     // Gallery models stop being entries once they start flying into the living room.
-    const visible=progress>.9?[]:names.filter(id=>entries[id].group.visible&&entries[id].state==='loaded');
+    const visible=progress>.9||progress<.25?[]:names.filter(id=>entries[id].group.visible&&entries[id].state==='loaded');
     const surface=document.elementFromPoint?.(pointerClientX,pointerClientY);
     const scrolling=scrollState.scrolling||scrollState.snapping||Math.abs(scrollState.velocity)>=5;
     const settled=Math.abs(progress-targetProgress)<.0008&&scrollState.stable&&!scrolling;
@@ -289,10 +289,11 @@ export async function createWorld(canvas, { onReady, onError, onState, audio = n
   }
   function handleContextLoss(event){event?.preventDefault?.();if(disposed||contextLost)return;const saved=captureRecovery();contextLost=true;paused=true;game?.setPaused?.(true);audio?.setPaused(true);texturePrewarm.sync();cancelAnimationFrame(frame);clearInput();releaseLock();controlRequested=false;awaitingControl=false;lifecycle='recovering';emit('图形连接中断 · 正在等待恢复，或返回章节');if(onContextLost)onContextLost(saved,api);else onError?.(new Error('WebGL context lost'));}
   listen(canvas,'webglcontextlost',handleContextLoss);
-  ['helmet','robot'].forEach(id=>load(id));frame=requestAnimationFrame(safeTick);emit();
+  ['helmet','robot','car'].forEach(id=>load(id));frame=requestAnimationFrame(safeTick);emit();
   const api={
     getDiagnostics(){return {quality,reduced,mode,progress,fov:camera.fov,postprocessing:!!composer,cinematic:!!cinematicPass?.enabled,bloom:bloomPass?{strength:bloomPass.strength,radius:bloomPass.radius,threshold:bloomPass.threshold}:null,motion:cinematicPass?{speed:cinematicPass.uniforms.uSpeed.value,impact:cinematicPass.uniforms.uImpact.value,flash:cinematicPass.uniforms.uFlash.value,motion:cinematicPass.uniforms.uMotion.value}:null,particleCount:journey.getParticleCount(),drawCalls:renderer.info.render.calls,gpu:{...renderer.info.memory}};},
     recoveryReady,isContextAvailable:()=>!disposed&&!renderer.getContext().isContextLost(),enter,exit:exitGame,restart,retry(){prepare(world,true);},control(payload,pressed){if(typeof payload==='string')control(payload,!!pressed);else control(payload?.key,!!payload?.pressed);},
+    openHero({instant=false}={}){if(disposed||mode!=='showcase'||!journey.openHero?.(instant))return false;if(!instant&&quality==='ultra'&&!reduced){root3dCenter(impactCenter);cinematicPass?.burst(impactCenter,camera);}return true;},
     setScrollState(value={}){scrollState={...scrollState,...value};if(scrollState.scrolling||scrollState.snapping||Math.abs(scrollState.velocity)>=5)resetHover(250);},
     setProgress(value){if(mode!=='showcase')return;const next=clamp(Number(value)||0,0,1);if(next>=.66)load('car');if(next>=.78)journey.loadPlaza?.();if(Math.abs(next-targetProgress)>.0008)resetHover(250);if(Math.abs(next-targetProgress)>.004)selected=null;targetProgress=next;},
     setPointer(x,y){pointerX=clamp(Number(x)||0,-1,1);pointerY=clamp(Number(y)||0,-1,1);},

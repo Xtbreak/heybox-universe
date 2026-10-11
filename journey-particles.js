@@ -147,6 +147,7 @@ fragmentShader:`uniform float uUltra,uProgress;varying float vAlpha,vSeed,vEnerg
       const incoming=JOURNEY_TRANSITIONS.find(r=>r.to===name),outgoing=JOURNEY_TRANSITIONS.find(r=>r.from===name);
       let fill=incoming?clamp((p-incoming.arrive[0])/(incoming.arrive[1]-incoming.arrive[0])):1;
       let cut=outgoing&&states.has(outgoing.to)?clamp((p-outgoing.leave[0])/(outgoing.leave[1]-outgoing.leave[0])):0;
+      if(options.reveal?.includes(name)){fill=1;cut=0;}
       state.uniforms.uJourneyFill.value=fill<=0?-.01:fill>=1?1.01:fill;
       state.uniforms.uJourneyCut.value=cut<=0?-.01:cut>=1?1.01:cut;
     }
