@@ -1,8 +1,8 @@
-import { createSpaceBackdrop } from './space-backdrop.js?v=journey-32';
-import { createJourneyUltra } from './journey-ultra.js?v=journey-32';
-import { createHeyboxCore } from './refined-heybox-core.js?v=journey-32';
-import { createJourneyParticles } from './journey-particles.js?v=journey-32';
-import { createCommunityPlaza } from './community-plaza.js?v=journey-32';
+import { createSpaceBackdrop } from './space-backdrop.js?v=journey-33';
+import { createJourneyUltra } from './journey-ultra.js?v=journey-33';
+import { createHeyboxCore } from './refined-heybox-core.js?v=journey-33';
+import { createJourneyParticles } from './journey-particles.js?v=journey-33';
+import { createCommunityPlaza } from './community-plaza.js?v=journey-33';
 
 const coarsePointer=globalThis.matchMedia?.('(pointer: coarse)');
 // A continuous, scene-space expedition. Imported GLB transforms are never modified.

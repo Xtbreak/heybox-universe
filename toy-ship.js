@@ -1,5 +1,5 @@
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
-import { heyboxMarkShapes } from './heybox-mark.js?v=journey-32';
+import { heyboxMarkShapes } from './heybox-mark.js?v=journey-33';
 
 /* Chunky toy starfighter, made like the RC jeep: flat-shaded boxes and
  * cylinders merged per material. +Y up, -Z forward. The returned root is
