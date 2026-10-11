@@ -1,8 +1,8 @@
-import { createSpaceBackdrop } from './space-backdrop.js?v=journey-37';
-import { createJourneyUltra } from './journey-ultra.js?v=journey-37';
-import { createVoxelHeybox } from './voxel-heybox.js?v=journey-37';
-import { createJourneyParticles } from './journey-particles.js?v=journey-37';
-import { createCommunityPlaza } from './community-plaza.js?v=journey-37';
+import { createSpaceBackdrop } from './space-backdrop.js?v=journey-38';
+import { createJourneyUltra } from './journey-ultra.js?v=journey-38';
+import { createVoxelHeybox } from './voxel-heybox.js?v=journey-38';
+import { createJourneyParticles } from './journey-particles.js?v=journey-38';
+import { createCommunityPlaza } from './community-plaza.js?v=journey-38';
 
 const coarsePointer=globalThis.matchMedia?.('(pointer: coarse)');
 // A continuous, scene-space expedition. Imported GLB transforms are never modified.
@@ -115,7 +115,7 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
   const ultraEffects=createJourneyUltra({THREE,root,camera,entries,core:null});
   // The same Heybox, small, waits on the friends' coffee table.
   const plaza=createCommunityPlaza({THREE,parent:root,core:{group:tableAnchor,ready:Promise.resolve(),update(){}}});
-  const voxels=createVoxelHeybox({THREE,root,camera,particles,heroAnchor,tableAnchor,modelLocations});
+  const voxels=createVoxelHeybox({THREE,root,camera,particles,heroAnchor,tableAnchor,modelLocations,room:plaza.group,doorway:plaza.doorway});
   const iceBase=ice.color.clone(),hdrMaterials=[];
   const optics={center:new THREE.Vector3(),strength:0,radius:.22};
   // Each scenic assembly owns a bounded set of fade materials; imported game assets are untouched.
@@ -181,7 +181,7 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     tiltX=THREE.MathUtils.damp(tiltX,reduced?0:pointerX,3.5,Math.max(0,dt));tiltY=THREE.MathUtils.damp(tiltY,reduced?0:pointerY,3.5,Math.max(0,dt));
     // Scroll turns the box square to the camera; at REVEAL_AT the channel is exactly aligned.
     const align=smooth(0,REVEAL_AT,p),off=1-align,drift=reduced?0:Math.sin(t*.21)*.05*off;
-    heroAnchor.position.set(1.1,.15+(reduced?0:Math.sin(t*.45)*.04*off),0);heroAnchor.scale.setScalar(mobile?.9:1.08);
+    heroAnchor.position.set(1.1,.15+(reduced?0:Math.sin(t*.45)*(.025+.03*off)),0);heroAnchor.scale.setScalar(mobile?.9:1.08);
     heroAnchor.lookAt(camera.position);heroAnchor.rotateY((.62+drift)*off+tiltX*.16*off);heroAnchor.rotateX((-.2*off+tiltY*.1*off));
     heroReveal=Math.max(0,1-Math.abs(.62*off+tiltX*.16*off)/.3)**2*smooth(.5,1,intro.build);
     for(let i=0;i<tunnels.length;i++){const q=tunnels[i],w=tunnelWindows[i],alpha=windowFade(p,...w);q.g.visible=alpha>.0001;
@@ -200,7 +200,7 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     planet.rotation.y=reduced?0:t*.012;skyRing.rotation.z=reduced?0:t*.025;
     backdrop.update({quality:options.quality,progress:pj,time:t,reduced,width,height,pointerX,pointerY,desktop:!coarsePointer?.matches,cameraZ:camera.position.z});
     ultraEffects.update({progress:pj,time:t,dt,reduced,quality:options.quality,hoverTarget:hovered,hoverProgress:options.hoverProgress||0});
-    particles.update({cut:{car:smooth(.862,.9,p)},progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,hoverTarget:hovered,hoverProgress:options.hoverProgress||0,flight});
+    particles.update({cut:{car:smooth(.862,.89,p)},progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,hoverTarget:hovered,hoverProgress:options.hoverProgress||0,flight});
     dustMaterial.uniforms.uTime.value=reduced?0:t;
     voxels.update({progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,peel:!!options.peel&&!coarsePointer?.matches,intro,reveal:heroReveal});
     optics.center.copy(hovered&&entries[hovered]?.group?entries[hovered].group.position:p<.23?heroAnchor.position:focus);

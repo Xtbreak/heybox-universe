@@ -1,6 +1,6 @@
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
-import { heyboxMarkShapes, drawHeyboxMark } from './heybox-mark.js?v=journey-37';
+import { heyboxMarkShapes, drawHeyboxMark } from './heybox-mark.js?v=journey-38';
 
 // The journey ends in a friend's living room: a small toy house at the end of
 // the park road. You walk in through the front door, six friends (Kenney Mini
@@ -52,6 +52,16 @@ export function createCommunityPlaza({ THREE: T, parent, core = null, position =
     g.fillStyle = '#ffd98a'; g.beginPath(); g.arc(w / 2, h * .62, 70, Math.PI, 0); g.fill(); g.fillStyle = '#2a1838'; g.fillRect(0, h * .62, w, h * .38);
     drawHeyboxMark(g, w / 2, h * .3, 96, '#fff4e0'); g.strokeStyle = '#fff4e0'; g.lineWidth = 6; g.strokeRect(10, 10, w - 20, h - 20);
   });
+  const welcomeMap = canvasTexture(768, 326, (g, w, h) => {
+    g.fillStyle = '#f6ecd8'; g.fillRect(0, 0, w, h);
+    let s = 7; const r = () => ((s = (s * 16807) % 2147483647) / 2147483647);
+    for (let i = 0; i < 900; i++) { g.fillStyle = `rgba(120,80,40,${.03 + r() * .05})`; g.fillRect(r() * w, r() * h, 1 + r() * 3, 1); }
+    g.fillStyle = '#e8553e'; g.beginPath(); g.arc(w * .86, h * .3, 34, 0, 7); g.fill();
+    g.fillStyle = '#2b2320'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = `400 ${Math.round(h * .38)}px "Kaiti SC","STKaiti","KaiTi","Songti SC",serif`; g.fillText('欢迎回来', w * .47, h * .47);
+    g.font = `500 ${Math.round(h * .07)}px ui-monospace,Menlo,monospace`; g.fillStyle = '#7a6a5c'; g.fillText('W E L C O M E   B A C K', w * .47, h * .82);
+    g.fillStyle = '#c84a36'; g.fillRect(w * .86 - 18, h * .66, 36, 36); g.fillStyle = '#f6ecd8'; g.font = `700 ${Math.round(h * .07)}px "Kaiti SC","STKaiti",serif`; g.fillText('盒', w * .86, h * .66 + 19);
+  });
   const toyPosterMap = canvasTexture(256, 192, (g, w, h) => {
     g.fillStyle = '#7cc0a8'; g.fillRect(0, 0, w, h); g.fillStyle = '#f6e3b4'; g.beginPath(); g.ellipse(w / 2, h * .78, w * .46, h * .2, 0, 0, 7); g.fill();
     g.fillStyle = '#e54732'; g.fillRect(w / 2 - 34, h * .48, 68, 30); g.fillRect(w / 2 - 20, h * .37, 40, 18); g.fillStyle = '#2b2a31';
@@ -66,7 +76,7 @@ export function createCommunityPlaza({ THREE: T, parent, core = null, position =
     black: std(0x1b1d22, { roughness: .45 }), white: std(0xf1f1ee, { roughness: .45 }), grey: std(0x3a3e46, { roughness: .5 }), metal: std(0xa7aeb5, { metalness: .5, roughness: .4 }),
     beanbag: std(0xe08a3c, { roughness: .95 }), pillow: std(0xf2c35f, { roughness: .95 }), pillow2: std(0x74b596, { roughness: .95 }), chair: std(0x2a2d34), red: std(0xe0483a), blue: std(0x2f9fe0),
     yellow: std(0xf3c33c), leaf: std(0x4f9a52), leafDark: std(0x3a7a40), pot: std(0xc06a3d), cat: std(0xeb9a4c), catLight: std(0xfbe2c0), ink: std(0x2b2320), markInk: std(0xfff6e6),
-    poster: std(0xffffff, { map: posterMap, flatShading: false }), toyPoster: std(0xffffff, { map: toyPosterMap, flatShading: false }),
+    welcome: std(0xffffff, { map: welcomeMap, roughness: .9, flatShading: false }), poster: std(0xffffff, { map: posterMap, flatShading: false }), toyPoster: std(0xffffff, { map: toyPosterMap, flatShading: false }),
     sky: keep(new T.MeshBasicMaterial({ color: 0xffffff, map: skyMap })),
     lamp: glowing(0xffc483, 1.6), windowWarm: glowing(0xffc06e, 1.05), neon: glowing(0xff6b4f, 3.1), rgbA: glowing(0x3fe6ff, 2.6), rgbB: glowing(0xff4fd8, 2.6), xbox: glowing(0x4dff6a, 3), ps: glowing(0x3d8bff, 3), ember: glowing(0xffd27a, 2.8)
   };
@@ -163,6 +173,9 @@ export function createCommunityPlaza({ THREE: T, parent, core = null, position =
   box(O, 'trim', .7, .94, .03, -3.35, 1.75, -D + .085); box(O, 'poster', .6, .84, .02, -3.35, 1.75, -D + .1);
   mark(O, 'neon', .62, -2.1, 2.2, -D + .1); box(O, 'woodDark', .9, .82, .02, -2.1, 2.2, -D + .08);
   box(O, 'trim', .9, .7, .03, 2.95, 1.95, -D + .085); box(O, 'toyPoster', .8, .6, .02, 2.95, 1.95, -D + .1);
+  // The welcome sign is a framed painting over the sofa corner, lit by a small picture lamp.
+  box(O, 'woodDark', 1.5, .74, .05, -.62, 1.98, -D + .095); box(O, 'gold', 1.4, .64, .02, -.62, 1.98, -D + .12); box(O, 'welcome', 1.32, .56, .01, -.62, 1.98, -D + .132);
+  box(O, 'black', .5, .05, .1, -.62, 2.42, -D + .17); box(O, 'lamp', .44, .015, .05, -.62, 2.395, -D + .19);
   const shelf = M(1.2, 0, -D + .22);
   for (const y of [1.15, 1.7]) box(shelf, 'wood', 1.5, .05, .32, 0, y, 0);
   box(shelf, 'red', .22, .1, .14, -.45, 1.26, 0); for (const x of [-.53, -.37]) cyl(shelf, 'black', .035, .035, .16, x, 1.215, 0, 0, 0, Math.PI / 2);
@@ -257,7 +270,7 @@ export function createCommunityPlaza({ THREE: T, parent, core = null, position =
     core.group.removeFromParent(); core.group.position.set(0, 0, 0); core.group.rotation.set(0, 0, 0); core.group.scale.setScalar(1); boxHolder.add(core.group);
     // Measure the closed box on its own, so the fit is in table space.
     core.ready?.then(() => { if (disposed) return; core.update(0, 0); boxHolder.remove(core.group); core.group.updateMatrixWorld(true);
-      const b = new T.Box3().setFromObject(core.group), s = b.getSize(new T.Vector3()), c = b.getCenter(new T.Vector3()), k = .62 / Math.max(.001, s.x, s.y);
+      const b = new T.Box3().setFromObject(core.group), s = b.getSize(new T.Vector3()), c = b.getCenter(new T.Vector3()), k = .8 / Math.max(.001, s.x, s.y);
       core.group.scale.setScalar(k); core.group.position.set(-c.x * k, -b.min.y * k + .005, -c.z * k); boxHolder.add(core.group);
       core.group.traverse(m => { if (m.isMesh) m.castShadow = true; }); }); }
 
@@ -334,7 +347,7 @@ export function createCommunityPlaza({ THREE: T, parent, core = null, position =
   function update({ progress = 0, time = 0, dt = 0, reduced = false, camera, quality = 'standard' } = {}) {
     const p = progress; if (p > .78) load();
     const visible = p > .885; group.visible = visible;
-    const open = smooth(.912, .942, p), inside = smooth(.94, .965, p), greet = smooth(.952, .99, p), seated = smooth(.972, 1, p);
+    const open = smooth(.866, .888, p), inside = smooth(.94, .965, p), greet = smooth(.952, .99, p), seated = smooth(.972, 1, p);
     porchLight.intensity = visible ? 2.2 * (1 - inside * .6) : 0; lampLight.intensity = visible ? 2.6 * Math.max(.25, inside) : 0;
     roomLight.intensity = visible ? 1.3 * Math.max(.3, inside) : 0; warmth.intensity = visible ? .22 * inside : 0;
     keyLight.intensity = visible ? 10 * inside : 0; keyLight.castShadow = visible && inside > 0;
@@ -349,7 +362,7 @@ export function createCommunityPlaza({ THREE: T, parent, core = null, position =
     for (const b of bubbles) { const k = clamp((greet - b.lag) / .3), pop = k <= 0 ? 0 : 1 + Math.sin(k * Math.PI * 2.5) * (1 - k) * .35;
       b.sprite.scale.setScalar(.5 * pop * k ** .3); b.sprite.position.y = b.base + (reduced ? 0 : Math.sin(time * 2 + b.seed) * .03); }
     tail.rotation.y = reduced ? 0 : Math.sin(time * 1.6) * .6; catBody.scale.y = .62 * (1 + (reduced ? 0 : Math.sin(time * 2.1) * .03)); catHead.rotation.z = .25 * greet;
-    if (core?.group) { core.update(.05 * seated, time, { reduced, ultra: quality === 'ultra', opacity: 1 }); boxHolder.rotation.y = reduced ? -.6 : -.6 + Math.sin(time * .5) * .5; }
+    if (core?.group) { core.update(.05 * seated, time, { reduced, ultra: quality === 'ultra', opacity: 1 }); boxHolder.rotation.y = reduced ? .12 : .12 + Math.sin(time * .5) * .08; }
     // Repaint screens at ~20 Hz once the door opens; the reduced setting keeps a still frame.
     paintTick += dt; if (open <= 0 || (paintTick < .05 && painted)) return; paintTick = 0;
     for (const s of screens) { if (!s.ctx || (reduced && s.painted)) continue; draw[s.kind](s.ctx, s.canvas.width, s.canvas.height, reduced ? 0 : time); s.texture.needsUpdate = true; s.painted = true; }
@@ -360,5 +373,7 @@ export function createCommunityPlaza({ THREE: T, parent, core = null, position =
     disposed = true; if (core?.group?.parent === boxHolder) boxHolder.remove(core.group);
     group.removeFromParent(); rig.removeFromParent(); owned.forEach(r => r.dispose?.()); owned.clear(); bulbs.dispose?.();
   }
-  return { group, update, load, dispose: () => dispose() };
+  // The opening the grains stream through, in room units: centre line outside and inside the wall.
+  const doorway = { group, outside: [0, 1.0, D + .75], inside: [0, 1.0, D - .7], halfWidth: .34, halfHeight: .5, approach: 1.6 };
+  return { group, doorway, update, load, dispose: () => dispose() };
 }
