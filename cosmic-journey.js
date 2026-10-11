@@ -1,8 +1,8 @@
-import { createSpaceBackdrop } from './space-backdrop.js?v=journey-31';
-import { createJourneyUltra } from './journey-ultra.js?v=journey-31';
-import { createHeyboxCore } from './refined-heybox-core.js?v=journey-31';
-import { createJourneyParticles } from './journey-particles.js?v=journey-31';
-import { createCommunityPlaza } from './community-plaza.js?v=journey-31';
+import { createSpaceBackdrop } from './space-backdrop.js?v=journey-32';
+import { createJourneyUltra } from './journey-ultra.js?v=journey-32';
+import { createHeyboxCore } from './refined-heybox-core.js?v=journey-32';
+import { createJourneyParticles } from './journey-particles.js?v=journey-32';
+import { createCommunityPlaza } from './community-plaza.js?v=journey-32';
 
 const coarsePointer=globalThis.matchMedia?.('(pointer: coarse)');
 // A continuous, scene-space expedition. Imported GLB transforms are never modified.
@@ -70,12 +70,17 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
   const tunnelWindows=[[.12,.20,.31,.365],[.435,.465,.515,.56],[.63,.675,.75,.795]];
   const tunnels=[tunnel(-7,83,4.7,1.85),tunnel(-116,76,5.0,1.55),tunnel(-229,84,5.6,2.1)];
   const worlds={},portalSpinners=[],modelLocations={helmet:[2,.15,-108],robot:[2,0,-204],car:[2,-.25,-338]};
+  // Soft contact shadow under each display model, so it sits on its stand.
+  const contactShadow=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d'),r=g.createRadialGradient(64,64,0,64,64,64);
+    r.addColorStop(0,'rgba(0,0,0,.85)');r.addColorStop(.45,'rgba(0,0,0,.5)');r.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=r;g.fillRect(0,0,128,128);
+    const t=keep(new THREE.CanvasTexture(c));return keep(new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false,opacity:.9,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));})();
   function portal(name,r){const p=modelLocations[name],g=group(root,p),back=group(g,[0,0,-2]);worlds[name]={g,back};
     ring(r,.085,silver,back);ring(r+.15,.013,ice,back);
     const inner=ring(r-.13,.022,ice,back);portalSpinners.push(inner);
     for(let i=0;i<16;i++){const a=i/16*Math.PI*2;const b=box(i%4===0?.13:.05,.26,.18,i%4===0?ice:dark,back,[Math.sin(a)*(r+.05),Math.cos(a)*(r+.05),.03]);b.rotation.z=-a;}
     glow(back,r*3,[0,0,-.2],.21);label(g,'悬停 1 秒  ↗',[0,-2.35,.5],2.5);
     const floor=mesh(new THREE.CylinderGeometry(2.35,2.5,.18,64),black,g,[0,-1.8,-.1]);const floorR=ring(2.37,.018,ice,g,[0,-1.69,-.1]);floorR.rotation.x=Math.PI/2;
+    const blob=mesh(new THREE.PlaneGeometry(1,1),contactShadow,g,[0,-1.695,0]);blob.rotation.x=-Math.PI/2;blob.scale.set(name==='car'?3.6:name==='robot'?2.2:2.6,name==='car'?2.4:name==='robot'?1.6:1.5,1);blob.renderOrder=1;
     return g;
   }
   const helmetStage=portal('helmet',2.55),robotStage=portal('robot',2.7),carStage=portal('car',2.65);

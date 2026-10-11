@@ -1,6 +1,6 @@
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
-import { heyboxMarkShapes, drawHeyboxMark } from './heybox-mark.js?v=journey-31';
+import { heyboxMarkShapes, drawHeyboxMark } from './heybox-mark.js?v=journey-32';
 
 // The journey ends in a friend's living room: a small toy house at the end of
 // the park road. You walk in through the front door, six friends (Kenney Mini
@@ -230,9 +230,12 @@ export function createCommunityPlaza({ THREE: T, parent, core = null, position =
   const tail = new T.Group(); tail.position.set(-.22, .1, 0); cat.add(tail);
   { const t = new T.Mesh(keep(new T.CylinderGeometry(.03, .035, .32, 6)), mats.cat); t.rotation.z = Math.PI / 2.3; t.position.set(-.12, .04, 0); tail.add(t); }
 
+  // Everything solid casts into the room light; ceilings, roof and flat floor layers only receive.
+  const NO_CAST = new Set(['ceiling', 'roof', 'roofDark', 'sky', 'windowWarm', 'lamp', 'floor', 'rug', 'grass', 'dirt', 'dirtDark', 'mat', 'markInk']);
   for (const [key, list] of batches) {
     const merged = mergeGeometries(list.filter(g => g.attributes.position.count).map(g => g.index ? g.toNonIndexed() : g), false); list.forEach(g => g.dispose());
     if (!merged) continue; keep(merged); const mesh = new T.Mesh(merged, mats[key]); mesh.name = 'room-' + key; group.add(mesh);
+    mesh.receiveShadow = true; mesh.castShadow = !NO_CAST.has(key);
   }
   // The front door swings out onto the porch on its left hinge.
   const door = new T.Group(); door.name = 'front-door'; door.position.set(-DOOR, 0, D + .01); group.add(door);
@@ -241,6 +244,7 @@ export function createCommunityPlaza({ THREE: T, parent, core = null, position =
     const knob = new T.Mesh(keep(new T.SphereGeometry(.05, 10, 8)), mats.gold); knob.position.set(DOOR * 2 - .16, 1.0, .07); door.add(knob);
     const plate = new T.Mesh(keep(new T.BoxGeometry(.3, .2, .02)), mats.gold); plate.position.set(DOOR, 1.25, .05); door.add(plate);
     for (const s of heyboxMarkShapes(T, .15)) { const m = new T.Mesh(keep(new T.ShapeGeometry(s, 6)), mats.ink); m.position.set(DOOR, 1.25, .062); door.add(m); } }
+  for (const o of [door, cat, spare]) o.traverse(m => { if (m.isMesh) m.castShadow = m.receiveShadow = true; });
   // String lights: along the roof edges outside, and across the room inside.
   const bulbSpots = [];
   for (let i = 0; i < 22; i++) { const u = i / 21, s = u < .5 ? -1 : 1, k = u < .5 ? u * 2 : (1 - u) * 2; bulbSpots.push([s * roofHalf * (1 - k), H + .02 + rise * k, D + .66]); }
@@ -254,13 +258,17 @@ export function createCommunityPlaza({ THREE: T, parent, core = null, position =
     // Measure the closed box on its own, so the fit is in table space.
     core.ready?.then(() => { if (disposed) return; core.update(0, 0); boxHolder.remove(core.group); core.group.updateMatrixWorld(true);
       const b = new T.Box3().setFromObject(core.group), s = b.getSize(new T.Vector3()), c = b.getCenter(new T.Vector3()), k = .62 / Math.max(.001, s.x, s.y);
-      core.group.scale.setScalar(k); core.group.position.set(-c.x * k, -b.min.y * k + .005, -c.z * k); boxHolder.add(core.group); }); }
+      core.group.scale.setScalar(k); core.group.position.set(-c.x * k, -b.min.y * k + .005, -c.z * k); boxHolder.add(core.group);
+      core.group.traverse(m => { if (m.isMesh) m.castShadow = true; }); }); }
 
   const lampLight = new T.PointLight(0xffb070, 0, 0, 2); lampLight.position.set(-3.3, 2.0, -1.8);
   const roomLight = new T.PointLight(0xffc89a, 0, 0, 2); roomLight.position.set(.1, 2.35, .3);
   const porchLight = new T.PointLight(0xffb469, 0, 0, 2); porchLight.position.set(DOOR + .45, 2.0, D + .6);
   const warmth = new T.HemisphereLight(0xffe4c4, 0x6b4630, 0);
-  rig.add(lampLight, roomLight, porchLight, warmth);
+  // Ceiling key light: the one light that casts, so furniture and friends sit on the floor.
+  const keyLight = new T.SpotLight(0xffd9b0, 0, 0, 1.2, .8, 1); keyLight.position.set(1.5, 2.55, 1.6); keyLight.target.position.set(-.9, 0, -1.4);
+  keyLight.castShadow = true; keyLight.shadow.camera.near = .2; keyLight.shadow.camera.far = 9; keyLight.shadow.normalBias = .02; keyLight.shadow.bias = -.0004; keyLight.shadow.radius = 4; keyLight.shadow.blurSamples = 12;
+  rig.add(lampLight, roomLight, porchLight, warmth, keyLight, keyLight.target);
 
   // Kenney rigs: root, torso, head, arm-left/right, leg-left/right. Rest pose is a T-pose.
   const rot = (x, y, z) => new T.Quaternion().setFromEuler(new T.Euler(x * DEG, y * DEG, z * DEG));
@@ -273,7 +281,7 @@ export function createCommunityPlaza({ THREE: T, parent, core = null, position =
     Promise.all(roster.map(r => loader.loadAsync(new URL(`./models/players/character-${r.file}.glb`, import.meta.url).href).then(gltf => {
       if (disposed) { dispose(gltf.scene); return; }
       const model = gltf.scene; model.scale.setScalar(1.5); r.frame.decompose(model.position, model.quaternion, new T.Vector3());
-      model.traverse(o => { if (o.isMesh) { o.frustumCulled = false; owned.add(o.geometry); for (const m of [o.material].flat()) { owned.add(m); if (m.map) owned.add(m.map); m.envMapIntensity = .3; m.color.setScalar(.82); } } });
+      model.traverse(o => { if (o.isMesh) { o.frustumCulled = false; owned.add(o.geometry); for (const m of [o.material].flat()) { owned.add(m); if (m.map) owned.add(m.map); m.envMapIntensity = .3; m.color.setScalar(.82); } o.castShadow = o.receiveShadow = true; } });
       const bone = n => model.getObjectByName(n);
       const c = { ...r, model, root: bone('root'), torso: bone('torso'), head: bone('head'), armL: bone('arm-left'), armR: bone('arm-right'), legL: bone('leg-left'), legR: bone('leg-right'), yaw: (v => Math.atan2(v.x, v.z))(new T.Vector3(0, 0, 1).transformDirection(r.frame)), seed: characters.length * 1.7 };
       group.add(model); characters.push(c);
@@ -328,7 +336,9 @@ export function createCommunityPlaza({ THREE: T, parent, core = null, position =
     const visible = p > .885; group.visible = visible;
     const open = smooth(.912, .942, p), inside = smooth(.94, .965, p), greet = smooth(.952, .99, p), seated = smooth(.972, 1, p);
     porchLight.intensity = visible ? 2.2 * (1 - inside * .6) : 0; lampLight.intensity = visible ? 2.6 * Math.max(.25, inside) : 0;
-    roomLight.intensity = visible ? 3.2 * Math.max(.2, inside) : 0; warmth.intensity = visible ? .35 * inside : 0;
+    roomLight.intensity = visible ? 1.3 * Math.max(.3, inside) : 0; warmth.intensity = visible ? .22 * inside : 0;
+    keyLight.intensity = visible ? 10 * inside : 0; keyLight.castShadow = visible && inside > 0;
+    const size = quality === 'ultra' ? 2048 : 1024; if (keyLight.shadow.mapSize.x !== size) { keyLight.shadow.mapSize.set(size, size); keyLight.shadow.map?.dispose(); keyLight.shadow.map = null; }
     if (!visible) return;
     door.rotation.y = -open * 1.75;
     if (camera) { camLocal.copy(camera.position); group.worldToLocal(camLocal); }

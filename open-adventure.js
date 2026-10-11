@@ -1,28 +1,28 @@
 import { EffectComposer } from './vendor/EffectComposer.js';
 import { RenderPass } from './vendor/RenderPass.js';
 import { UnrealBloomPass } from './vendor/UnrealBloomPass.js';
-import { createCinematicPass } from './cinematic-pass.js?v=journey-31';
-import { normalizeQuality } from './journey-quality.js?v=journey-31';
+import { createCinematicPass } from './cinematic-pass.js?v=journey-32';
+import { normalizeQuality } from './journey-quality.js?v=journey-32';
 import { OutputPass } from './vendor/OutputPass.js';
-import { createSpatialRefraction } from './spatial-refraction.js?v=journey-31';
-import {createMiniatureCar} from './miniature-car.js?v=journey-31';
-import {createToyShip} from './toy-ship.js?v=journey-31';
-import {createTexturePrewarm} from './texture-prewarm.js?v=journey-31';
-import {createDestinationArrival} from './destination-arrival.js?v=journey-31';
-import {createPortalEntry} from './portal-entry.js?v=journey-31';
-import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-31';
+import { createSpatialRefraction } from './spatial-refraction.js?v=journey-32';
+import {createMiniatureCar} from './miniature-car.js?v=journey-32';
+import {createToyShip} from './toy-ship.js?v=journey-32';
+import {createTexturePrewarm} from './texture-prewarm.js?v=journey-32';
+import {createDestinationArrival} from './destination-arrival.js?v=journey-32';
+import {createPortalEntry} from './portal-entry.js?v=journey-32';
+import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-32';
 import * as THREE from './vendor/three.module.js';
 import { MeshoptDecoder } from './vendor/meshopt_decoder.module.js';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { RoomEnvironment } from './vendor/RoomEnvironment.js';
-import { createCosmicJourney } from './cosmic-journey.js?v=journey-31';
+import { createCosmicJourney } from './cosmic-journey.js?v=journey-32';
 
 // One renderer, three independently owned worlds, and the original cinematic journey.
 export async function createWorld(canvas, { onReady, onError, onState, audio = null, onFrame, onContextLost, recoverySnapshot = null, signal } = {}) {
   if(signal?.aborted)throw new Error('World creation cancelled');
   const names=['helmet','robot','car'];
   // Game code and game-only models load when an entry starts and are released on exit; only gallery models stay resident.
-  const gameModules={helmet:'./flight-game.js?v=journey-31',robot:'./sandbox-game.js?v=journey-31',car:'./driving-game.js?v=journey-31'};
+  const gameModules={helmet:'./flight-game.js?v=journey-32',robot:'./sandbox-game.js?v=journey-32',car:'./driving-game.js?v=journey-32'};
   const gameExtras={robot:['weapon','./models/fps-pistol.glb']};
   const files={robot:'RobotExpressive.glb'};
   const instructions={helmet:'悬停星舰 1 秒，进入深空救援',robot:'悬停作战装置 1 秒，突入空间设施',car:'悬停遥控车 1 秒，驶入玩具公园'};
@@ -55,7 +55,7 @@ export async function createWorld(canvas, { onReady, onError, onState, audio = n
     // Keep reflective surfaces below the glow threshold; HDR light sources stay bright.
     // Inside the friends' room the space glow steps back: lamps, not bloom, light it.
     const indoor = homepage ? journey.getIndoor?.() || 0 : 0;
-    if(homepage){for(const item of showcaseLights)item.light.intensity=item.intensity*(ultra?.38:1)*(1-.55*indoor);scene.environmentIntensity=(ultra?.58:1)*(1-.6*indoor);}
+    if(homepage){for(const item of showcaseLights)item.light.intensity=item.intensity*(ultra?.38:1)*(1-.85*indoor);scene.environmentIntensity=(ultra?.58:1)*(1-.8*indoor);}
     opticsPass?.updateOptics(journey.getOptics?.(), camera, width, height, homepage && !reduced);
     cinematicPass?.configure(ultra, width, height);
     renderer.toneMappingExposure = homepage ? .95 : world === 'helmet' ? 1.1 : 1;

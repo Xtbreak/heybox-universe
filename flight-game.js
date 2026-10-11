@@ -1,4 +1,4 @@
-import { createToyShip, createToyCarrier } from './toy-ship.js?v=journey-31';
+import { createToyShip, createToyCarrier } from './toy-ship.js?v=journey-32';
 /** Original rescue-flight game. Shared models stay owned by the host. */
 export function createGame({ THREE: T, scene, camera, model, assets = {}, sound = () => {}, emit = () => {}, reduced = false }) {
   const root = new T.Group(); root.name = 'Nacre-rescue-sector'; scene.add(root);

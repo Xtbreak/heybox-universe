@@ -6,8 +6,12 @@ export function createGame({ THREE, scene, camera, model, playAnimation = () => 
   scene.children.forEach(object => { if (object.isLight) { prior.lights.push([object, object.visible]); object.visible = false; } });
   // Bounded neutral fill preserves the GLB finish; local fixture lights shape the rooms.
   scene.environmentIntensity = .3;
-  root.add(new THREE.HemisphereLight(0xc6d7e0, 0x20292f, .82));
-  const keyLight = new THREE.DirectionalLight(0xe0e8e9, 1.25); keyLight.position.set(-7, 14, 5); root.add(keyLight);
+  root.add(new THREE.HemisphereLight(0xc6d7e0, 0x20292f, .6));
+  // The key light stands in for the ceiling fixtures: it casts over the whole compound,
+  // and the ceiling slab itself is excluded so the rooms below still receive it.
+  const keyLight = new THREE.DirectionalLight(0xe0e8e9, 2.1); keyLight.position.set(-13, 24, -16); keyLight.target.position.set(0, 0, -5); root.add(keyLight, keyLight.target);
+  keyLight.castShadow = true; keyLight.shadow.mapSize.set(reduced ? 1024 : 2048, reduced ? 1024 : 2048);
+  Object.assign(keyLight.shadow.camera, { left: -34, right: 34, top: 42, bottom: -42, near: 1, far: 70 }); keyLight.shadow.normalBias = .04; keyLight.shadow.bias = -.0003; keyLight.shadow.radius = 2.5;
   const resources = new Set(), own = value => (resources.add(value), value);
   const clamp = THREE.MathUtils.clamp, V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
   difficulty = clamp(Math.floor(Number(difficulty) || 1), 1, 3);
@@ -120,7 +124,7 @@ export function createGame({ THREE, scene, camera, model, playAnimation = () => 
   for (const x of [-28, 28]) { wall(x, -5, .65, 74, 2.8); for (let z = -39; z < 30; z += 6) box(x, 3, z, .95, .25, .55, mat.orange); }
   wall(0, 30, 56, .65, 2.8); wall(0, -42, 56, .65, 2.8);
   // The visible ceiling is also solid, including when jumping from raised cover.
-  solid(0, 4.65, -15.1, 36.6, .22, 46.5, mat.dark, 'metal');
+  solid(0, 4.65, -15.1, 36.6, .22, 46.5, mat.dark, 'metal').userData.noCast = true;
   for (let z = 4; z > -36; z -= 6) { box(0, 4.4, z, 7.5, .18, .22, mat.edge); box(0, 4.35, z, 2.6, .055, .45, mat.lamp); }
   for (const x of [-11, 11]) for (let z = 3; z >= -33; z -= 12) { box(x, 4.39, z, 3.5, .11, .55, mat.lamp); }
   for (const x of [-17.4, 17.4]) { cylinder(x, 3.85, -14, .12, 44, mat.edge, root, 'z'); cylinder(x, 3.5, -14, .07, 44, mat.orange, root, 'z'); }
@@ -803,8 +807,15 @@ export function createGame({ THREE, scene, camera, model, playAnimation = () => 
     const muzzle = muzzleFlash.getWorldPosition(V()), segment = muzzle.clone().sub(eye), length = segment.length();
     muzzleBlocked = !!raycast(eye, segment.divideScalar(length || 1), length, { actors: false });
   }
+  // Every solid shape casts and receives, except the ceiling, the light fixtures and the first-person view.
+  let shadowsReady = false;
+  function enableShadows() {
+    shadowsReady = true;
+    root.traverse(o => { if (!o.isMesh || o.material?.isMeshBasicMaterial || o.material === mat.lamp) return; o.receiveShadow = true; o.castShadow = !o.userData.noCast; });
+  }
   function update(dt, input = {}) {
     if (disposed || dead || completed) return; dt = clamp(Number.isFinite(dt) ? dt : 0, 0, .05); time += dt;
+    if (!shadowsReady || (time % 1 < dt)) enableShadows();
     const keys = input.keys || new Set(), has = (...names) => names.some(k => keys.has(k)), edge = (...names) => names.some(k => keys.has(k) && !prevKeys.has(k));
     shotCooldown = Math.max(0, shotCooldown - dt); recoil = Math.max(0, recoil - dt * .42); recoilKick = THREE.MathUtils.damp(recoilKick, 0, 12, dt); flashTime = Math.max(0, flashTime - dt);
     if (reloadTime > 0) { reloadTime = Math.max(0, reloadTime - dt); if (reloadTime === 0) { const amount = Math.min(weapons[weapon].maxAmmo - ammo[weapon], reserve[weapon]); ammo[weapon] += amount; reserve[weapon] -= amount; audio('reloadEnd'); } }
@@ -974,5 +985,6 @@ export function createGame({ THREE, scene, camera, model, playAnimation = () => 
   camera.near = .045; camera.far = 135; camera.fov = 76; camera.rotation.order = 'YXZ'; camera.updateProjectionMatrix();
   resize(width, height); updateAim(); updateCamera(.016, {}); root.updateMatrixWorld(true);
   saveCheckpoint();
+  enableShadows();
   return { update, action, getState, resize, dispose, snapshot, restore, retryCheckpoint, resetInput: () => action('clearInput') };
 }

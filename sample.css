@@ -189,12 +189,12 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
  #speed-pill{top:74px;height:24px;width:calc(120px + var(--speed,0) * 80px)}
 
 }
-/* journey-31: near-zero copy. Script-owned nodes stay in the DOM but out of sight. */
+/* journey-32: near-zero copy. Script-owned nodes stay in the DOM but out of sight. */
 .frame .label,.world-index,#speed-pill,.journey-readout,#render-mode,#model-hover,.passage-caption,footer,#load-title,#load-status,#charge-label,.loading .label{display:none!important}
 #model-hud{display:none!important}body:has(#retry-model:not([hidden])) #model-hud{display:flex!important}
 #model-hud #model-name,#model-hud #model-instruction{display:none}
 .jump-charge{gap:16px}
-/* journey-31: the walk from the porch into the living room ends the page. */
+/* journey-32: the walk from the porch into the living room ends the page. */
 #together{height:230svh;min-height:1500px}
 #together .copy{top:9svh;width:46%}
 #together h2{font-size:clamp(38px,4.2vw,68px);text-shadow:0 4px 30px #1a0d06cc}
@@ -203,7 +203,7 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
 .together-credits{display:inline-block;margin-top:22px;font-size:10px;letter-spacing:1.5px;color:#f2d6b6a8;pointer-events:auto;text-decoration:none;border-bottom:1px solid #f2d6b640;padding-bottom:3px}
 .together-credits:hover,.together-credits:focus-visible{color:#fff3e2}
 @media(max-width:800px){#together .copy{top:7svh;width:86%}#together h2{font-size:clamp(30px,8vw,44px)}}
-/* journey-31: one short frame per world; the camera plateau no longer spans two screens of still scrolling. */
+/* journey-32: one short frame per world; the camera plateau no longer spans two screens of still scrolling. */
 #equipment,#companion,#drive{height:118svh;min-height:800px}
 /* Readability over bright warp glows: a soft dark halo behind every chapter title. */
 .frame h1,.frame h2{text-shadow:0 2px 22px #050a10c0,0 0 70px #050a1080}
