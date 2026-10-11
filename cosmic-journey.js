@@ -1,11 +1,11 @@
-import { createSpaceBackdrop } from './space-backdrop.js?v=journey-39';
-import { createJourneyUltra } from './journey-ultra.js?v=journey-39';
-import { createVoxelHeybox } from './voxel-heybox.js?v=journey-39';
-import { createJourneyParticles } from './journey-particles.js?v=journey-39';
-import { createCommunityPlaza } from './community-plaza.js?v=journey-39';
-import { createLunarOpening } from './lunar-opening.js?v=journey-39';
-import { SHED_AT } from './brick-hero.js?v=journey-39';
-import { createShowcaseScenes } from './showcase-scenes.js?v=journey-39';
+import { createSpaceBackdrop } from './space-backdrop.js?v=journey-40';
+import { createJourneyUltra } from './journey-ultra.js?v=journey-40';
+import { createVoxelHeybox } from './voxel-heybox.js?v=journey-40';
+import { createJourneyParticles } from './journey-particles.js?v=journey-40';
+import { createCommunityPlaza } from './community-plaza.js?v=journey-40';
+import { createLunarOpening } from './lunar-opening.js?v=journey-40';
+import { SHED_AT } from './brick-hero.js?v=journey-40';
+import { createShowcaseScenes } from './showcase-scenes.js?v=journey-40';
 
 const coarsePointer=globalThis.matchMedia?.('(pointer: coarse)');
 // A continuous, scene-space expedition. Imported GLB transforms are never modified.
@@ -132,6 +132,8 @@ export function createCosmicJourney({ THREE, scene, camera, entries, audio = nul
   const showcase=createShowcaseScenes({THREE,root,locations:modelLocations});
   const worldFades=names.map(n=>fadingGroup(worlds[n].g)),sceneryFades=[orbitalScenery,lunarScenery,highway].map(fadingGroup);
   const windowFade=(p,a,b,c,d)=>smooth(a,b,p)*(1-smooth(c,d,p));
+  // Worlds only grow in around the camera on its last few metres, never as a far-off island in the void.
+  const ARRIVE=[[.326,.35],[.529,.552],[.756,.78]];
   const nodes=[
     [0, 0,.3,9, 1.1,.1,0,42], [.065, -.35,.55,7.9, 1.25,.14,0,43], [.12, -.55,.7,6.6, .7,.1,-.5,45],
     [.19, .2,.1,2.6, 0,0,-14,59], [.23, 0,0,-10, 0,0,-38,67],
@@ -203,11 +205,11 @@ export function createCosmicJourney({ THREE, scene, camera, entries, audio = nul
       g.rotation.set(name==='car'?.04:name==='helmet'?.32:0,name==='helmet'?Math.PI-1.0+Math.sin(t*.18)*.09:name==='robot'?-.19:name==='car'?-Math.PI*.19:0,0);
       const held=heldModelPoses.get(name);if(held){g.position.copy(held.position);g.rotation.copy(held.rotation);}
       g.scale.setScalar(name==='car'?1.38:name==='robot'?1.05:1.07);
-      worldFades[i](i===0?windowFade(p,.265,.30,.475,.51):i===1?windowFade(p,.47,.51,.67,.70):windowFade(p,.70,.75,.895,.915));portalSpinners[i].rotation.z=reduced?0:t*(i%2?-.1:.12);
+      worldFades[i](i===0?windowFade(p,...ARRIVE[0],.475,.51):i===1?windowFade(p,...ARRIVE[1],.67,.70):windowFade(p,...ARRIVE[2],.895,.915));portalSpinners[i].rotation.z=reduced?0:t*(i%2?-.1:.12);
     }
     const plateau=[p>.36&&p<.44,p>.565&&p<.655,p>.79&&p<.885];
-    for(const e of showcase.update({fades:[windowFade(p,.265,.30,.475,.51),windowFade(p,.47,.51,.67,.70),windowFade(p,.70,.75,.925,.95)],focus:plateau,progress:p,time:t,dt,reduced,view:height*Math.min(2,globalThis.devicePixelRatio||1)}))audio?.play(e.name,{intensity:e.intensity,pan:e.pan});
-    sceneryFades[0](windowFade(p,.255,.29,.51,.56));sceneryFades[1](windowFade(p,.465,.50,.67,.70));sceneryFades[2](windowFade(p,.70,.745,.925,.95));
+    for(const e of showcase.update({fades:[windowFade(p,...ARRIVE[0],.475,.51),windowFade(p,...ARRIVE[1],.67,.70),windowFade(p,...ARRIVE[2],.925,.95)],focus:plateau,progress:p,time:t,dt,reduced,view:height*Math.min(2,globalThis.devicePixelRatio||1)}))audio?.play(e.name,{intensity:e.intensity,pan:e.pan});
+    sceneryFades[0](windowFade(p,...ARRIVE[0],.51,.56));sceneryFades[1](windowFade(p,...ARRIVE[1],.67,.70));sceneryFades[2](windowFade(p,...ARRIVE[2],.925,.95));
     planet.rotation.y=reduced?0:t*.012;skyRing.rotation.z=reduced?0:t*.025;
     backdrop.update({quality:options.quality,progress:pj,time:t,reduced,width,height,pointerX,pointerY,desktop:!coarsePointer?.matches,cameraZ:camera.position.z});
     ultraEffects.update({progress:pj,time:t,dt,reduced,quality:options.quality,hoverTarget:hovered,hoverProgress:options.hoverProgress||0});

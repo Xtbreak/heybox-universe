@@ -4,7 +4,7 @@
 // flat-shaded batches (one draw per material per cluster); clusters rise into place as
 // their chapter fades in, and every loop only runs while its scene is on screen.
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
-import { createToyShip, createToyCarrier } from './toy-ship.js?v=journey-39';
+import { createToyShip, createToyCarrier } from './toy-ship.js?v=journey-40';
 
 const noop = () => {};
 const clamp = x => Math.max(0, Math.min(1, x));

@@ -2,7 +2,7 @@
 // stack themselves into a cube, breathe (seams open and leak ice light from a core lamp),
 // then every brick that is not part of the mark pops out and drops onto the moon in a
 // puff of dust. The mark keeps breathing until the scroll shatters it into grains.
-import { NOISE_GLSL } from './lunar-opening.js?v=journey-39';
+import { NOISE_GLSL } from './lunar-opening.js?v=journey-40';
 
 export const BX = 12, BY = 12, BZ = 6, BRICKS = BX * BY * BZ;
 export const ASSEMBLE = { start: .3, spread: 2.4, dur: .95 }, SHED_AT = 4.6, SHED = { spread: 1.8, dur: 1.05 };
@@ -145,6 +145,25 @@ export function createBrickHero({ THREE: T, root, heroAnchor, lunar, mask, pitch
     fragmentShader: 'varying float vA;void main(){float r=length(gl_PointCoord-.5);gl_FragColor=vec4(vec3(.62,.6,.57),vA*(1.-smoothstep(.1,.5,r)));}' }));
   const dust = new T.Points(dustGeo, dustMat); dust.frustumCulled = false; dust.renderOrder = 3; dust.raycast = () => {}; root.add(dust);
 
+  // Seam sparks: fine ice glitter that leaks out between the breathing bricks, drifts and winks out.
+  const SPARKS = 1100, sparkPos = new Float32Array(SPARKS * 3), sparkInfo = new Float32Array(SPARKS * 4);
+  for (let i = 0; i < SPARKS; i++) { const b = logo[Math.floor(rand() * logo.length)]; const ax = Math.floor(rand() * 3), sg = rand() < .5 ? -1 : 1;
+    const o = [(rand() - .5) * P, (rand() - .5) * P, (rand() - .5) * P]; o[ax] = sg * P * .5;
+    sparkPos.set([slot[b * 3] + o[0], slot[b * 3 + 1] + o[1], slot[b * 3 + 2] + o[2]], i * 3); sparkInfo.set([rand(), rand(), rand(), rand()], i * 4); }
+  const sparkGeo = keep(new T.BufferGeometry()); sparkGeo.setAttribute('position', new T.BufferAttribute(sparkPos, 3)); sparkGeo.setAttribute('aInfo', new T.BufferAttribute(sparkInfo, 4));
+  const sparkMat = keep(new T.ShaderMaterial({ transparent: true, depthWrite: false, blending: T.AdditiveBlending,
+    uniforms: { uAnchor: uniforms.uAnchor, uTime: uniforms.uTime, uView: { value: 800 }, uAlpha: { value: 0 }, uHalf: { value: half } },
+    vertexShader: `attribute vec4 aInfo;uniform mat4 uAnchor;uniform float uTime,uView,uAlpha;uniform vec3 uHalf;varying float vA;varying vec3 vC;
+      void main(){float life=2.2+aInfo.x*2.8,age=mod(uTime+aInfo.y*life,life)/life;
+        vec3 out_=normalize(position/uHalf+vec3(aInfo.z,aInfo.w,aInfo.x)*.6-.3);
+        vec3 p=position*(1.+.06*sin(uTime*1.2-length(position)*2.6))+out_*(.04+age*(.35+aInfo.z*.55))+vec3(sin(uTime*.9+aInfo.w*20.)*.03,age*(.12+.2*aInfo.w),cos(uTime*.7+aInfo.z*20.)*.03);
+        vec4 mv=modelViewMatrix*(uAnchor*vec4(p,1.));gl_Position=projectionMatrix*mv;
+        float breath=.5+.5*sin(uTime*1.2-length(position)*2.6+aInfo.x*.8);
+        vA=1.6*uAlpha*smoothstep(0.,.08,age)*(1.-smoothstep(.45,1.,age))*(.35+.65*breath)*(.6+.4*sin(uTime*(9.+aInfo.w*7.)+aInfo.y*50.));
+        vC=mix(vec3(.55,.85,1.),vec3(1.),aInfo.w*.7);gl_PointSize=clamp((.014+.022*aInfo.z)*projectionMatrix[1][1]*uView*.5/max(.3,-mv.z),1.2,5.);}`,
+    fragmentShader: 'varying float vA;varying vec3 vC;void main(){float r=length(gl_PointCoord-.5);float a=min(1.,vA*(1.-smoothstep(.05,.5,r)));gl_FragColor=vec4(vC*a,a);}' }));
+  const sparks = new T.Points(sparkGeo, sparkMat); sparks.name = 'brick-seam-sparks'; sparks.frustumCulled = false; sparks.renderOrder = 4; sparks.raycast = () => {}; root.add(sparks);
+
   // The core lamp: lights the inner faces through the open seams and spills onto the ground.
   const core = new T.PointLight(0x8fdcff, 0, 7, 2); core.name = 'brick-core-light'; heroAnchor.add(core);
 
@@ -166,7 +185,7 @@ export function createBrickHero({ THREE: T, root, heroAnchor, lunar, mask, pitch
     groundAttr.needsUpdate = true; dustAttr.needsUpdate = true;
   }
   function update({ since = 0, shed = -1, progress = 0, time = 0, reduced = false, quality = 'standard', pointer, peel = false, aspect = 1, flash = 0, tremble = 0, height = 800, visible = true }) {
-    mesh.visible = dust.visible = visible; core.visible = visible;
+    mesh.visible = dust.visible = visible; core.visible = visible; sparks.visible = visible && !reduced;
     if (!visible) return;
     root.updateWorldMatrix(true, false); heroAnchor.updateWorldMatrix(true, false);
     inv.copy(root.matrixWorld).invert(); uniforms.uAnchor.value.multiplyMatrices(inv, heroAnchor.matrixWorld);
@@ -177,8 +196,9 @@ export function createBrickHero({ THREE: T, root, heroAnchor, lunar, mask, pitch
     dustMat.uniforms.uView.value = height * Math.min(2, globalThis.devicePixelRatio || 1);
     // The lamp swells with the breath and fades as the mark gives way.
     const assembled = clamp((since - ASSEMBLE.start - ASSEMBLE.spread * .5) / 1.5), gone = clamp((progress - .088) / .05);
+    sparkMat.uniforms.uView.value = dustMat.uniforms.uView.value; sparkMat.uniforms.uAlpha.value = clamp((since - SHED_AT - 1) / 1.5) * (1 - gone) * (quality === 'ultra' ? 1 : .8) * (1 + 1.5 * tremble + flash);
     core.intensity = assembled * (1 - gone) * (reduced ? 2.4 : 1.6 + 1.6 * (.5 + .5 * Math.sin(time * 1.2))) * (1 + 3 * flash + 2 * tremble);
   }
   return { mesh, update, shards, shardOrder, half, logoCount: logo.length,
-    dispose() { mesh.removeFromParent(); dust.removeFromParent(); core.removeFromParent(); core.dispose?.(); } };
+    dispose() { mesh.removeFromParent(); dust.removeFromParent(); sparks.removeFromParent(); core.removeFromParent(); core.dispose?.(); } };
 }

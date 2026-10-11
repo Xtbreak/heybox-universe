@@ -1,28 +1,28 @@
 import { EffectComposer } from './vendor/EffectComposer.js';
 import { RenderPass } from './vendor/RenderPass.js';
 import { UnrealBloomPass } from './vendor/UnrealBloomPass.js';
-import { createCinematicPass } from './cinematic-pass.js?v=journey-39';
-import { normalizeQuality } from './journey-quality.js?v=journey-39';
+import { createCinematicPass } from './cinematic-pass.js?v=journey-40';
+import { normalizeQuality } from './journey-quality.js?v=journey-40';
 import { OutputPass } from './vendor/OutputPass.js';
-import { createSpatialRefraction } from './spatial-refraction.js?v=journey-39';
-import {createMiniatureCar} from './miniature-car.js?v=journey-39';
-import {createToyShip} from './toy-ship.js?v=journey-39';
-import {createTexturePrewarm} from './texture-prewarm.js?v=journey-39';
-import {createDestinationArrival} from './destination-arrival.js?v=journey-39';
-import {createPortalEntry} from './portal-entry.js?v=journey-39';
-import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-39';
+import { createSpatialRefraction } from './spatial-refraction.js?v=journey-40';
+import {createMiniatureCar} from './miniature-car.js?v=journey-40';
+import {createToyShip} from './toy-ship.js?v=journey-40';
+import {createTexturePrewarm} from './texture-prewarm.js?v=journey-40';
+import {createDestinationArrival} from './destination-arrival.js?v=journey-40';
+import {createPortalEntry} from './portal-entry.js?v=journey-40';
+import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-40';
 import * as THREE from './vendor/three.module.js';
 import { MeshoptDecoder } from './vendor/meshopt_decoder.module.js';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { RoomEnvironment } from './vendor/RoomEnvironment.js';
-import { createCosmicJourney } from './cosmic-journey.js?v=journey-39';
+import { createCosmicJourney } from './cosmic-journey.js?v=journey-40';
 
 // One renderer, three independently owned worlds, and the original cinematic journey.
 export async function createWorld(canvas, { onReady, onError, onState, audio = null, onFrame, onContextLost, recoverySnapshot = null, signal } = {}) {
   if(signal?.aborted)throw new Error('World creation cancelled');
   const names=['helmet','robot','car'];
   // Game code and game-only models load when an entry starts and are released on exit; only gallery models stay resident.
-  const gameModules={helmet:'./flight-game.js?v=journey-39',robot:'./sandbox-game.js?v=journey-39',car:'./driving-game.js?v=journey-39'};
+  const gameModules={helmet:'./flight-game.js?v=journey-40',robot:'./sandbox-game.js?v=journey-40',car:'./driving-game.js?v=journey-40'};
   const gameExtras={robot:['weapon','./models/fps-pistol.glb']};
   const files={robot:'RobotExpressive.glb'};
   const instructions={helmet:'悬停星舰 1 秒，进入深空救援',robot:'悬停作战装置 1 秒，突入空间设施',car:'悬停遥控车 1 秒，驶入玩具公园'};

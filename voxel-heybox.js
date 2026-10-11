@@ -1,8 +1,9 @@
 // The opening box is built from big bricks (brick-hero.js). When the scroll lines up the
 // mark, its bricks shatter into 4800 small obsidian grains, one instanced draw. The same
-// grains scatter and re-form as each world, and finally stream through the front door
-// into the little logo on the living-room table.
-import { createBrickHero, BX, BY, SHED_AT } from './brick-hero.js?v=journey-39';
+// grains scatter and re-form as each world; every moving grain sheds a tail of fine ice
+// glitter. After the car only the glitter remains: it streams up the road, through the
+// front door, and fades out in the room.
+import { createBrickHero, BX, BY, SHED_AT } from './brick-hero.js?v=journey-40';
 export const NX = 20, NY = 20, NZ = 12, VOXELS = NX * NY * NZ, PITCH = .11, BRICK = .18;
 export const VOXEL_PATH = [
   { from: 'box', to: 'helmet', leave: [.088, .15], arrive: [.295, .367], burst: 2.6 },
@@ -130,6 +131,25 @@ export function createVoxelHeybox({ THREE: T, root, camera, particles, heroAncho
   material.customProgramCacheKey = () => 'voxel-heybox-2';
   const mesh = new T.Mesh(geo, material); mesh.name = 'voxel-heybox-grains'; mesh.frustumCulled = false; mesh.raycast = () => {}; root.add(mesh);
 
+  // Fine glitter: every grain drags TAIL tiny sparks that replay its own path a little behind it.
+  const TAIL = 4, trailGeo = keep(new T.InstancedBufferGeometry());
+  trailGeo.setAttribute('position', new T.Float32BufferAttribute(Array.from({ length: TAIL }, (_, k) => [k, 0, 0]).flat(), 3));
+  for (const k of ['aFrom', 'aTo', 'aOrder', 'aSeed', 'aGround']) trailGeo.setAttribute(k, geo.getAttribute(k));
+  trailGeo.instanceCount = VOXELS;
+  Object.assign(uniforms, { uLag: { value: .0035 }, uTrailEnd: { value: 1 }, uTrailAlpha: { value: 1 }, uView: { value: 800 } });
+  const trailMaterial = keep(new T.ShaderMaterial({ uniforms, transparent: true, depthWrite: false, blending: T.AdditiveBlending,
+    vertexShader: HEAD + `\nuniform float uLag,uTrailEnd,uTrailAlpha,uView;varying float vtA;varying vec3 vtC;
+      void main(){float k=position.x,vxPP=uP-k*uLag;` + STATE.replace(/\buP\b/g, 'vxPP') + `
+        vec3 jt=vec3(fract(s1*13.7+k*.37),fract(s2*7.3+k*.61),fract((s1+s2)*5.1+k*.29))-.5;
+        vxP+=jt*(.04+.11*k)*(.3+sin(3.14159*t))+uCamU*k*.012;
+        vec4 mv=modelViewMatrix*vec4(vxP,1.);gl_Position=projectionMatrix*mv;
+        float tw=.55+.45*sin(uTime*(7.+s2*6.)+s1*60.+k*1.7);
+        vtA=uTrailAlpha*smoothstep(0.,.035,t)*(1.-smoothstep(uTrailEnd-.28,uTrailEnd,t))*max(startVis*endVis,step(.5,uRoute))*tw*(1.-.18*k)*(.35+.65*fract(s1*31.+k*.13));
+        vtC=mix(vec3(.62,.86,1.),vec3(1.),fract(s2*17.+k*.3));
+        gl_PointSize=clamp((.9+1.6*fract(s1*7.+k*.21))*uView/1000.*(1.+3.*smoothstep(4.,.6,-mv.z)),1.,4.5);}`,
+    fragmentShader: 'varying float vtA;varying vec3 vtC;void main(){vec2 c=gl_PointCoord-.5;float r=length(c);float a=vtA*(1.-smoothstep(.12,.5,r))+vtA*.5*max(0.,1.-abs(c.x)*9.)*max(0.,1.-abs(c.y)*2.4)*step(.75,vtA);gl_FragColor=vec4(vtC*a,a);}' }));
+  const trail = new T.Points(trailGeo, trailMaterial); trail.name = 'voxel-heybox-glitter'; trail.frustumCulled = false; trail.raycast = () => {}; root.add(trail);
+
   // A soft halo behind the hero: rim light on the cube, then the back-light of the mark.
   const haloTexture = (() => {
     if (typeof document === 'undefined') return null;
@@ -223,8 +243,10 @@ export function createVoxelHeybox({ THREE: T, root, camera, particles, heroAncho
     const r = VOXEL_PATH[index], u = uniforms, isBox = n => n === 'box' || n === 'table';
     // Grains resting inside a model (or as bricks) are invisible: skip the per-frame surface reads.
     const moving = p >= r.leave[0] - .002;
-    mesh.visible = moving || (isBox(r.to) && p > r.arrive[0]);
-    if (mesh.visible) {
+    // The last leg is glitter only: no grain model is rebuilt on the table.
+    const finale = index === 3, need = moving || (isBox(r.to) && p > r.arrive[0] && !finale);
+    mesh.visible = need && !finale; trail.visible = moving && p <= r.arrive[1] && !reduced;
+    if (need) {
       const sf = fill(r.from, from, orders, u.uFromC.value, u.uFromRot.value, 0), st = moving ? fill(r.to, to, orders, u.uToC.value, u.uToRot.value, 1) : 0;
       u.uSizeFrom.value = r.from === 'box' ? BRICK / 3 * .92 * sf : r.from === 'table' ? PITCH * .9 * sf : .085; u.uSizeTo.value = isBox(r.to) ? PITCH * .9 * (st || 1) : .085;
       fromAttr.needsUpdate = toAttr.needsUpdate = orderAttr.needsUpdate = true;
@@ -236,6 +258,8 @@ export function createVoxelHeybox({ THREE: T, root, camera, particles, heroAncho
     camera.updateMatrixWorld(true); u.uCam.value.copy(camera.position).applyMatrix4(inv);
     camera.getWorldDirection(u.uCamF.value).transformDirection(inv); u.uCamR.value.setFromMatrixColumn(camera.matrixWorld, 0).transformDirection(inv); u.uCamU.value.setFromMatrixColumn(camera.matrixWorld, 1).transformDirection(inv);
     u.uAspect.value = width / Math.max(1, height);
+    u.uView.value = height * Math.min(2, globalThis.devicePixelRatio || 1); u.uTrailEnd.value = finale ? .66 : 1;
+    u.uTrailAlpha.value = (quality === 'ultra' ? 1 : .8) * (finale ? 1.25 : 1); u.uLag.value = finale ? .005 : .0035;
     const k = 1 - Math.exp(-Math.max(0, dt) * 10); if (peel && !reduced) pointer.lerp(v.set(pointerX, pointerY, 0), pointer.x > 5 ? 1 : k); else pointer.set(9, 9);
     u.uPointer.value.copy(pointer); u.uPeel.value = peel && !reduced ? 1 : 0;
     // The bricks shed themselves on a clock; the grains stay black all the way to the table.
@@ -270,6 +294,6 @@ export function createVoxelHeybox({ THREE: T, root, camera, particles, heroAncho
   }
   return {
     mesh, update, bricks, getActive: () => active, flash() { flash = 1; },
-    dispose() { bricks.dispose(); mesh.removeFromParent(); heroSheet.removeFromParent(); heroAir.removeFromParent(); roomAir?.removeFromParent(); constellation.removeFromParent(); starLabels.forEach(s => s?.removeFromParent()); own.forEach(r => r.dispose?.()); own.clear(); }
+    dispose() { bricks.dispose(); mesh.removeFromParent(); trail.removeFromParent(); heroSheet.removeFromParent(); heroAir.removeFromParent(); roomAir?.removeFromParent(); constellation.removeFromParent(); starLabels.forEach(s => s?.removeFromParent()); own.forEach(r => r.dispose?.()); own.clear(); }
   };
 }

@@ -1,4 +1,4 @@
-import {clamp,footprintContact,buildSolidIndex} from './miniature-driving-physics.js?v=journey-39';
+import {clamp,footprintContact,buildSolidIndex} from './miniature-driving-physics.js?v=journey-40';
 
 // Small deterministic impulse solver for the orange toy world. Bodies have 3D velocity,
 // angular momentum, rotated collision extents, pair contacts and ground sleep.

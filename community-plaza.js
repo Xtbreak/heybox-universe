@@ -1,6 +1,6 @@
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
-import { heyboxMarkShapes, drawHeyboxMark } from './heybox-mark.js?v=journey-39';
+import { heyboxMarkShapes, drawHeyboxMark } from './heybox-mark.js?v=journey-40';
 
 // The journey ends in a friend's living room: a small toy house at the end of
 // the park road. You walk in through the front door, six friends (Kenney Mini
