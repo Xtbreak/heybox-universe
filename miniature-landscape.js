@@ -5,23 +5,23 @@ export function createMiniatureLandscape({THREE:T,scene,reduced=false}){
   const G=g=>(geometries.add(g),g),M=m=>(materials.add(m),m),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   const mat=c=>M(new T.MeshStandardMaterial({color:c,roughness:.91,flatShading:true}));
   const palette={ground:0xf49b53,sand:0xf5aa61,cream:0xffefd0,white:0xfff9e8,orange:0xef783c,red:0xc6503e,dark:0x574342,wood:0xce8750,teal:0x659b95,yellow:0xf9ca65,rose:0xd37c6c};
-  const m=Object.fromEntries(Object.entries(palette).map(([k,v])=>[k,mat(v)]));
-  const box=G(new T.BoxGeometry(1,1,1)),cylinder=G(new T.CylinderGeometry(1,1,1,16)),ball=G(new T.IcosahedronGeometry(1,1)),cone=G(new T.ConeGeometry(1,1,12));
-  const canopy=G(new T.BufferGeometry());canopy.setAttribute('position',new T.Float32BufferAttribute([-1,-1,-1,1,-1,-1,1,-1,1,-1,-1,1,-.85,.85,-.85,1,1.35,-.85,1,1.1,1,-.85,.6,1],3));canopy.setIndex([0,2,1,0,3,2,4,5,6,4,6,7,0,1,5,0,5,4,1,2,6,1,6,5,2,3,7,2,7,6,3,0,4,3,4,7]);canopy.computeVertexNormals();
+  const P=palette,m=Object.fromEntries(Object.entries(palette).map(([k,v])=>[k,mat(v)]));
+  const box=G(new T.BoxGeometry(1,1,1)),cylinder=G(new T.CylinderGeometry(1,1,1,16));
   function add(g,mt,x,y,z,sx=1,sy=sx,sz=sx,yaw=0){const key=g.uuid+mt.uuid;if(!batches.has(key))batches.set(key,{g,mt,items:[]});batches.get(key).items.push([x,y,z,sx,sy,sz,yaw]);}
   function mesh(g,mt,name){const o=new T.Mesh(g,mt);o.name=name;o.receiveShadow=true;o.castShadow=true;root.add(o);return o;}
   const bounds=90,groundHeight=()=>0;
   // Overscan floor and no perimeter walls: recovery is handled by the driving controller.
   const floor=G(new T.PlaneGeometry(900,900,12,12));floor.rotateX(-Math.PI/2);const fp=floor.attributes.position,fc=[];for(let i=0;i<fp.count;i++){const a=clamp((fp.getX(i)+85)/170,0,1),b=clamp((fp.getZ(i)+85)/170,0,1),color=new T.Color(0xf5883c).lerp(new T.Color(0xff9043),a).lerp(new T.Color(0xfccf92),b*.68);fc.push(color.r,color.g,color.b);}floor.setAttribute('color',new T.Float32BufferAttribute(fc,3));const fm=mat(0xffffff);fm.vertexColors=true;const floorMesh=mesh(floor,fm,'Seamless warm gradient floor');floorMesh.castShadow=false;
   function plate(x,z,w,d,mt=m.sand,level=.036){add(box,mt,x,level/2,z,w,level,d);}
-  function solid(x,z,radius,height=3,y=0){colliders.push({x,z,radius,height,y});}
-  function post(x,z,h=2,mt=m.orange){add(cylinder,mt,x,h/2,z,.16,h,.16);solid(x,z,.18,h);}
   // Block-built lettering stays crisp without canvas textures, fonts or external assets.
   const glyph={A:['01110','11011','11011','11111','11011','11011','11011'],B:['11110','11011','11011','11110','11011','11011','11110'],C:['01111','11000','11000','11000','11000','11000','01111'],D:['11110','11011','11011','11011','11011','11011','11110'],E:['11111','11000','11000','11110','11000','11000','11111'],F:['11111','11000','11000','11110','11000','11000','11000'],G:['01111','11000','11000','11011','11011','11011','01111'],H:['11011','11011','11011','11111','11011','11011','11011'],I:['111','010','010','010','010','010','111'],J:['00111','00011','00011','00011','11011','11011','01110'],K:['11011','11010','11100','11100','11110','11011','11011'],L:['11000','11000','11000','11000','11000','11000','11111'],M:['11011','11111','11111','11011','11011','11011','11011'],N:['11001','11101','11101','11011','11011','11011','11001'],O:['01110','11011','11011','11011','11011','11011','01110'],P:['11110','11011','11011','11110','11000','11000','11000'],R:['11110','11011','11011','11110','11100','11011','11011'],S:['01111','11000','11000','01110','00011','00011','11110'],T:['11111','00100','00100','00100','00100','00100','00100'],U:['11011','11011','11011','11011','11011','11011','01110'],V:['11011','11011','11011','11011','11011','01010','00100'],W:['11011','11011','11011','11011','11111','11111','01010'],X:['11011','11011','01010','00100','01010','11011','11011'],Y:['11011','11011','01010','00100','00100','00100','00100'],Z:['11111','00011','00110','00100','01100','11000','11111'],'0':['01110','11011','11011','11011','11011','11011','01110'],'1':['010','110','010','010','010','010','111'],'2':['11110','00011','00011','01110','11000','11000','11111'],'3':['11110','00011','00011','01110','00011','00011','11110'],'4':['11011','11011','11011','11111','00011','00011','00011'],'5':['11111','11000','11000','11110','00011','00011','11110'],'6':['01111','11000','11000','11110','11011','11011','01110'],'+':['00000','00100','00100','11111','00100','00100','00000']};
   function lettering(text,x,z,scale=.24,{upright=false,y=.056,depth=.035,material=m.cream}={}){
     const chars=[...text.toUpperCase()],width=chars.reduce((s,c)=>s+(glyph[c]?.[0].length||3)+1,0)-1;let cursor=x-width*scale/2;
     for(const ch of chars){const rows=glyph[ch];if(rows)for(let r=0;r<7;r++){let a=0;while(a<rows[r].length){if(rows[r][a]!=='1'){a++;continue;}let b=a+1;while(rows[r][b]==='1')b++;const xx=cursor+(a+b)*scale/2;if(upright)add(box,material,xx,y+(6.5-r)*scale,z,(b-a)*scale,scale,depth);else add(box,material,xx,y,z+(r-3)*scale,(b-a)*scale,depth,scale);a=b;}}cursor+=((rows?.[0].length||3)+1)*scale;}
   }
+  // Upright block lettering as prop parts, relative to the body's bottom centre.
+  function letterParts(text,y,z,scale,depth,color){const parts=[],chars=[...text.toUpperCase()],width=chars.reduce((s,c)=>s+(glyph[c]?.[0].length||3)+1,0)-1;let cursor=-width*scale/2;
+    for(const ch of chars){const rows=glyph[ch];if(rows)for(let r=0;r<7;r++){let a=0;while(a<rows[r].length){if(rows[r][a]!=='1'){a++;continue;}let b=a+1;while(rows[r][b]==='1')b++;parts.push(['box',color,cursor+(a+b)*scale/2,y+(6.5-r)*scale,z,(b-a)*scale,scale,depth]);a=b;}}cursor+=((rows?.[0].length||3)+1)*scale;}return parts;}
   function border(x,z,w,d,mt=m.cream){for(let xx=x-w/2;xx<=x+w/2;xx+=2.8)for(const zz of [z-d/2,z+d/2])add(box,mt,xx,.065,zz,1.3,.13,.32);for(let zz=z-d/2+2.8;zz<z+d/2;zz+=2.8)for(const xx of [x-w/2,x+w/2])add(box,mt,xx,.065,zz,.32,.13,1.3);}
   const pathTiles=[];
   function path(id,points,width=7){const out=[];for(let k=1;k<points.length;k++){const a=points[k-1],b=points[k],dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz),count=Math.ceil(len/.9);for(let i=0;i<count;i++){const f=i/count;out.push({x:a[0]+dx*f,y:0,z:a[1]+dz*f});}const yaw=Math.atan2(dx,dz);for(let t=1.8;t<len;t+=3.4){const x=a[0]+dx*t/len,z=a[1]+dz*t/len;if(Math.abs(x)<18&&z>-7&&z<29)continue;for(const side of [-1,1]){const px=x+dz/len*side*width/2,pz=z-dx/len*side*width/2;if(pathTiles.some(q=>Math.hypot(q.x-px,q.z-pz)<1.5))continue;pathTiles.push({x:px,z:pz});add(box,m.cream,px,.044,pz,.46,.075,1.3,yaw);}}}const p=points.at(-1);out.push({x:p[0],y:0,z:p[1]});return{id,width,surface:'gravel',points:out,closed:false};}
@@ -30,12 +30,10 @@ export function createMiniatureLandscape({THREE:T,scene,reduced=false}){
   // INTRO / CROSSROADS: the car arrives in the middle of a designed, human-scale place.
   plate(0,14,27,26);border(0,14,27,26);// Six independent dynamic letter bodies form the title at z=0.
   lettering('DRIVE + PLAY',0,7,.25);lettering('W A S D',-6,26,.24);
-  for(const [x,z,a] of [[-7.7,22,Math.PI/2],[-6,22,0],[-4.3,22,-Math.PI/2],[-6,20.3,Math.PI]]){add(box,m.white,x,.27,z,1.4,.54,1.4);solid(x,z,.76,.54);const g=G(new T.BufferGeometry()),pp=[];for(const [u,v] of [[-.28,-.2],[.28,-.2],[0,.3]])pp.push(x+u*Math.cos(a)+v*Math.sin(a),.551,z-u*Math.sin(a)+v*Math.cos(a));g.setAttribute('position',new T.Float32BufferAttribute(pp,3));g.setIndex([0,2,1]);g.computeVertexNormals();mesh(g,m.wood,'Physical arrow key');}
   add(cylinder,m.cream,11,.025,19,2.5,.05,2.5);lettering('RESET',11,19,.135,{y:.075,material:m.orange});
   for(const [x,z,yaw] of [[-18,12,-Math.PI/2],[19,12,Math.PI/2],[0,30,0],[0,-14,Math.PI]])arrow(x,z,yaw,1.25);
   // A tiny RC controller exhibit and a friendly information kiosk flank the plaza.
-  plate(-17,0,7,7,m.orange);add(box,m.dark,-17,1.4,0,4,2.5,2.2,.15);for(const x of [-18,-16]){add(cylinder,m.white,x,2.7,0,.32,.17,.32);add(cylinder,m.dark,x,3.1,0,.12,.7,.12);}post(-17,-.6,5,m.dark);solid(-17,0,2.2,4);
-  plate(18,0,8,7,m.orange);add(box,m.cream,18,2.3,0,5,4.6,1);add(box,m.teal,18,2.8,.54,4.25,2.45,.13);lettering('HI',18,.67,.24,{upright:true,y:2.1,depth:.13,material:m.white});solid(18,0,2.6,4.6);add(box,m.dark,18,.2,0,5.7,.4,2.2);
+  plate(-17,0,7,7,m.orange);plate(18,0,8,7,m.orange);
   // BOWLING: inset lane, gutters, a ten-pin triangle and a real movable ball.
   plate(-34,-8,14,37,m.orange);plate(-34,-8,8.2,33,m.wood,.07);for(const x of [-38.9,-29.1])add(box,m.red,x,.11,-8,.6,.22,33);
   for(let z=-23;z<8;z+=2.7)add(box,m.sand,-34,.086,z,8,.016,.07);
@@ -45,10 +43,7 @@ export function createMiniatureLandscape({THREE:T,scene,reduced=false}){
   plate(-28,39,33,23,m.sand);border(-28,39,33,23);lettering('SMASH',-28,49,.4);lettering('02',-45,33,.3);
   // GALLERY: three small architectural islands with toy-scale display objects.
   lettering('DISCOVER',-7,-35,.38);
-  function pedestal(x,z,w,d){plate(x,z,w+3,d+3,m.orange);add(box,m.cream,x,.32,z,w,.64,d);solid(x,z,Math.min(w,d)*.51,.8);}
-  pedestal(-16,-25,10,8);add(box,m.dark,-16,3.1,-26,8,4.6,.65);add(box,m.teal,-16,3.2,-25.64,7,3.6,.12);add(box,m.yellow,-17,3.4,-25.52,2.1,1.6,.12);add(box,m.cream,-14.8,2.7,-25.51,1.4,.8,.14);add(box,m.dark,-16,.85,-22.7,5,.25,2.4);solid(-16,-25,4.2,5.5);lettering('CREATE',-16,-18.7,.23);
-  pedestal(0,-27,9,9);add(box,m.orange,0,2.9,-27,5,4.5,5,.15);add(box,m.cream,0,5.28,-27,5.6,.35,5.6,.15);for(const x of [-1.15,1.15])add(ball,m.dark,x,3.3,-24.3,.39,.44,.25);add(box,m.dark,0,2.25,-24.29,1.2,.22,.16);solid(0,-27,3.7,5.6);lettering('HEYBOX',0,-19.8,.21);
-  pedestal(16,-27,9,9);add(cylinder,m.red,16,1.4,-27,3,1.8,3);add(ball,m.yellow,16,4.2,-27,2.6,2.6,2.6);add(box,m.white,16,4.2,-24.7,3,.65,.4,-.12);solid(16,-27,3.1,6.8);lettering('EXPLORE',16,-19.8,.21);
+  lettering('CREATE',-16,-18.7,.23);lettering('HEYBOX',0,-19.8,.21);lettering('EXPLORE',16,-19.8,.21);
   // PARK / STUNTS: generous straight approaches, two jump scales and two bridges.
   const playground={center:{x:0,z:10},bounds:{minX:-60,maxX:65,minZ:-55,maxZ:62},resetPad:{x:11,z:19,radius:2.5},ramps:[
     {id:'little-hop',kind:'jump',x:28,z:-2,yaw:Math.PI,length:9,width:6,height:1.5},
@@ -66,7 +61,21 @@ export function createMiniatureLandscape({THREE:T,scene,reduced=false}){
     const bands=[],bi=[],vs=r.kind==='bridge'?Array.from({length:19},(_,i)=>(i+1)*r.length/20-r.length/2):[-r.length/2+.6,r.length/2-.4];for(const v of vs){const k=bands.length/3;for(const [u,w] of [[-r.width/2+.13,v-.05],[-r.width/2+.13,v+.05],[r.width/2-.13,v-.05],[r.width/2-.13,v+.05]]){const x=r.x+u*Math.cos(r.yaw)+w*Math.sin(r.yaw),z=r.z-u*Math.sin(r.yaw)+w*Math.cos(r.yaw);bands.push(x,rampHeight(r,x,z)+.014,z);}bi.push(k,k+1,k+2,k+2,k+1,k+3);}const bg=G(new T.BufferGeometry());bg.setAttribute('position',new T.Float32BufferAttribute(bands,3));bg.setIndex(bi);bg.computeVertexNormals();mesh(bg,r.kind==='bridge'?m.cream:m.red,'Ramp surface bands · '+r.id);
   }
   function sampleSurface(x,z){for(const r of playground.ramps){const y=rampHeight(r,x,z);if(y!==null){const q=rampLocal(r,x,z),eps=.015,u=clamp(q.x,-r.width/2+eps,r.width/2-eps),v=clamp(q.z,-r.length/2+eps,r.length/2-eps),cx=r.x+u*Math.cos(r.yaw)+v*Math.sin(r.yaw),cz=r.z-u*Math.sin(r.yaw)+v*Math.cos(r.yaw),hx=((rampHeight(r,cx+eps,cz)??y)-(rampHeight(r,cx-eps,cz)??y))/(2*eps),hz=((rampHeight(r,cx,cz+eps)??y)-(rampHeight(r,cx,cz-eps)??y))/(2*eps),n=Math.hypot(hx,1,hz);return{height:y,onRoad:true,surface:r.kind==='bridge'?'bridge':'ramp',water:false,friction:1,playgroundId:r.id,normal:{x:-hx/n,y:1/n,z:-hz/n}};}}return{height:0,onRoad:true,surface:'gravel',water:false,friction:1,normal:{x:0,y:1,z:0}};}
-  const prop=(id,type,x,z,size,mass=2,y=0,yaw=0)=>playground.props.push({id,type,x,z,size,mass,y,yaw});
+  const prop=(id,type,x,z,size,mass=2,y=0,yaw=0,extra={})=>playground.props.push({id,type,x,z,size,mass,y,yaw,...extra});
+  // Everything you can see standing up in the yard is a movable body: no fixed colliders remain.
+  for(const [i,x,z,a] of [[0,-7.7,22,Math.PI/2],[1,-6,22,0],[2,-4.3,22,-Math.PI/2],[3,-6,20.3,Math.PI]])prop('key-'+i,'crate',x,z,{x:1.4,y:.6,z:1.4},4,0,0,{parts:[['box',P.white,0,.27,0,1.4,.54,1.4],['tri',P.wood,0,.56,0,.34,.05,.34,0,a,0]]});
+  prop('rc-controller','crate',-17,0,{x:4,y:2.5,z:2.2},18,.15,.15,{color:P.dark});
+  for(const x of [-1,1])prop('rc-stick'+x,'crate',-17+x*.99,.15,{x:.64,y:.95,z:.64},1.5,2.65,.15,{parts:[['cyl',P.white,0,.085,0,.32,.17,.32],['cyl',P.dark,0,.52,0,.12,.7,.12]]});
+  prop('rc-antenna','brick',-17-.09,-.6,{x:.3,y:2.5,z:.3},1,2.65,0,{color:P.dark});
+  prop('hi-base','brick',18,0,{x:5.7,y:.4,z:2.2},20,0,0,{color:P.dark});
+  prop('hi-kiosk','crate',18,.3,{x:5,y:4.2,z:1.6},16,.4,0,{parts:[['box',P.cream,0,2.1,0,5,4.2,1],['box',P.teal,0,2.4,.54,4.25,2.45,.13],...letterParts('HI',1.7,.67,.24,.13,P.white)]});
+  for(const [id,x,z,w,d] of [['create',-16,-25,10,8],['heybox',0,-27,9,9],['explore',16,-27,9,9]]){plate(x,z,w+3,d+3,m.orange);for(const i of [-1,1])for(const k of [-1,1])prop('pedestal-'+id+i+k,'brick',x+i*w/4,z+k*d/4,{x:w/2-.04,y:.64,z:d/2-.04},9,0,0,{color:P.cream});}
+  prop('create-board','crate',-16,-26,{x:8,y:4.76,z:.65},14,.64,0,{parts:[['box',P.dark,0,2.38,0,8,4.6,.65],['box',P.teal,0,2.56,.36,7,3.6,.12],['box',P.yellow,-1,2.76,.48,2.1,1.6,.12],['box',P.cream,1.2,2.06,.49,1.4,.8,.14]]});
+  prop('create-keyboard','brick',-16,-22.7,{x:5,y:.25,z:2.4},3,.64,0,{color:P.dark});
+  prop('heybox-lid','brick',0,-27,{x:5.6,y:.35,z:5.6},6,5.14,.15,{color:P.cream});
+  prop('heybox-head','crate',0,-27,{x:5,y:4.5,z:5},22,.64,.15,{parts:[['box',P.orange,0,2.25,0,5,4.5,5],['ball',P.dark,-1.15,2.66,2.7,.39,.44,.25],['ball',P.dark,1.15,2.66,2.7,.39,.44,.25],['box',P.dark,0,1.61,2.71,1.2,.22,.16]]});
+  prop('explore-drum','crate',16,-27,{x:6,y:1.8,z:6},40,.64,0,{parts:[['cyl',P.red,0,.9,0,3,1.8,3]]});
+  prop('explore-globe','ball',16,-27,{x:5.2,y:5.2,z:5.2},14,2.44,0,{parts:[['ball',P.yellow,0,2.6,0,2.6,2.6,2.6],['box',P.white,0,2.6,2.3,3,.65,.4,0,-.12,0]]});
   for(const [i,letter] of [...'HEYBOX'].entries())playground.props.push({id:'title-'+letter,type:'letter',letter,x:-10+i*4,z:0,size:{x:3.4,y:4.8,z:1.15},mass:8,y:0,yaw:0});
   for(let row=0;row<4;row++)for(let c=0;c<=row;c++)prop('pin-'+row+'-'+c,'pin',-34+(c-row/2)*1.3,-17-row*1.4,{x:.76,y:2.25,z:.76},1.9);
   prop('bowling-ball','ball',-34,6,{x:2.4,y:2.4,z:2.4},8);
@@ -77,16 +86,17 @@ export function createMiniatureLandscape({THREE:T,scene,reduced=false}){
   lettering('SLALOM',14,59,.36);for(let i=0;i<9;i++)prop('slalom-'+i,'cone',-10+i*4.4,52+(i%2?3:-3),{x:1,y:1.55,z:1},1.2);
   for(const [i,x,z] of [[0,24,7],[1,32,7],[2,39,5],[3,47,5],[4,-40,10],[5,-28,10]])prop('entry-cone-'+i,'cone',x,z,{x:.9,y:1.35,z:.9},1.2);
   // Small exhibits and planted pockets frame the routes rather than fill them at random.
-  function planter(x,z,s=1){add(cylinder,m.cream,x,.6*s,z,1.65*s,1.2*s,1.65*s);add(cylinder,m.red,x,1.22*s,z,1.43*s,.08,1.43*s);add(cylinder,m.dark,x,2.6*s,z,.21*s,2.8*s,.21*s);add(canopy,m.yellow,x,4*s,z,1.55*s,2.3*s,1.4*s,.35);solid(x,z,1.65*s,6.2*s);}
+  function planter(x,z,s=1){prop('planter-'+x+'-'+z,'crate',x,z,{x:3.3*s,y:1.26*s,z:3.3*s},14*s,0,0,{parts:[['cyl',P.cream,0,.6*s,0,1.65*s,1.2*s,1.65*s],['cyl',P.red,0,1.22*s,0,1.43*s,.08,1.43*s]]});
+    prop('tree-'+x+'-'+z,'crate',x,z,{x:2.6*s,y:5.8*s,z:2.6*s},5*s,1.26*s,0,{parts:[['cyl',P.dark,0,1.4*s,0,.21*s,2.8*s,.21*s],['canopy',P.yellow,0,2.74*s,0,1.3*s,2.3*s,1.2*s,0,.35,0]]});}
   for(const [x,z,s] of [[-24,-8,.9],[-48,-36,1.2],[25,-42,1.05],[58,22,1],[-49,26,.85],[-7,39,.7],[20,23,.8],[-57,2,1],[-7,-48,.85]])planter(x,z,s);
-  function bench(x,z,yaw=0){add(box,m.wood,x,.85,z,4,.28,1.3,yaw);for(const dx of [-1.5,1.5])add(box,m.dark,x+dx,.42,z,.25,.84,1);add(box,m.cream,x,1.45,z-.5,4,.95,.2,yaw);solid(x,z,2,1.9);}
+  function bench(x,z,yaw=0){prop('bench-'+x+'-'+z,'crate',x,z,{x:4,y:1.92,z:1.3},8,0,yaw,{parts:[['box',P.wood,0,.85,0,4,.28,1.3],['box',P.dark,-1.5,.42,0,.25,.84,1],['box',P.dark,1.5,.42,0,.25,.84,1],['box',P.cream,0,1.45,-.5,4,.95,.2]]});}
   // Low cream block corners echo a hand-built toy construction set.
-  for(const [x,z] of [[-21,27],[23,23],[-52,-17],[9,-48]])for(let row=0;row<2;row++)for(let i=0;i<4;i++){add(box,m.cream,x+i*1.6+(row%2)*.35,.39+row*.78,z,1.5,.74,.8);solid(x+i*1.6,z,.63,1.55);}
+  for(const [x,z] of [[-21,27],[23,23],[-52,-17],[9,-48]])for(let row=0;row<2;row++)for(let i=0;i<4;i++)prop('block-'+x+'-'+z+'-'+row+'-'+i,'brick',x+i*1.6+(row%2)*.35,z,{x:1.5,y:.74,z:.8},2.5,row*.745,0,{color:P.cream});
   bench(-24,-13);bench(17,26);bench(-48,20);
   // Toy gantries make the remote corners recognizable in silhouette.
-  for(const [x,z,label] of [[-34,-28,'BOWL'],[43,-28,'AIR']]){for(const dx of [-5,5]){add(box,m.red,x+dx,3,z,.7,6,.7);solid(x+dx,z,.5,6);}add(box,m.cream,x,6,z,11,.9,1);lettering(label,x,z+.56,.36,{upright:true,y:6.5,depth:.36,material:m.white});}
+  for(const [x,z,label] of [[-34,-28,'BOWL'],[43,-28,'AIR']]){for(const dx of [-5,5])prop('gantry-'+label+dx,'brick',x+dx,z,{x:.7,y:5.55,z:.7},10,0,0,{color:P.red});prop('gantry-'+label,'crate',x,z,{x:11,y:.9,z:1},12,5.56,0,{parts:[['box',P.cream,0,.45,0,11,.9,1],...letterParts(label,.95,.56,.36,.36,P.white)]});}
   // Tiny architectural detail at the far crossroads: paired flags, seating and an open arch.
-  for(const x of [-6,6]){post(x,-53,7,m.red);add(box,x<0?m.yellow:m.teal,x+1.4,6.1,-53,2.8,1.6,.12);}lettering('FREE TO ROAM',0,-57,.27);
+  for(const x of [-6,6])prop('flag'+x,'crate',x,-53,{x:.36,y:7,z:.36},4,0,0,{parts:[['cyl',P.red,0,3.5,0,.16,7,.16],['box',x<0?P.yellow:P.teal,1.4,6.1,0,2.8,1.6,.12]]});lettering('FREE TO ROAM',0,-57,.27);
   const dummy=new T.Object3D();for(const {g,mt,items} of batches.values()){const inst=new T.InstancedMesh(g,mt,items.length);inst.name='Batched toy-yard details';inst.castShadow=true;inst.receiveShadow=true;for(let i=0;i<items.length;i++){const [x,y,z,sx,sy,sz,a]=items[i];dummy.position.set(x,y,z);dummy.scale.set(sx,sy,sz);dummy.rotation.set(0,a,0);dummy.updateMatrix();inst.setMatrixAt(i,dummy.matrix);}inst.instanceMatrix.needsUpdate=true;inst.computeBoundingSphere();root.add(inst);instances.push(inst);}batches.clear();
   const landmarks=[{id:'plaza',name:'HEYBOX 出发广场',x:0,z:14},{id:'bowling',name:'玩具保龄球',x:-34,z:-8},{id:'smash',name:'多米诺工坊',x:-28,z:39},{id:'gallery',name:'发现小岛',x:0,z:-27},{id:'jumps',name:'飞跃跳台',x:37,z:-5},{id:'bridge',name:'积木桥',x:32,z:33},{id:'slalom',name:'绕桩乐园',x:14,z:52}];
   const spawn={x:0,z:18,heading:Math.PI};let disposed=false;

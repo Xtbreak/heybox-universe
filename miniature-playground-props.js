@@ -1,20 +1,27 @@
-import {clamp,footprintContact,buildSolidIndex} from './miniature-driving-physics.js?v=journey-38';
+import {clamp,footprintContact,buildSolidIndex} from './miniature-driving-physics.js?v=journey-39';
 
 // Small deterministic impulse solver for the orange toy world. Bodies have 3D velocity,
 // angular momentum, rotated collision extents, pair contacts and ground sleep.
 export function createPlaygroundProps({THREE:T,root,world,sample}) {
-  const specs=(world.playground?.props||[]).slice(0,64),geometries=[],materials=[];
+  const specs=(world.playground?.props||[]).slice(0,160),geometries=[],materials=[];
   const mat=(color)=>{const m=new T.MeshStandardMaterial({color,roughness:.88});materials.push(m);return m;};
   const vertexMaterial=mat(0xffffff);vertexMaterial.vertexColors=true;
   const wood=mat(0xf7cd83),woodEdge=mat(0xc58b4b),orange=mat(0xee6535),cream=mat(0xffefd0),brick=mat(0x71ada6),red=mat(0xdf4d39),blue=mat(0x416779);
   const geo=g=>(geometries.push(g),g),group=new T.Group();group.name='playground · movable objects';root.add(group);
   const extentMatrix=new T.Matrix4();
+  // Shared unit shapes for compound exhibits (planters, kiosks, gantries...) declared as parts.
+  const unit={box:geo(new T.BoxGeometry(1,1,1)),cyl:geo(new T.CylinderGeometry(1,1,1,16)),ball:geo(new T.IcosahedronGeometry(1,1)),cone:geo(new T.ConeGeometry(1,1,12)),tri:geo(new T.ConeGeometry(1,1,3))};
+  {const c=geo(new T.BufferGeometry());c.setAttribute('position',new T.Float32BufferAttribute([-1,-1,-1,1,-1,-1,1,-1,1,-1,-1,1,-.85,.85,-.85,1,1.35,-.85,1,1.1,1,-.85,.6,1],3));c.setIndex([0,2,1,0,3,2,4,5,6,4,6,7,0,1,5,0,5,4,1,2,6,1,6,5,2,3,7,2,7,6,3,0,4,3,4,7]);c.computeVertexNormals();unit.canopy=c;}
+  const tints=new Map(),tint=c=>{if(!tints.has(c))tints.set(c,mat(c));return tints.get(c);};
   const solids=buildSolidIndex(world.colliders||world.solids||[]),axis=new T.Vector3(),rotation=new T.Quaternion();
   const bodies=specs.map((s,i)=>{
     const defaults=s.type==='letter'?{x:3,y:4,z:1.1}:s.type==='pin'?{x:.75,y:2.3,z:.75}:s.type==='ball'?{x:2.4,y:2.4,z:2.4}:s.type==='cone'?{x:.72,y:1.15,z:.72}:s.type==='brick'?{x:1.22,y:.64,z:.64}:{x:1.24,y:1.24,z:1.24};
     const size=typeof s.size==='number'?{x:s.size,y:s.size,z:s.size}:{...defaults,...s.size};
     const mesh=new T.Group();mesh.name='playground-prop-'+(s.id??i);group.add(mesh);
-    if(s.type==='letter'){
+    if(Array.isArray(s.parts)){
+      // Parts are [shape,color,x,y,z,sx,sy,sz,rx,ry,rz] measured from the body's bottom centre.
+      for(const [shape,color,x,y,z,sx,sy,sz,rx=0,ry=0,rz=0] of s.parts){const part=new T.Mesh(unit[shape]||unit.box,tint(color));part.position.set(x,y-size.y/2,z);part.scale.set(sx,sy,sz);part.rotation.set(rx,ry,rz);mesh.add(part);}
+    }else if(s.type==='letter'){
       // Individually movable chunky letter bodies, built as solid cream blocks.
       const glyphs={H:['101','101','111','101','101'],E:['111','100','110','100','111'],Y:['101','101','010','010','010'],B:['110','101','110','101','110'],O:['111','101','101','101','111'],X:['101','101','010','101','101']};
       const rows=glyphs[String(s.letter||s.label||'H').toUpperCase()]||glyphs.H;
@@ -31,8 +38,8 @@ export function createPlaygroundProps({THREE:T,root,world,sample}) {
       const cone=new T.Mesh(geo(new T.ConeGeometry(size.x*.43,size.y-.12,8)),orange);cone.position.y=.06;mesh.add(cone);
       const band=new T.Mesh(geo(new T.CylinderGeometry(size.x*.14,size.x*.23,.18,8)),cream);band.position.y=.15;mesh.add(band);
     }else{
-      mesh.add(new T.Mesh(geo(new T.BoxGeometry(size.x,size.y,size.z)),s.type==='brick'?brick:wood));
-      if(s.type!=='brick')for(const side of [-1,1]){
+      mesh.add(new T.Mesh(geo(new T.BoxGeometry(size.x,size.y,size.z)),s.color!==undefined?tint(s.color):s.type==='brick'?brick:wood));
+      if(s.type!=='brick'&&s.color===undefined)for(const side of [-1,1]){
         const rail=new T.Mesh(geo(new T.BoxGeometry(size.x*.13,size.y*1.015,size.z*1.015)),woodEdge);rail.position.x=side*size.x*.35;mesh.add(rail);
       }
     }
@@ -45,7 +52,7 @@ export function createPlaygroundProps({THREE:T,root,world,sample}) {
     }
     const merged=geo(new T.BufferGeometry());merged.setAttribute('position',new T.Float32BufferAttribute(positions,3));merged.setAttribute('normal',new T.Float32BufferAttribute(normals,3));merged.setAttribute('color',new T.Float32BufferAttribute(colors,3));
     const solidMesh=new T.Mesh(merged,vertexMaterial);solidMesh.castShadow=true;solidMesh.receiveShadow=true;mesh.add(solidMesh);
-    const b={id:String(s.id??i),type:s.type||'crate',size,mass:clamp(s.mass??(s.type==='letter'?22:s.type==='pin'?2:s.type==='ball'?18:s.type==='cone'?1.5:s.type==='brick'?5:10),.5,50),mesh,
+    const b={id:String(s.id??i),type:s.type||'crate',size,mass:clamp(s.mass??(s.type==='letter'?22:s.type==='pin'?2:s.type==='ball'?18:s.type==='cone'?1.5:s.type==='brick'?5:10),.5,160),mesh,
       position:new T.Vector3(),velocity:new T.Vector3(),quaternion:new T.Quaternion(),omega:new T.Vector3(),extent:new T.Vector3(),sleep:0,sleeping:false};
     b.initial={x:s.x,y:(Number.isFinite(s.y)?s.y:sample(s.x,s.z).height)+size.y/2,z:s.z,yaw:s.yaw||0};return b;
   });
@@ -82,6 +89,13 @@ export function createPlaygroundProps({THREE:T,root,world,sample}) {
       if(b.type==='ball'&&b.velocity.lengthSq()>.015){b.omega.x=b.velocity.z/(b.size.y/2);b.omega.z=-b.velocity.x/(b.size.y/2);}
     }
   }
+  function topple(b,dt){
+    // Knocked exhibits topple onto the face under their centre instead of resting at impossible angles.
+    if(b.type==='ball'||Math.abs(b.velocity.y)>1.2)return;
+    const e=extentMatrix.makeRotationFromQuaternion(b.quaternion).elements,h=b.size,w=[Math.abs(e[1])/h.x,Math.abs(e[5])/h.y,Math.abs(e[9])/h.z];
+    const best=w[0]>w[1]&&w[0]>w[2]?0:w[2]>w[1]?2:1,up=Math.abs(e[best*4+1]);
+    if(up<.999){const sg=Math.sign(e[best*4+1])||1,ax=e[best*4]*sg,az=e[best*4+2]*sg;b.omega.x+=-az*30*dt;b.omega.z+=ax*30*dt;}
+  }
   function step(dt,car){
     if(!dt)return 0;let strongest=0;
     for(const b of bodies){
@@ -92,7 +106,7 @@ export function createPlaygroundProps({THREE:T,root,world,sample}) {
         if(!supported)wake(b);
       }
       if(!b.sleeping){b.omega.multiplyScalar(Math.exp(-.35*dt)).clampLength(0,18);b.velocity.y-=18*dt;b.velocity.multiplyScalar(Math.exp(-.12*dt));b.position.addScaledVector(b.velocity,dt);
-        const spin=b.omega.length();if(spin>.00001){axis.copy(b.omega).divideScalar(spin);rotation.setFromAxisAngle(axis,spin*dt);b.quaternion.premultiply(rotation).normalize();}extents(b);groundContact(b,dt);
+        const spin=b.omega.length();if(spin>.00001){axis.copy(b.omega).divideScalar(spin);rotation.setFromAxisAngle(axis,spin*dt);b.quaternion.premultiply(rotation).normalize();}topple(b,dt);extents(b);groundContact(b,dt);
       }
       if(car&&b.position.y+b.extent.y>car.y+.12&&b.position.y-b.extent.y<car.y+2.18){
         const hit=footprintContact(car,{x:b.position.x,z:b.position.z,...(b.type==='ball'?{radius:b.size.x/2}:{hx:b.extent.x,hz:b.extent.z})});
@@ -125,7 +139,7 @@ export function createPlaygroundProps({THREE:T,root,world,sample}) {
       for(const a of ['x','z'])if(Math.abs(b.position[a])>limit){b.position[a]=clamp(b.position[a],-limit,limit);b.velocity[a]*=-.2;}
     }
     for(let pass=0;pass<5;pass++){
-      for(let i=0;i<bodies.length;i++)for(let j=i+1;j<bodies.length;j++)pair(bodies[i],bodies[j]);
+      for(let i=0;i<bodies.length;i++)for(let j=i+1;j<bodies.length;j++)if(!bodies[i].sleeping||!bodies[j].sleeping)pair(bodies[i],bodies[j]);
       for(const b of bodies)groundContact(b,dt/5);
     }
     // Pair correction can push a pile back into the chassis. Project its final

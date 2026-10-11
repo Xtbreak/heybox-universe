@@ -1,12 +1,15 @@
-import { createSpaceBackdrop } from './space-backdrop.js?v=journey-38';
-import { createJourneyUltra } from './journey-ultra.js?v=journey-38';
-import { createVoxelHeybox } from './voxel-heybox.js?v=journey-38';
-import { createJourneyParticles } from './journey-particles.js?v=journey-38';
-import { createCommunityPlaza } from './community-plaza.js?v=journey-38';
+import { createSpaceBackdrop } from './space-backdrop.js?v=journey-39';
+import { createJourneyUltra } from './journey-ultra.js?v=journey-39';
+import { createVoxelHeybox } from './voxel-heybox.js?v=journey-39';
+import { createJourneyParticles } from './journey-particles.js?v=journey-39';
+import { createCommunityPlaza } from './community-plaza.js?v=journey-39';
+import { createLunarOpening } from './lunar-opening.js?v=journey-39';
+import { SHED_AT } from './brick-hero.js?v=journey-39';
+import { createShowcaseScenes } from './showcase-scenes.js?v=journey-39';
 
 const coarsePointer=globalThis.matchMedia?.('(pointer: coarse)');
 // A continuous, scene-space expedition. Imported GLB transforms are never modified.
-export function createCosmicJourney({ THREE, scene, camera, entries }) {
+export function createCosmicJourney({ THREE, scene, camera, entries, audio = null }) {
   const root = new THREE.Group(); root.name = 'cosmic-journey'; scene.add(root);
   const resources = new Set(), keep = v => (resources.add(v), v);
   const clamp = v => Math.max(0, Math.min(1, Number(v) || 0));
@@ -32,7 +35,7 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
   // The black box is a field of small obsidian grains (voxel-heybox.js). It faces the
   // camera at an angle; scrolling turns it square-on, where its logo channel lines up.
   const heroAnchor=group(root,[1.1,.15,0]);heroAnchor.name='voxel-hero-anchor';const tableAnchor=new THREE.Group();tableAnchor.name='voxel-table-anchor';{const b=new THREE.Mesh(keep(new THREE.BoxGeometry(2.2,2.2,1.32)),keep(new THREE.MeshBasicMaterial({visible:false})));b.raycast=()=>{};tableAnchor.add(b);}
-  const REVEAL_AT=.07;let introStart=null,lastT=0,tiltX=0,tiltY=0,heroReveal=0;
+  const REVEAL_AT=.07;let introStart=null,introClock=0,lastT=0,tiltX=0,tiltY=0,heroReveal=0;
   // The shared GPU particle layer owns the background stars and travel dust.
   // Nebular scattering is additive and mostly transparent, leaving silhouettes readable.
   for(let i=0;i<10;i++){const g=glow(root,35+random()*45,[(random()-.5)*90,(random()-.5)*60,-35-i*47],.045);g.scale.y*=.5;}
@@ -103,19 +106,21 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
   // Moon architecture: tall silver colonnades orbiting an immense low lunar horizon.
   const lunarScenery=group();
   const moon=mesh(new THREE.SphereGeometry(24,48,32),lunar,lunarScenery,[-8,-29,-222]);
-  const buildings=new THREE.InstancedMesh(keep(new THREE.BoxGeometry(1,1,1)),silver,26);
-  for(let i=0;i<26;i++){const a=i/26*Math.PI*2,r=10+(i%3)*3,h=4+(i%5)*1.7;dummy.position.set(Math.cos(a)*r,-3+h*.5,-211+Math.sin(a)*r*.6);dummy.rotation.set(0,-a,0);dummy.scale.set(.65,h,.85);dummy.updateMatrix();buildings.setMatrixAt(i,dummy.matrix);const bar=box(.04,h,.045,ice,lunarScenery,[dummy.position.x+.36,dummy.position.y,dummy.position.z+.45]);}lunarScenery.add(buildings);keep(buildings);
+  // (The silver colonnade gave way to the facility diorama in showcase-scenes.js.)
   const skyRing=ring(14,.045,silver,lunarScenery,[0,4,-220]);skyRing.rotation.x=1.03;
-  // Silver highway vanishing through repeated luminous gate towers.
-  const highway=group(root,[2,-2.05,-338]);box(7,.18,87,black,highway,[0,0,-29]);
-  for(const x of [-3.2,3.2])box(.035,.05,87,ice,highway,[x,.11,-29]);
-  for(let i=0;i<24;i++){box(.06,.025,1.6,i%3===0?ice:silver,highway,[0,.12,8-i*3.3]);if(i%3===0){for(const x of [-3.8,3.8]){box(.21,7,.35,silver,highway,[x,3.4,-i*3.3]);box(.035,6.7,.04,ice,highway,[x-.14,3.4,.21-i*3.3]);}box(7.8,.2,.35,silver,highway,[0,6.9,-i*3.3]);}}
+  // Toy park road to the porch: asphalt, cream kerb lines and dashed centre marks.
+  const asphalt=material(0x50545b,{metalness:0,roughness:.9,flatShading:true}),kerb=material(0xe8dcc4,{metalness:0,roughness:.8});
+  const highway=group(root,[2,-2.05,-338]);box(7,.18,87,asphalt,highway,[0,0,-29]);
+  for(const x of [-3.2,3.2])box(.06,.03,87,kerb,highway,[x,.11,-29]);
+  for(let i=0;i<24;i++)box(.08,.02,1.6,kerb,highway,[0,.1,8-i*3.3]);
   const particles=createJourneyParticles({THREE,root,camera,entries,core:null,transport:false});
   const backdrop=createSpaceBackdrop({THREE,root});
   const ultraEffects=createJourneyUltra({THREE,root,camera,entries,core:null});
   // The same Heybox, small, waits on the friends' coffee table.
   const plaza=createCommunityPlaza({THREE,parent:root,core:{group:tableAnchor,ready:Promise.resolve(),update(){}}});
-  const voxels=createVoxelHeybox({THREE,root,camera,particles,heroAnchor,tableAnchor,modelLocations,room:plaza.group,doorway:plaza.doorway});
+  // The opening stands on a real-looking moon: regolith, craters, rocks, haze and the Earth.
+  const lunarOpening=createLunarOpening({THREE,root,center:heroAnchor.position,floorY:heroAnchor.position.y-1.7});
+  const voxels=createVoxelHeybox({THREE,root,camera,particles,heroAnchor,tableAnchor,modelLocations,room:plaza.group,doorway:plaza.doorway,lunar:lunarOpening});
   const iceBase=ice.color.clone(),hdrMaterials=[];
   const optics={center:new THREE.Vector3(),strength:0,radius:.22};
   // Each scenic assembly owns a bounded set of fade materials; imported game assets are untouched.
@@ -123,6 +128,8 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     const clone=m=>{if(cache.has(m))return cache.get(m);const c=keep(m.clone());c.transparent=true;c.depthWrite=false;cache.set(m,c);if(m===ice)hdrMaterials.push(c);mats.push([c,m.opacity,m.depthWrite]);return c;};
     o.material=Array.isArray(o.material)?o.material.map(clone):clone(o.material);});
     return value=>{g.visible=value>0.0001;for(const [m,base,depthWrite] of mats){m.opacity=base*value;m.depthWrite=depthWrite&&value>.995;}};}
+  // Toy dioramas with looping game previews around each display model (showcase-scenes.js).
+  const showcase=createShowcaseScenes({THREE,root,locations:modelLocations});
   const worldFades=names.map(n=>fadingGroup(worlds[n].g)),sceneryFades=[orbitalScenery,lunarScenery,highway].map(fadingGroup);
   const windowFade=(p,a,b,c,d)=>smooth(a,b,p)*(1-smooth(c,d,p));
   const nodes=[
@@ -174,16 +181,18 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     camera.position.lerp(focus,hoverApproach);
     camera.lookAt(focus);if(!reduced)camera.rotateZ(Math.sin(p*Math.PI*9)*flight*.045);
     const fov=(ultra&&!reduced?THREE.MathUtils.lerp(pose[6],52+18*ultraEffects.rift(p),ultraEffects.rift(p)):pose[6])+(mobile?5+17*indoor:0);if(Math.abs(fov-lastFov)>.01 || Math.abs(camera.fov-fov)>.01 || camera.far<900){camera.fov=fov;camera.far=Math.max(camera.far,900);camera.updateProjectionMatrix();lastFov=fov;}
-    // Opening: the construction sketch draws itself, then the grains settle in layer by layer.
+    // Opening: the bricks lift off the regolith and stack, breathe, then shed down to the mark.
+    // The clock runs on its own; scrolling early fast-forwards it so the mark is always uncovered.
     lastT=t;if(introStart===null&&p>.01)introStart=t-9;
-    const since=introStart===null?0:reduced?99:t-introStart;
-    const intro={draw:smooth(.1,1.9,since),build:smooth(1.5,3.6,since),sketch:1-.55*smooth(3.4,4.8,since)};
+    if(introStart!==null&&introClock===0)introClock=Math.max(0,t-introStart);else if(introStart!==null)introClock+=Math.max(0,dt)*(p>.012?5:1);
+    const since=introStart===null?0:reduced?99:introClock;
+    const intro={since,shed:since>SHED_AT?since-SHED_AT:-1},assembled=smooth(2.2,3.8,since);
     tiltX=THREE.MathUtils.damp(tiltX,reduced?0:pointerX,3.5,Math.max(0,dt));tiltY=THREE.MathUtils.damp(tiltY,reduced?0:pointerY,3.5,Math.max(0,dt));
     // Scroll turns the box square to the camera; at REVEAL_AT the channel is exactly aligned.
     const align=smooth(0,REVEAL_AT,p),off=1-align,drift=reduced?0:Math.sin(t*.21)*.05*off;
-    heroAnchor.position.set(1.1,.15+(reduced?0:Math.sin(t*.45)*(.025+.03*off)),0);heroAnchor.scale.setScalar(mobile?.9:1.08);
+    heroAnchor.position.set(1.1,.15+(reduced?0:(Math.sin(t*.6)*.07+Math.sin(t*1.3)*.012)*assembled),0);heroAnchor.scale.setScalar(mobile?.9:1.08);
     heroAnchor.lookAt(camera.position);heroAnchor.rotateY((.62+drift)*off+tiltX*.16*off);heroAnchor.rotateX((-.2*off+tiltY*.1*off));
-    heroReveal=Math.max(0,1-Math.abs(.62*off+tiltX*.16*off)/.3)**2*smooth(.5,1,intro.build);
+    heroReveal=Math.max(0,1-Math.abs(.62*off+tiltX*.16*off)/.3)**2*assembled;
     for(let i=0;i<tunnels.length;i++){const q=tunnels[i],w=tunnelWindows[i],alpha=windowFade(p,...w);q.g.visible=alpha>.0001;
       q.mat.uniforms.time.value=reduced?0:t;q.mat.uniforms.strength.value=alpha*(.12+flight*.10);}
     plaza.update({progress:p,time:t,dt,reduced,camera,quality:options.quality});
@@ -196,17 +205,20 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
       g.scale.setScalar(name==='car'?1.38:name==='robot'?1.05:1.07);
       worldFades[i](i===0?windowFade(p,.265,.30,.475,.51):i===1?windowFade(p,.47,.51,.67,.70):windowFade(p,.70,.75,.895,.915));portalSpinners[i].rotation.z=reduced?0:t*(i%2?-.1:.12);
     }
+    const plateau=[p>.36&&p<.44,p>.565&&p<.655,p>.79&&p<.885];
+    for(const e of showcase.update({fades:[windowFade(p,.265,.30,.475,.51),windowFade(p,.47,.51,.67,.70),windowFade(p,.70,.75,.925,.95)],focus:plateau,progress:p,time:t,dt,reduced,view:height*Math.min(2,globalThis.devicePixelRatio||1)}))audio?.play(e.name,{intensity:e.intensity,pan:e.pan});
     sceneryFades[0](windowFade(p,.255,.29,.51,.56));sceneryFades[1](windowFade(p,.465,.50,.67,.70));sceneryFades[2](windowFade(p,.70,.745,.925,.95));
     planet.rotation.y=reduced?0:t*.012;skyRing.rotation.z=reduced?0:t*.025;
     backdrop.update({quality:options.quality,progress:pj,time:t,reduced,width,height,pointerX,pointerY,desktop:!coarsePointer?.matches,cameraZ:camera.position.z});
     ultraEffects.update({progress:pj,time:t,dt,reduced,quality:options.quality,hoverTarget:hovered,hoverProgress:options.hoverProgress||0});
     particles.update({cut:{car:smooth(.862,.89,p)},progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,hoverTarget:hovered,hoverProgress:options.hoverProgress||0,flight});
     dustMaterial.uniforms.uTime.value=reduced?0:t;
-    voxels.update({progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,peel:!!options.peel&&!coarsePointer?.matches,intro,reveal:heroReveal});
+    lunarOpening.update({fade:1-smooth(.11,.2,p),time:t,reduced});
+    voxels.update({progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,peel:!!options.peel&&!coarsePointer?.matches,intro,reveal:heroReveal,tremble:reduced?0:smooth(.07,.088,p)*(1-smooth(.089,.095,p))});
     optics.center.copy(hovered&&entries[hovered]?.group?entries[hovered].group.position:p<.23?heroAnchor.position:focus);
     optics.strength=reduced?0:Math.max(windowFade(p,.085,.11,.15,.205)*.55,heroReveal*.25,hovered?clamp(options.hoverProgress)*.55:0,flight*.16);
     optics.radius=hovered?.20:.25;
     active=p<.49?'helmet':p<.715?'robot':'car';return active;
   }
-  return {root,update,setQuality(value){ultraEffects.setQuality(value);backdrop.setQuality(value);particles.setQuality?.(value);},getRift:p=>ultraEffects.rift(p),riftEnd:ultraEffects.end,getParticleCount:()=>particles.getCount(),loadPlaza:()=>plaza.load(),ready:null,REVEAL_AT,getReveal:()=>heroReveal,flashHero(){voxels.flash();},startIntro(instant=false){if(introStart===null)introStart=instant?lastT-9:lastT;},getOptics:()=>optics,getIndoor:()=>indoorMix,getWorld:()=>active,openHero(){return false;},getHeroCenter:()=>heroAnchor.position,setVisible(value){root.visible=!!value;particles.setVisible?.(!!value);},samplePose(progress){return sample(clampRail(progress)).slice();},dispose(){plaza.dispose();backdrop.dispose();ultraEffects.dispose();voxels.dispose();particles.dispose();for(const [g,parent] of originalParents)if(parent)parent.add(g);root.removeFromParent();resources.forEach(r=>r.dispose?.());resources.clear();}};
+  return {root,update,setQuality(value){ultraEffects.setQuality(value);backdrop.setQuality(value);particles.setQuality?.(value);},getRift:p=>ultraEffects.rift(p),riftEnd:ultraEffects.end,getParticleCount:()=>particles.getCount(),loadPlaza:()=>plaza.load(),ready:null,REVEAL_AT,getReveal:()=>heroReveal,flashHero(){voxels.flash();},startIntro(instant=false){if(introStart===null)introStart=instant?lastT-9:lastT;},getOptics:()=>optics,getIndoor:()=>indoorMix,getWorld:()=>active,openHero(){return false;},getHeroCenter:()=>heroAnchor.position,setVisible(value){root.visible=!!value;particles.setVisible?.(!!value);},samplePose(progress){return sample(clampRail(progress)).slice();},dispose(){plaza.dispose();showcase.dispose();lunarOpening.dispose();backdrop.dispose();ultraEffects.dispose();voxels.dispose();particles.dispose();for(const [g,parent] of originalParents)if(parent)parent.add(g);root.removeFromParent();resources.forEach(r=>r.dispose?.());resources.clear();}};
 }

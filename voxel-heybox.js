@@ -1,9 +1,9 @@
-// The black box is a grain field: 20×20×12 small obsidian cubes, one instanced draw.
-// Scrolling sheds every grain that is not part of the mark: they tumble onto the floor
-// and leave a solid voxel logo, back-lit by a halo. The same grains then scatter and
-// re-form as each world, and finally stream through the front door, snow-white on the
-// way, into the little logo on the living-room table.
-export const NX = 20, NY = 20, NZ = 12, VOXELS = NX * NY * NZ, PITCH = .11;
+// The opening box is built from big bricks (brick-hero.js). When the scroll lines up the
+// mark, its bricks shatter into 4800 small obsidian grains, one instanced draw. The same
+// grains scatter and re-form as each world, and finally stream through the front door
+// into the little logo on the living-room table.
+import { createBrickHero, BX, BY, SHED_AT } from './brick-hero.js?v=journey-39';
+export const NX = 20, NY = 20, NZ = 12, VOXELS = NX * NY * NZ, PITCH = .11, BRICK = .18;
 export const VOXEL_PATH = [
   { from: 'box', to: 'helmet', leave: [.088, .15], arrive: [.295, .367], burst: 2.6 },
   { from: 'helmet', to: 'robot', leave: [.432, .475], arrive: [.514, .573], burst: 1.3 },
@@ -17,16 +17,16 @@ const fract = x => x - Math.floor(x);
 const mono = "'JetBrains Mono','SFMono-Regular',Menlo,Consolas,monospace";
 
 // Logo cells on the front face (row 0 = bottom). Falls back to an empty mask without canvas.
-function logoMask() {
+function logoMask(NX, NY, fill, threshold = 90) {
   const mask = new Uint8Array(NX * NY);
   if (typeof document === 'undefined' || typeof Path2D === 'undefined') return mask;
   const c = document.createElement('canvas'); c.width = NX * 8; c.height = NY * 8; const g = c.getContext('2d'); if (!g) return mask;
-  const k = 15 * 8 / 408; g.translate((c.width - 368 * k) / 2 - 72 * k, (c.height - 408 * k) / 2 - 52 * k); g.scale(k, k);
+  const k = fill * 8 / 408; g.translate((c.width - 368 * k) / 2 - 72 * k, (c.height - 408 * k) / 2 - 52 * k); g.scale(k, k);
   const path = new Path2D(MARK[0]); g.fill(path); g.translate(256, 256); g.rotate(Math.PI); g.translate(-256, -256); g.fill(path);
   const data = g.getImageData(0, 0, c.width, c.height).data;
   for (let y = 0; y < NY; y++) for (let x = 0; x < NX; x++) {
     let a = 0; for (let v = 0; v < 8; v++) for (let u = 0; u < 8; u++) a += data[((y * 8 + v) * c.width + x * 8 + u) * 4 + 3];
-    if (a / 64 > 100) mask[(NY - 1 - y) * NX + x] = 1;
+    if (a / 64 > threshold) mask[(NY - 1 - y) * NX + x] = 1;
   }
   return mask;
 }
@@ -78,9 +78,10 @@ mat3 vxR=vxAxis(axis,sin(3.14159*t)*(2.+s1*6.)+kick*s2*3.+peel*(2.+s1*4.)+sin(3.
 vxLocal=position;vxInward=transpose(vxR)*normalize(uFromC-vxP+.0001);vxKeep=(1.-ex)*boxness;
 vxGlow=uSeam*smoothstep(0.,.04,t)*(1.-smoothstep(.25,.7,t))*(.5+.5*s2);vxStream=w;vxLift=peel;`;
 
-export function createVoxelHeybox({ THREE: T, root, camera, particles, heroAnchor, tableAnchor, modelLocations, room = null, doorway = null }) {
+export function createVoxelHeybox({ THREE: T, root, camera, particles, heroAnchor, tableAnchor, modelLocations, room = null, doorway = null, lunar }) {
   const own = new Set(), keep = r => (own.add(r), r);
-  const mask = logoMask();
+  const mask = logoMask(NX, NY, 17);
+  const bricks = createBrickHero({ THREE: T, root, heroAnchor, lunar, mask: logoMask(BX, BY, 10), pitch: BRICK, voxels: VOXELS, keep });
   const grid = new Float32Array(VOXELS * 3), layer = new Float32Array(VOXELS), boxOrder = new Float32Array(VOXELS), tableOrder = new Float32Array(VOXELS);
   let seed = 90127; const rand = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
   const geo = keep(new T.InstancedBufferGeometry()), cubeGeo = keep(new T.BoxGeometry(1, 1, 1));
@@ -139,14 +140,6 @@ export function createVoxelHeybox({ THREE: T, root, camera, particles, heroAncho
   const heroSheet = new T.Mesh(keep(new T.PlaneGeometry(NX * PITCH * 1.7, NY * PITCH * 1.7)), keep(new T.MeshBasicMaterial({ map: haloTexture, color: 0x000000, transparent: true, blending: T.AdditiveBlending, depthWrite: false, fog: false })));
   heroSheet.position.z = -NZ * PITCH / 2 - .35; heroSheet.raycast = () => {}; heroAnchor.add(heroSheet);
 
-  // The floor the excess grains land on: a dark plinth with a faint ice grid.
-  const floor = new T.Mesh(keep(new T.PlaneGeometry(9, 9)), keep(new T.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uOpacity: { value: 0 }, uColor: { value: new T.Color(0x8fdcff) } },
-    vertexShader: 'varying vec2 vP;void main(){vP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader: `uniform float uOpacity;uniform vec3 uColor;varying vec2 vP;void main(){float r=length(vP);vec2 g=abs(fract(vP/${(PITCH * 2).toFixed(3)}+.5)-.5)/fwidth(vP/${(PITCH * 2).toFixed(3)});
-      float line=1.-min(min(g.x,g.y),1.),ring=1.-smoothstep(0.,.025,abs(r-3.35));float fade=1.-smoothstep(1.2,4.3,r);
-      gl_FragColor=vec4(mix(vec3(.035,.04,.048),uColor,line*.35+ring*.6),uOpacity*(fade*(.55+line*.12)+ring*.4));}` })));
-  floor.rotation.x = -Math.PI / 2; floor.position.set(G.x, floorY, G.z); floor.renderOrder = -1; floor.raycast = () => {}; root.add(floor);
-
   // Atmosphere: slow motes drifting up through the light, like the reference's air.
   function motes(parent, count, size, at, color, world) {
     const pos = new Float32Array(count * 3), sd = new Float32Array(count * 4);
@@ -165,25 +158,7 @@ export function createVoxelHeybox({ THREE: T, root, camera, particles, heroAncho
   const heroAir = motes(root, 900, [12, 7, 11], [G.x - .6, G.y + 1, G.z + .5], 0xd6f1ff, .022);
   const roomAir = room ? motes(room, 320, [7.4, 2.5, 6.6], [0, 1.3, 0], 0xffd9a8, .016) : null;
 
-  // Construction sketch: progressive thin lines, numbered points and dimensions.
-  const sketch = new T.Group(); sketch.name = 'voxel-construction-sketch'; heroAnchor.add(sketch);
-  const hx = NX * PITCH / 2, hy = NY * PITCH / 2, hz = NZ * PITCH / 2;
-  const corner = (x, y, z) => [x * hx, y * hy, z * hz];
-  const edges = [[[-1, -1, 1], [1, -1, 1]], [[1, -1, 1], [1, 1, 1]], [[1, 1, 1], [-1, 1, 1]], [[-1, 1, 1], [-1, -1, 1]], [[-1, -1, 1], [-1, -1, -1]], [[1, -1, 1], [1, -1, -1]], [[1, 1, 1], [1, 1, -1]], [[-1, 1, 1], [-1, 1, -1]], [[-1, -1, -1], [1, -1, -1]], [[1, -1, -1], [1, 1, -1]], [[1, 1, -1], [-1, 1, -1]], [[-1, 1, -1], [-1, -1, -1]]].map(([a, b]) => [corner(...a), corner(...b)]);
-  const o = .32, extra = [
-    [[-hx, -hy, hz], [hx, hy, hz]], [[hx, -hy, hz], [-hx, hy, hz]], [[0, -hy - .12, hz], [0, hy + .12, hz]], [[-hx - .12, 0, hz], [hx + .12, 0, hz]],
-    [[-hx, -hy - o, hz], [hx, -hy - o, hz]], [[-hx, -hy - o - .06, hz], [-hx, -hy - o + .06, hz]], [[hx, -hy - o - .06, hz], [hx, -hy - o + .06, hz]],
-    [[hx + o, -hy, hz], [hx + o, hy, hz]], [[hx + o - .06, -hy, hz], [hx + o + .06, -hy, hz]], [[hx + o - .06, hy, hz], [hx + o + .06, hy, hz]],
-    [[hx + o * .7, -hy - o * .7, hz], [hx + o * .7, -hy - o * .7, -hz]]
-  ];
-  const lines = [...edges, ...extra], K = 18, linePos = [], lineOrder = [];
-  lines.forEach(([a, b], n) => { for (let k = 0; k < K; k++) { for (const u of [k / K, (k + 1) / K]) { linePos.push(a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u, a[2] + (b[2] - a[2]) * u); lineOrder.push((n + k / K) / lines.length); } } });
-  const lineGeo = keep(new T.BufferGeometry()); lineGeo.setAttribute('position', new T.Float32BufferAttribute(linePos, 3)); lineGeo.setAttribute('aOrder', new T.Float32BufferAttribute(lineOrder, 1));
-  const lineMat = keep(new T.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uDraw: { value: 0 }, uOpacity: { value: 0 }, uColor: { value: new T.Color(0xc9d3da) } },
-    vertexShader: 'attribute float aOrder;varying float vO;void main(){vO=aOrder;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader: 'uniform float uDraw,uOpacity;uniform vec3 uColor;varying float vO;void main(){if(vO>uDraw)discard;gl_FragColor=vec4(uColor,uOpacity*(.55+.45*smoothstep(uDraw-.04,uDraw,vO)));}' }));
-  const sketchLines = new T.LineSegments(lineGeo, lineMat); sketchLines.raycast = () => {}; sketch.add(sketchLines);
-  function textSprite(text, { height = .12, color = '#c9d3da', marker = false, parent = sketch, at = [0, 0, 0] } = {}) {
+  function textSprite(text, { height = .12, color = '#c9d3da', marker = false, parent = root, at = [0, 0, 0] } = {}) {
     if (typeof document === 'undefined') return null;
     const c = document.createElement('canvas'), g = c.getContext('2d'); if (!g) return null;
     g.font = `500 44px ${mono}`; const w = Math.ceil(g.measureText(text).width) + (marker ? 58 : 12); c.width = w; c.height = 64;
@@ -194,13 +169,6 @@ export function createVoxelHeybox({ THREE: T, root, camera, particles, heroAncho
     const s = new T.Sprite(keep(new T.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, opacity: 0 })));
     s.center.set(marker ? 22 / w : .5, .5); s.scale.set(height * w / 64, height, 1); s.position.set(...at); s.raycast = () => {}; parent.add(s); return s;
   }
-  const marks = [];
-  const point = (p, n, order) => { const s = textSprite(String(n).padStart(2, '0'), { marker: true, at: p }); if (s) marks.push([s, order]); };
-  [[-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1], [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1]].forEach((c, i) => point(corner(...c), [23, 57, 38, 15, 4, 91, 62, 70][i], [0, 1, 2, 3, 4, 5, 6, 7].map(n => n / 23)[i] + .02));
-  const dims = [['220', [0, -hy - o - .13, hz], .58], ['220', [hx + o + .26, 0, hz], .64], ['132', [hx + o * .7 + .2, -hy - o * .7 - .1, 0], .72]];
-  for (const [text, at, order] of dims) { const s = textSprite(text, { at, height: .1 }); if (s) marks.push([s, order]); }
-  const caption = textSprite('HBX—01 / 20×20×12 / 4800', { at: [-hx, hy + .26, hz], height: .085, color: '#8b979f' }); if (caption) { caption.center.set(0, .5); marks.push([caption, .2]); }
-
   // Numbered constellation lines between a few grains while the box comes apart.
   const picks = kept.length > 40 ? [3, 41, 17, 63, 29, 88, 52].map(k => kept[Math.floor(k / 100 * kept.length)]) : [VOXELS - 1 - 20 * 3 - 4, VOXELS - 1 - 20 * 9 - 15, VOXELS - 1 - 20 * 15 - 2, VOXELS - 1 - 20 * 6 - 11, VOXELS - 1 - 20 * 18 - 8, VOXELS - 1 - 20 * 12 - 17, VOXELS - 1 - 20 * 1 - 9];
   const starGeo = keep(new T.BufferGeometry()), starPos = new Float32Array((picks.length - 1) * 6);
@@ -218,8 +186,16 @@ export function createVoxelHeybox({ THREE: T, root, camera, particles, heroAncho
       out[i * 3] = e[0] * x + e[4] * y + e[8] * z + e[12]; out[i * 3 + 1] = e[1] * x + e[5] * y + e[9] * z + e[13]; out[i * 3 + 2] = e[2] * x + e[6] * y + e[10] * z + e[14]; }
     m4.decompose(center, q, sc); rot.setFromMatrix4(m4); return sc.x;
   }
+  // The mark's bricks, each split into small grains, in the hero's current pose.
+  function fillShards(out, ord, center, rot) {
+    const e = anchorMatrix(heroAnchor).elements, S = bricks.shards;
+    for (let i = 0; i < VOXELS; i++) { const x = S[i * 3], y = S[i * 3 + 1], z = S[i * 3 + 2];
+      out[i * 3] = e[0] * x + e[4] * y + e[8] * z + e[12]; out[i * 3 + 1] = e[1] * x + e[5] * y + e[9] * z + e[13]; out[i * 3 + 2] = e[2] * x + e[6] * y + e[10] * z + e[14]; ord[i * 2] = bricks.shardOrder[i]; }
+    m4.decompose(center, q, sc); rot.setFromMatrix4(m4); return sc.x;
+  }
   function fill(name, out, ord, center, rot, which) {
-    if (name === 'box' || name === 'table') { const s = fillBox(name === 'box' ? heroAnchor : tableAnchor, out, center, rot); for (let i = 0; i < VOXELS; i++) ord[i * 2 + which] = name === 'box' ? boxOrder[i] : tableOrder[i]; return s; }
+    if (name === 'box') return fillShards(out, ord, center, rot);
+    if (name === 'table') { const s = fillBox(tableAnchor, out, center, rot); for (let i = 0; i < VOXELS; i++) ord[i * 2 + which] = tableOrder[i]; return s; }
     const tmp = fill.tmp || (fill.tmp = new Float32Array(VOXELS));
     rot.identity();
     if (particles.sample(name, out, tmp, VOXELS)) { for (let i = 0; i < VOXELS; i++) ord[i * 2 + which] = tmp[i]; center.set(0, 0, 0); for (let i = 0; i < VOXELS; i += 16) center.x += out[i * 3], center.y += out[i * 3 + 1], center.z += out[i * 3 + 2]; center.multiplyScalar(16 / VOXELS); return 0; }
@@ -240,36 +216,36 @@ export function createVoxelHeybox({ THREE: T, root, camera, particles, heroAncho
     for (let k = 0, key = 'xyz'; k < 3; k++) { const ax = key[k], base = F[k] + (Tt[k] - F[k]) * e + dir[ax] * b, sw = C[ax] + Fw[ax] * dd + (Rt[ax] * Math.cos(a) + Up[ax] * Math.sin(a)) * R; out[k] = base + (sw - base) * w; }
     return t;
   }
-  function update({ progress = 0, time = 0, dt = 0, reduced = false, quality = 'standard', width = 1280, height = 800, pointerX = 9, pointerY = 9, peel = false, intro = { draw: 1, build: 1, sketch: 0 }, reveal = 0 } = {}) {
+  function update({ progress = 0, time = 0, dt = 0, reduced = false, quality = 'standard', width = 1280, height = 800, pointerX = 9, pointerY = 9, peel = false, intro = { since: 99, shed: 9 }, reveal = 0, tremble = 0 } = {}) {
     const p = clamp(progress); clock = reduced ? 0 : time;
     root.updateWorldMatrix(true, false); inv.copy(root.matrixWorld).invert();
     let index = VOXEL_PATH.findIndex(r => p <= r.arrive[1] + .004); if (index < 0) index = VOXEL_PATH.length - 1;
     const r = VOXEL_PATH[index], u = uniforms, isBox = n => n === 'box' || n === 'table';
-    // Grains resting inside a model are invisible: skip the per-frame surface reads.
+    // Grains resting inside a model (or as bricks) are invisible: skip the per-frame surface reads.
     const moving = p >= r.leave[0] - .002;
-    mesh.visible = moving || isBox(r.from) || (isBox(r.to) && p > r.arrive[0]);
+    mesh.visible = moving || (isBox(r.to) && p > r.arrive[0]);
     if (mesh.visible) {
       const sf = fill(r.from, from, orders, u.uFromC.value, u.uFromRot.value, 0), st = moving ? fill(r.to, to, orders, u.uToC.value, u.uToRot.value, 1) : 0;
-      u.uSizeFrom.value = isBox(r.from) ? PITCH * .9 * sf : .085; u.uSizeTo.value = isBox(r.to) ? PITCH * .9 * (st || 1) : .085;
+      u.uSizeFrom.value = r.from === 'box' ? BRICK / 3 * .92 * sf : r.from === 'table' ? PITCH * .9 * sf : .085; u.uSizeTo.value = isBox(r.to) ? PITCH * .9 * (st || 1) : .085;
       fromAttr.needsUpdate = toAttr.needsUpdate = orderAttr.needsUpdate = true;
     }
     active = index;
     u.uP.value = p; u.uTime.value = clock; u.uBurst.value = reduced ? r.burst * .4 : r.burst; u.uLeave.value.set(...r.leave); u.uArrive.value.set(...r.arrive);
-    u.uFromBox.value = r.from === 'box' || r.from === 'table' ? 1 : 0; u.uToBox.value = r.to === 'box' || r.to === 'table' ? 1 : 0;
-    u.uBuild.value = index === 0 ? intro.build : 1; u.uActive.value = index === 0 && intro.build <= 0 ? 0 : 1;
+    u.uFromBox.value = r.from === 'table' ? 1 : 0; u.uToBox.value = r.to === 'box' || r.to === 'table' ? 1 : 0;
+    u.uBuild.value = 1; u.uActive.value = 1;
     camera.updateMatrixWorld(true); u.uCam.value.copy(camera.position).applyMatrix4(inv);
     camera.getWorldDirection(u.uCamF.value).transformDirection(inv); u.uCamR.value.setFromMatrixColumn(camera.matrixWorld, 0).transformDirection(inv); u.uCamU.value.setFromMatrixColumn(camera.matrixWorld, 1).transformDirection(inv);
     u.uAspect.value = width / Math.max(1, height);
     const k = 1 - Math.exp(-Math.max(0, dt) * 10); if (peel && !reduced) pointer.lerp(v.set(pointerX, pointerY, 0), pointer.x > 5 ? 1 : k); else pointer.set(9, 9);
     u.uPointer.value.copy(pointer); u.uPeel.value = peel && !reduced ? 1 : 0;
-    // Scroll sheds the excess; the last leg is routed through the front door and turns snow-white.
-    const drop = smooth(.004, .064, p); u.uFall.value = index === 0 ? 1 : 0; u.uDrop.value = index === 0 ? drop : 0; u.uBreathe.value = reduced ? 0 : 1;
-    u.uRoute.value = index === 3 && doorway ? 1 : 0; u.uWhite.value = index === 3 ? 1 : 0;
+    // The bricks shed themselves on a clock; the grains stay black all the way to the table.
+    const drop = smooth(0, 1.6, intro.shed); u.uFall.value = 0; u.uDrop.value = 0; u.uBreathe.value = reduced ? 0 : 1;
+    u.uRoute.value = index === 3 && doorway ? 1 : 0; u.uWhite.value = 0;
+    bricks.update({ since: intro.since, shed: intro.shed, progress: p, time: clock, reduced, quality, pointer, peel: peel && !reduced && index === 0, aspect: u.uAspect.value, flash, tremble, height, visible: p < .16 });
     if (index === 3 && doorway) { doorway.group.updateWorldMatrix(true, false); const dm = m4.multiplyMatrices(inv, doorway.group.matrixWorld), ln = new T.Matrix3().setFromMatrix4(dm);
       u.uDoorA.value.set(...doorway.outside).applyMatrix4(dm); u.uDoorB.value.set(...doorway.inside).applyMatrix4(dm);
       u.uDoorR.value.set(doorway.halfWidth, 0, 0).applyMatrix3(ln); u.uDoorU.value.set(0, doorway.halfHeight, 0).applyMatrix3(ln); u.uDoorN.value.set(0, 0, doorway.approach).applyMatrix3(ln); }
-    const built = index === 0 ? smooth(.4, 1, intro.build) : 0;
-    floor.material.uniforms.uOpacity.value = built * (.35 + .65 * smooth(0, .25, drop)) * (1 - smooth(.105, .16, p)); floor.visible = floor.material.uniforms.uOpacity.value > .002;
+    const built = index === 0 ? smooth(1.2, 3.6, intro.since) : 0;
     const view = height * Math.min(2, globalThis.devicePixelRatio || 1);
     for (const [air, alpha] of [[heroAir, built * (1 - smooth(.13, .2, p))], [roomAir, smooth(.935, .965, p)]]) { if (!air) continue;
       air.visible = alpha > .002; air.material.uniforms.uAlpha.value = alpha * (quality === 'ultra' ? .9 : .7); air.material.uniforms.uTime.value = reduced ? 0 : clock; air.material.uniforms.uView.value = view; }
@@ -280,10 +256,6 @@ export function createVoxelHeybox({ THREE: T, root, camera, particles, heroAncho
     // Halo: a rim behind the cube that becomes the mark's back-light, peaking in the flash.
     const gone = smooth(.09, .11, p); heroSheet.visible = index === 0 && built > 0 && gone < 1;
     heroSheet.material.color.copy(accent).multiplyScalar((.05 + .12 * drop + .22 * reveal + .9 * flash) * built * (1 - gone) * (reduced ? 1 : .92 + .08 * Math.sin(clock * 1.3)));
-    // Sketch: draws, holds faint, then leaves with the first scroll.
-    lineMat.uniforms.uDraw.value = intro.draw * 1.001; const sketchAlpha = intro.sketch * (1 - smooth(.02, .07, p));
-    lineMat.uniforms.uOpacity.value = sketchAlpha * .55; sketch.visible = sketchAlpha > .002;
-    for (const [s, order] of marks) s.material.opacity = sketchAlpha * smooth(order, order + .05, intro.draw);
     // Constellation through the explosion.
     const starAlpha = index === 0 && !reduced ? smooth(.092, .105, p) * (1 - smooth(.15, .175, p)) : 0;
     constellation.visible = starAlpha > .002;
@@ -297,7 +269,7 @@ export function createVoxelHeybox({ THREE: T, root, camera, particles, heroAncho
     return index;
   }
   return {
-    mesh, update, getActive: () => active, flash() { flash = 1; },
-    dispose() { mesh.removeFromParent(); sketch.removeFromParent(); heroSheet.removeFromParent(); floor.removeFromParent(); heroAir.removeFromParent(); roomAir?.removeFromParent(); constellation.removeFromParent(); starLabels.forEach(s => s?.removeFromParent()); own.forEach(r => r.dispose?.()); own.clear(); }
+    mesh, update, bricks, getActive: () => active, flash() { flash = 1; },
+    dispose() { bricks.dispose(); mesh.removeFromParent(); heroSheet.removeFromParent(); heroAir.removeFromParent(); roomAir?.removeFromParent(); constellation.removeFromParent(); starLabels.forEach(s => s?.removeFromParent()); own.forEach(r => r.dispose?.()); own.clear(); }
   };
 }
