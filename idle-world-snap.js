@@ -28,7 +28,7 @@ export function createIdleWorldSnap({
   // These poses put the cinematic titles over the intended camera composition.
   // The last section uses its p = 1 position (or the reachable bottom).
   const poses = { dive: .19, warp: .285, equipment: .395, drift: .495,
-    companion: .600, 'time-rift': .715, drive: .835, arrival: .975 };
+    companion: .600, 'time-rift': .715, drive: .835 };
   const epsilon = 1;
   const scrollKeys = new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ', 'Spacebar', 'Space']);
   const heldKeys = new Set(), listeners = [];

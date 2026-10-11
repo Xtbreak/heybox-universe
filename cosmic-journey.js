@@ -1,8 +1,8 @@
-import { createSpaceBackdrop } from './space-backdrop.js?v=journey-30';
-import { createJourneyUltra } from './journey-ultra.js?v=journey-30';
-import { createHeyboxCore } from './refined-heybox-core.js?v=journey-30';
-import { createJourneyParticles } from './journey-particles.js?v=journey-30';
-import { createCommunityPlaza } from './community-plaza.js?v=journey-30';
+import { createSpaceBackdrop } from './space-backdrop.js?v=journey-31';
+import { createJourneyUltra } from './journey-ultra.js?v=journey-31';
+import { createHeyboxCore } from './refined-heybox-core.js?v=journey-31';
+import { createJourneyParticles } from './journey-particles.js?v=journey-31';
+import { createCommunityPlaza } from './community-plaza.js?v=journey-31';
 
 const coarsePointer=globalThis.matchMedia?.('(pointer: coarse)');
 // A continuous, scene-space expedition. Imported GLB transforms are never modified.
@@ -10,8 +10,8 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
   const root = new THREE.Group(); root.name = 'cosmic-journey'; scene.add(root);
   const resources = new Set(), keep = v => (resources.add(v), v);
   const clamp = v => Math.max(0, Math.min(1, Number(v) || 0));
-  // Past the gallery (p = 1) the rail continues into the players' living room.
-  const END = 1.2, clampRail = v => Math.max(0, Math.min(END, Number(v) || 0));
+  // After the toy park the road ends at a friend's house; the rail stops inside, seated.
+  const END = 1, clampRail = clamp;
   const smooth = (a,b,v) => { const x=clamp((v-a)/(b-a)); return x*x*(3-2*x); };
   const names=['helmet','robot','car'], originalParents=new Map();
   for (const name of names) { const g=entries[name]?.group; if(g){originalParents.set(g,g.parent);root.add(g);} }
@@ -67,8 +67,8 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     }
     return{g,mat};
   }
-  const tunnelWindows=[[.12,.20,.31,.365],[.435,.465,.515,.56],[.63,.675,.75,.795],[.88,.915,.945,.98]];
-  const tunnels=[tunnel(-7,83,4.7,1.85),tunnel(-116,76,5.0,1.55),tunnel(-229,84,5.6,2.1),tunnel(-349,65,5.6,1.4)];
+  const tunnelWindows=[[.12,.20,.31,.365],[.435,.465,.515,.56],[.63,.675,.75,.795]];
+  const tunnels=[tunnel(-7,83,4.7,1.85),tunnel(-116,76,5.0,1.55),tunnel(-229,84,5.6,2.1)];
   const worlds={},portalSpinners=[],modelLocations={helmet:[2,.15,-108],robot:[2,0,-204],car:[2,-.25,-338]};
   function portal(name,r){const p=modelLocations[name],g=group(root,p),back=group(g,[0,0,-2]);worlds[name]={g,back};
     ring(r,.085,silver,back);ring(r+.15,.013,ice,back);
@@ -96,17 +96,12 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
   const highway=group(root,[2,-2.05,-338]);box(7,.18,87,black,highway,[0,0,-29]);
   for(const x of [-3.2,3.2])box(.035,.05,87,ice,highway,[x,.11,-29]);
   for(let i=0;i<24;i++){box(.06,.025,1.6,i%3===0?ice:silver,highway,[0,.12,8-i*3.3]);if(i%3===0){for(const x of [-3.8,3.8]){box(.21,7,.35,silver,highway,[x,3.4,-i*3.3]);box(.035,6.7,.04,ice,highway,[x-.14,3.4,.21-i*3.3]);}box(7.8,.2,.35,silver,highway,[0,6.9,-i*3.3]);}}
-  const finale=group(root,[0,0,-428]);const finalRings=[];for(let i=0;i<3;i++){const g=group(finale,[(i-1)*5.3,0,0]);ring(2.37,.06,silver,g);const r=ring(2.54,.018,ice,g);finalRings.push(r);glow(g,7,[0,0,-1],.16);label(g,'悬停 1 秒  ↗',[0,-2.7,.5],2.6);}
-  const finalOrbit=ring(12,.013,faint,finale);finalOrbit.rotation.x=1.03;
-  const closingCore=createHeyboxCore({THREE});
-  closingCore.group.name='finale-closing-blackbox';closingCore.group.position.set(0,5,-10);closingCore.group.scale.setScalar(.82);
-  const corePosition=new THREE.Vector3();
-  const particles=createJourneyParticles({THREE,root,camera,entries,core:heyboxCore,closingCore});
+  const particles=createJourneyParticles({THREE,root,camera,entries,core:heyboxCore});
   const backdrop=createSpaceBackdrop({THREE,root});
-  const ultraEffects=createJourneyUltra({THREE,root,camera,entries,core:heyboxCore,closingCore});
-  const plaza=createCommunityPlaza({THREE,parent:root});
-  // Each gallery model shrinks into one of the players' screens.
-  const landing={helmet:[1.004,1.06],robot:[1.012,1.07],car:[1.02,1.08]},flyFrom=new THREE.Vector3(),flyTo=new THREE.Vector3();
+  const ultraEffects=createJourneyUltra({THREE,root,camera,entries,core:heyboxCore});
+  // The same Heybox, small, waits on the friends' coffee table.
+  const tableCore=createHeyboxCore({THREE});tableCore.group.name='living-room-heybox';
+  const plaza=createCommunityPlaza({THREE,parent:root,core:tableCore});
   const iceBase=ice.color.clone(),hdrMaterials=[];
   const optics={center:new THREE.Vector3(),strength:0,radius:.22};
   // Each scenic assembly owns a bounded set of fade materials; imported game assets are untouched.
@@ -114,7 +109,7 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     const clone=m=>{if(cache.has(m))return cache.get(m);const c=keep(m.clone());c.transparent=true;c.depthWrite=false;cache.set(m,c);if(m===ice)hdrMaterials.push(c);mats.push([c,m.opacity,m.depthWrite]);return c;};
     o.material=Array.isArray(o.material)?o.material.map(clone):clone(o.material);});
     return value=>{g.visible=value>0.0001;for(const [m,base,depthWrite] of mats){m.opacity=base*value;m.depthWrite=depthWrite&&value>.995;}};}
-  const worldFades=names.map(n=>fadingGroup(worlds[n].g)),sceneryFades=[orbitalScenery,lunarScenery,highway].map(fadingGroup),finaleFade=fadingGroup(finale);finale.add(closingCore.group);
+  const worldFades=names.map(n=>fadingGroup(worlds[n].g)),sceneryFades=[orbitalScenery,lunarScenery,highway].map(fadingGroup);
   const windowFade=(p,a,b,c,d)=>smooth(a,b,p)*(1-smooth(c,d,p));
   const nodes=[
     [0, 0,.3,9, 1.1,.1,0,42], [.065, -.35,.55,7.9, 1.25,.14,0,43], [.12, -.55,.7,6.6, .7,.1,-.5,45],
@@ -126,11 +121,12 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     [.645, 0.04373177843,0.4145772595,-193.7,0.3645772595,0.1,-204,44], [.66, 0,.15,-211, 0,0,-243,60],
     [.72, -.4,.5,-272, 0,0,-300,69], [.77, 0,.9,-326.5, .6,-.3,-338,47],
     [.8, 0.04067382812,0.8296630859,-327.9,0.4406738281,-0.3,-338,44], [.88, 0.04067382812,0.8296630859,-327.9,0.4406738281,-0.3,-338,44],
-    [.90, .15,.7,-346, 0,0,-380,59], [.96, 0,1,-407, 0,0,-428,47],
-    [.985, 0,.9,-407.5, 0,0,-428,46], [1, 0,.9,-407.5, 0,0,-428,46],
-    [1.05, 0,1.7,-442, 0,-.6,-472,55], [1.12, 0,2.9,-480, 0,-.3,-497,50], [1.2, 0,2.4,-484, 0,0,-497,46]
+    // Down the park road to the porch, through the door, and onto the spare cushion.
+    [.905, 2.2,.55,-370, 2,.1,-412,52], [.93, 2.05,.42,-405.6, 2,-.1,-412.04,50],
+    [.955, 1.85,.42,-411.6, 1.95,-.9,-418.6,56], [.975, 1.45,.4,-412.1, 1.9,-1.2,-418.9,59],
+    [.99, 1.4,.38,-412.3, 1.9,-1.24,-418.9,60], [1, 1.4,.38,-412.3, 1.9,-1.24,-418.9,60]
   ];
-  const pose=new Array(7).fill(0),focus=new THREE.Vector3();let active='helmet',lastFov=-1;
+  const pose=new Array(7).fill(0),focus=new THREE.Vector3();let active='helmet',lastFov=-1,indoorMix=0;
   let hoverTarget=null,hoverCameraOffset=null,hoverApproach=0;const heldModelPoses=new Map();
   // Monotone cubic Hermite rail: continuous velocity through flight waypoints,
   // exactly stationary on the three existing interaction plateaus, no overshoot.
@@ -154,17 +150,16 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
       hoverTarget=hovered;heldModelPoses.clear();hoverCameraOffset=hovered?{x:reduced?0:pointerX*.13,y:reduced?0:pointerY*.09}:null;
       if(hovered){const g=entries[hovered]?.group;if(g)heldModelPoses.set(hovered,{position:g.position.clone(),rotation:g.rotation.clone()});}
     }
-    const mobile=width/Math.max(1,height)<.85,flight=Math.max(smooth(.16,.23,p)*(1-smooth(.30,.35,p)),smooth(.445,.48,p)*(1-smooth(.51,.55,p)),smooth(.65,.68,p)*(1-smooth(.735,.78,p)),smooth(.89,.91,p)*(1-smooth(.94,.97,p)),smooth(1.0,1.03,p)*(1-smooth(1.08,1.12,p)));
-    const leaveGallery=1-smooth(1.0,1.05,p),plazaIn=smooth(1.0,1.1,p);
-    sample(p);camera.position.set(pose[0]+(hoverCameraOffset?.x??(reduced?0:pointerX*.13)),pose[1]+(hoverCameraOffset?.y??(reduced?0:pointerY*.09)),pose[2]+(mobile?2.2+.8*smooth(.12,.23,p)+10*smooth(.90,.98,p)*leaveGallery:0)+Math.max(0,1.65-width/Math.max(1,height))*(mobile?11:7.5)*plazaIn);
-    focus.set(pose[3],pose[4],pose[5]);if(mobile)focus.x=1.1*(1-smooth(.12,.23,p))+1.5*smooth(.30,.36,p)*(1-smooth(.88,.97,p));
+    const mobile=width/Math.max(1,height)<.85,flight=Math.max(smooth(.16,.23,p)*(1-smooth(.30,.35,p)),smooth(.445,.48,p)*(1-smooth(.51,.55,p)),smooth(.65,.68,p)*(1-smooth(.735,.78,p)));
+    // Indoors the pointer only nudges the gaze, and the mobile pull-back stays outside the walls.
+    const indoor=smooth(.93,.955,p),sway=1-.7*indoor;indoorMix=smooth(.875,.925,p);
+    sample(p);camera.position.set(pose[0]+(hoverCameraOffset?.x??(reduced?0:pointerX*.13*sway)),pose[1]+(hoverCameraOffset?.y??(reduced?0:pointerY*.09*sway)),pose[2]+(mobile?(2.2+.8*smooth(.12,.23,p))*(1-indoor):0));
+    focus.set(pose[3],pose[4],pose[5]);if(mobile){const own=1-smooth(.88,.92,p);focus.x=focus.x*(1-own)+own*(1.1*(1-smooth(.12,.23,p))+1.5*smooth(.30,.36,p));}
     // The hit hull stays frozen in screen space while this small approach is rendered.
     hoverApproach=THREE.MathUtils.damp(hoverApproach,hovered&&!reduced?clamp(options.hoverProgress)*.055:0,9,Math.max(0,dt));
-    const finaleFraming=smooth(.93,.965,p)*leaveGallery,narrow=width<=800;
-    if(!narrow){camera.position.x-=5.7*finaleFraming;focus.x-=5.7*finaleFraming;}
     camera.position.lerp(focus,hoverApproach);
     camera.lookAt(focus);if(!reduced)camera.rotateZ(Math.sin(p*Math.PI*9)*flight*.045);
-    const fov=(ultra&&!reduced?THREE.MathUtils.lerp(pose[6],52+18*ultraEffects.rift(p),ultraEffects.rift(p)):pose[6])+(mobile?5+12*plazaIn:0);if(Math.abs(fov-lastFov)>.01 || Math.abs(camera.fov-fov)>.01 || camera.far<900){camera.fov=fov;camera.far=Math.max(camera.far,900);camera.updateProjectionMatrix();lastFov=fov;}
+    const fov=(ultra&&!reduced?THREE.MathUtils.lerp(pose[6],52+18*ultraEffects.rift(p),ultraEffects.rift(p)):pose[6])+(mobile?5+17*indoor:0);if(Math.abs(fov-lastFov)>.01 || Math.abs(camera.fov-fov)>.01 || camera.far<900){camera.fov=fov;camera.far=Math.max(camera.far,900);camera.updateProjectionMatrix();lastFov=fov;}
     const open=smooth(.035,.18,p);cube.visible=p<.205;
     cube.position.set(1.55*(1-open),(.14+(reduced?0:Math.sin(t*.45)*.045))*(1-open),0);
     // A bounded presentation angle keeps the brand readable, even after a long idle.
@@ -173,33 +168,24 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     for(let i=0;i<tunnels.length;i++){const q=tunnels[i],w=tunnelWindows[i],alpha=windowFade(p,...w);q.g.visible=alpha>.0001;
       q.mat.uniforms.time.value=reduced?0:t;q.mat.uniforms.strength.value=alpha*(.12+flight*.10);}
     plaza.update({progress:p,time:t,dt,reduced,camera,quality:options.quality});
-    const finaleMix=smooth(.930,.954,p),finalVisible=p>.955,galleryScale=.66,galleryY=narrow?-8.2:0;
-    finale.scale.setScalar(galleryScale);finale.position.y=galleryY;
     for(let i=0;i<names.length;i++){
       const name=names[i],entry=entries[name],location=modelLocations[name];if(!entry?.group)continue;
-
-      const g=entry.group,[flyStart,flyEnd]=landing[name];g.visible=particles.isPrepared(name)&&((finalVisible&&p<flyEnd)||(name==='helmet'?p>.292&&p<.477:name==='robot'?p>.511&&p<.700:p>.741&&p<.930));
-      g.position.set(location[0]+((i-1)*5.3*galleryScale-location[0])*finaleMix,location[1]*(1-finaleMix)+galleryY*finaleMix+(name==='car'?.53:0)+(reduced?0:Math.sin(t*.7+i)*.07),location[2]+(-428-location[2])*finaleMix);
-      g.rotation.set(name==='car'?.04:0,name==='helmet'?-.34+Math.sin(t*.18)*.09:name==='robot'?-.19:name==='car'?-Math.PI*.19:0,0);
+      const g=entry.group;g.visible=particles.isPrepared(name)&&(name==='helmet'?p>.292&&p<.477:name==='robot'?p>.511&&p<.700:p>.741&&p<.915);
+      g.position.set(location[0],location[1]+(name==='car'?.53:0)+(reduced?0:Math.sin(t*.7+i)*.07),location[2]);
+      g.rotation.set(name==='car'?.04:name==='helmet'?.32:0,name==='helmet'?Math.PI-1.0+Math.sin(t*.18)*.09:name==='robot'?-.19:name==='car'?-Math.PI*.19:0,0);
       const held=heldModelPoses.get(name);if(held){g.position.copy(held.position);g.rotation.copy(held.rotation);}
-      const scale=name==='car'?1.38:name==='robot'?1.05:1.07;g.scale.setScalar(scale*(1-finaleMix*(1-.9*galleryScale)));
-      const fly=smooth(flyStart,flyEnd,p);if(fly>0&&!held){flyFrom.copy(g.position);plaza.anchors[name].getWorldPosition(flyTo);root.worldToLocal(flyTo);
-        g.position.lerpVectors(flyFrom,flyTo,fly);g.position.y+=Math.sin(fly*Math.PI)*3.2;g.rotation.y+=fly*Math.PI*2;g.scale.multiplyScalar(1-fly*.94);}
-      worldFades[i](i===0?windowFade(p,.265,.30,.475,.51):i===1?windowFade(p,.47,.51,.67,.70):windowFade(p,.70,.75,.90,.935));portalSpinners[i].rotation.z=reduced?0:t*(i%2?-.1:.12);
+      g.scale.setScalar(name==='car'?1.38:name==='robot'?1.05:1.07);
+      worldFades[i](i===0?windowFade(p,.265,.30,.475,.51):i===1?windowFade(p,.47,.51,.67,.70):windowFade(p,.70,.75,.895,.915));portalSpinners[i].rotation.z=reduced?0:t*(i%2?-.1:.12);
     }
-    sceneryFades[0](windowFade(p,.255,.29,.51,.56));sceneryFades[1](windowFade(p,.465,.50,.67,.70));sceneryFades[2](windowFade(p,.70,.745,.91,.95));
-    finaleFade(smooth(.91,.965,p)*(1-smooth(1.0,1.022,p)));for(let i=0;i<finalRings.length;i++)finalRings[i].rotation.z=reduced?0:t*.1;
-    closingCore.update((1-smooth(.938,.993,p))*.75,t,{reduced,ultra,opacity:1-smooth(.995,1.02,p)});closingCore.group.visible=!narrow&&p<1.022;
-    closingCore.group.rotation.set(.075,.18,-.02);
+    sceneryFades[0](windowFade(p,.255,.29,.51,.56));sceneryFades[1](windowFade(p,.465,.50,.67,.70));sceneryFades[2](windowFade(p,.70,.745,.925,.95));
     planet.rotation.y=reduced?0:t*.012;skyRing.rotation.z=reduced?0:t*.025;
-    if(p>.90){closingCore.group.getWorldPosition(corePosition);}else corePosition.copy(cube.position);
     backdrop.update({quality:options.quality,progress:pj,time:t,reduced,width,height,pointerX,pointerY,desktop:!coarsePointer?.matches,cameraZ:camera.position.z});
     ultraEffects.update({progress:pj,time:t,dt,reduced,quality:options.quality,hoverTarget:hovered,hoverProgress:options.hoverProgress||0});
-    particles.update({progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,hoverTarget:hovered,hoverProgress:options.hoverProgress||0,corePosition,coreOpen:p>.90?(1-smooth(.938,.993,p))*.75:open,flight,finaleMix});
+    particles.update({progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,hoverTarget:hovered,hoverProgress:options.hoverProgress||0,flight});
     optics.center.copy(hovered&&entries[hovered]?.group?entries[hovered].group.position:p<.23?cube.position:focus);
     optics.strength=reduced?0:Math.max(windowFade(p,.045,.10,.15,.205)*.65,hovered?clamp(options.hoverProgress)*.55:0,flight*.16);
     optics.radius=hovered?.20:.25;
     active=p<.49?'helmet':p<.715?'robot':'car';return active;
   }
-  return {root,update,setQuality(value){ultraEffects.setQuality(value);backdrop.setQuality(value);particles.setQuality?.(value);},getRift:p=>ultraEffects.rift(p),riftEnd:ultraEffects.end,getParticleCount:()=>particles.getCount(),loadPlaza:()=>plaza.load(),ready:Promise.all([heyboxCore.ready,closingCore.ready]),getOptics:()=>optics,getWorld:()=>active,setVisible(value){root.visible=!!value;particles.setVisible?.(!!value);},samplePose(progress){return sample(clampRail(progress)).slice();},dispose(){plaza.dispose();backdrop.dispose();ultraEffects.dispose();particles.dispose();closingCore.dispose();heyboxCore.dispose();for(const [g,parent] of originalParents)if(parent)parent.add(g);root.removeFromParent();resources.forEach(r=>r.dispose?.());resources.clear();}};
+  return {root,update,setQuality(value){ultraEffects.setQuality(value);backdrop.setQuality(value);particles.setQuality?.(value);},getRift:p=>ultraEffects.rift(p),riftEnd:ultraEffects.end,getParticleCount:()=>particles.getCount(),loadPlaza:()=>plaza.load(),ready:heyboxCore.ready,getOptics:()=>optics,getIndoor:()=>indoorMix,getWorld:()=>active,setVisible(value){root.visible=!!value;particles.setVisible?.(!!value);},samplePose(progress){return sample(clampRail(progress)).slice();},dispose(){plaza.dispose();backdrop.dispose();ultraEffects.dispose();particles.dispose();tableCore.dispose();heyboxCore.dispose();for(const [g,parent] of originalParents)if(parent)parent.add(g);root.removeFromParent();resources.forEach(r=>r.dispose?.());resources.clear();}};
 }

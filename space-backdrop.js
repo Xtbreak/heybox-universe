@@ -15,7 +15,7 @@ export function createSpaceBackdrop({ THREE:T, root }) {
         float cloud=fbm(p+vec2(uTime*.009,uProgress*2.));float wisps=fbm(p*2.3+cloud*2.-uTime*.012);
         float density=pow(clamp(cloud*wisps*1.8-.23,0.,1.),1.8);
         float tint=smoothstep(.47,.72,uProgress)*(1.-smoothstep(.76,.9,uProgress));
-        vec3 color=mix(vec3(.06,.35,.72),vec3(.55,.09,.51),tint);
+        vec3 color=mix(vec3(.06,.35,.72),vec3(.36,.2,.62),tint*.85);
         color=mix(color,vec3(.61,.27,.1),smoothstep(.80,1.,uProgress)*.5);
         float title=.25+.75*smoothstep(.24,.67,length((vUv-vec2(.40,.55))*vec2(1.,1.4)));
         gl_FragColor=vec4(color*density*.7,title*.75);

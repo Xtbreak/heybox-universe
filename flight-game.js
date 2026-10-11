@@ -1,3 +1,4 @@
+import { createToyShip, createToyCarrier } from './toy-ship.js?v=journey-31';
 /** Original rescue-flight game. Shared models stay owned by the host. */
 export function createGame({ THREE: T, scene, camera, model, assets = {}, sound = () => {}, emit = () => {}, reduced = false }) {
   const root = new T.Group(); root.name = 'Nacre-rescue-sector'; scene.add(root);
@@ -61,7 +62,9 @@ export function createGame({ THREE: T, scene, camera, model, assets = {}, sound 
   const engineLayout = Array.isArray(assets.flightEngineLayout)&&assets.flightEngineLayout.length ? assets.flightEngineLayout : sharedShip?.isObject3D ? [[-3.2, .52, 2.4], [-3.2, -.53, 2.4], [3.2, .52, 2.4], [3.2, -.53, 2.4]] : [[-1.3, -.1, 3.8], [1.3, -.1, 3.8]];
   const flameScale = Number.isFinite(assets.flightEngineRadius) ? assets.flightEngineRadius / .4 : .56;
   const engineTrails = engineLayout.map(p => { const m = part(engineGeo, ice, visual, p, [flameScale, flameScale, 1.5]); m.userData.baseZ = p[2]; return m; });
-  const enemyPrototype = fighter('enemy');
+  // Enemies are toys from the same box, in purple and red.
+  const enemyToy = createToyShip({ THREE: T, faction: 'enemy', length: 8.5 }), enemyPrototype = enemyToy.root;
+  own({ dispose: () => enemyToy.dispose() });
   // The supplied helmet belongs to the portal. Never reparent, rescale, hide, or dispose it here.
   void model;
 
@@ -122,23 +125,20 @@ export function createGame({ THREE: T, scene, camera, model, assets = {}, sound 
   for (let i = 0; i < 9; i++) { const z = (i - 4) * 12, p = V(0, 0, z), g = part(cube, i % 2 ? silver : graphite, wreck, p.toArray(), [19, 12, 8]); part(cube, ice, wreck, [9.7, 2, z], [.16, .28, 6]); }
   wreck.updateMatrixWorld(true); collider(wreck.getWorldPosition(V()), 58, 'wreck');
   const transport = new T.Group(); transport.name = 'Dawn-rescue-transport'; root.add(transport);
-  // The host owns the capital-ship prototype, its PBR maps, materials, and geometry.
-  // Clone only the hierarchy. Flight mission logic continues to target this same transport Group.
-  const sharedDawn = assets.dawnShip, transportEngineTrails = [];
-  if (sharedDawn?.isObject3D) {
-    const dawnVisual = sharedDawn.clone(true), dawnWrap = new T.Group(); dawnWrap.name = 'Dawn-visual';
-    const bounds = new T.Box3().setFromObject(dawnVisual), size = bounds.getSize(V()), center = bounds.getCenter(V());
-    dawnVisual.position.sub(center); dawnWrap.add(dawnVisual);
-    dawnWrap.scale.setScalar(24 / Math.max(size.x, size.y, size.z, .01)); transport.add(dawnWrap);
-    // Supplied model is centered, -Z forward / +Y up. Sockets use normalized 24-unit space.
-    const dawnEngines = Array.isArray(assets.dawnEngineLayout) && assets.dawnEngineLayout.length ? assets.dawnEngineLayout : [[-2.24952, -.74984, 12], [-2.24952, .74984, 12], [2.24952, -.74984, 12], [2.24952, .74984, 12]];
-    const dawnRadius = Number.isFinite(assets.dawnEngineRadius) ? assets.dawnEngineRadius : .42;
+  // The rescue mothership is a toy from the same box as the fighters: built here,
+  // 24 units long, -Z forward. Mission logic keeps targeting this transport Group.
+  const transportEngineTrails = [];
+  const carrier = createToyCarrier({ THREE: T, length: 24 });
+  own({ dispose: () => carrier.dispose() });
+  if (carrier.root) {
+    carrier.root.name = 'Dawn-visual'; transport.add(carrier.root);
+    const dawnEngines = carrier.engineLayout, dawnRadius = carrier.engineRadius;
     for (const socket of dawnEngines) {
       const plume = part(engineGeo, ice, transport, socket, [dawnRadius / .4, dawnRadius / .4, .35]);
       plume.name = 'Dawn-engine-plume'; plume.userData.baseZ = socket[2]; transportEngineTrails.push(plume);
     }
   } else {
-    // Preserve the original local fallback when the external capital asset is unavailable.
+    // Plain fallback hull, only if the toy carrier could not be built.
     prism([[0, -12], [3.8, -7], [4.5, 8], [2.8, 12], [-2.8, 12], [-4.5, 8], [-3.8, -7]], 4.3, silver, transport);
     for (const s of [-1, 1]) { part(cube, graphite, transport, [s * 5.7, -.7, 1.4], [3.2, 5, 15]); for (let j = 0; j < 4; j++) part(cube, ceramic, transport, [s * 5.8, -.8, -4.5 + j * 3.6], [3.3, 3.7, 2.8]); part(engineGeo, ice, transport, [s * 4.5, .1, 10.8], [4, 4, 3]); }
     part(cube, glass, transport, [0, 2.3, -7.5], [4.9, .45, 3.6]);

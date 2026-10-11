@@ -159,16 +159,7 @@ html{overflow-x:clip}.giant-type{max-width:100%;overflow:hidden}
 body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
 @keyframes title-glitch{0%,16%,21%,39%,44%,100%{transform:none;text-shadow:0 4px 45px #080b1040}18%,41%{transform:translateX(2px);text-shadow:-2px 0 #73e2ff,2px 0 #fc5bcd}}
 
-/* The closing gallery has its own lower screen band on phones and tablets. */
 @media(max-width:800px){
- #arrival .copy{top:12svh;margin-left:6vw;width:86%;padding-bottom:12px}
- #arrival .label{font-size:8px;letter-spacing:1.4px;margin-bottom:14px}
- #arrival h2{font-size:clamp(29px,5vw,40px);line-height:1.17;letter-spacing:-1.5px;margin-bottom:14px}
- #arrival .body-copy{font-size:11px;line-height:1.8;margin-bottom:12px}
- #arrival .expedition-summary{max-width:100%;margin:12px 0;padding-top:10px;gap:6px 12px}
- #arrival .expedition-summary span{font-size:10px}#arrival .expedition-summary strong{font-size:20px}
- #arrival .cta{min-height:44px;padding:10px 18px;font-size:11px;gap:24px}
- #arrival .official{margin:12px 0;font-size:10px}#arrival .credits-link{font-size:9px}
  .header-right{gap:6px}.header-right button{padding:10px;min-height:44px}
 }
 .frame h1,.frame h2{transform:skewY(calc(var(--vel,0) * -2.2deg));transition:transform .25s}
@@ -193,51 +184,26 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
 .stat-grid span{font-size:12px;color:#b8cfdb}
 .stat-grid small{font-size:9px;line-height:1.6;color:#6f8a99;letter-spacing:.5px}
 
-/* Finale */
-#arrival .copy{top:12svh}
-.recap-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:520px;margin:4px 0 4px}
-.recap-row div{border-top:1px solid #b6e7fa40;padding-top:10px;display:flex;flex-direction:column;gap:4px}
-.recap-row i{font:normal 9px monospace;color:#7fa9c0;letter-spacing:2px}
-.recap-row b{font-size:13px;color:#e6f4fa}
-.recap-row small{font-size:9px;color:#8197a4;line-height:1.5}
-.finale-actions{display:flex;align-items:center;gap:26px;flex-wrap:wrap}.finale-actions .official{margin:0}
-
-/* Epilogue: a page that rises over the frozen gallery */
-#epilogue{position:relative;z-index:3;padding:22vh 0 0;color:var(--text);background:linear-gradient(180deg,transparent,#05080cd0 18vh,#04070bf2 60vh,#030509);overflow:hidden}
-.in-epilogue footer,.in-epilogue .journey-readout,.in-epilogue #model-hud{opacity:0;visibility:hidden}
-
-.epi-block{margin:0 7vw 14vh;max-width:900px}
-.epi-block h2{font-size:clamp(46px,6vw,98px)}
-.epi-block .body-copy{max-width:520px}
-
-.morph-stage{position:relative;display:grid;grid-template-columns:1.25fr 1fr;align-items:center;gap:4vw;margin:0 7vw 16vh;min-height:520px;pointer-events:auto}
-#morph-canvas{width:100%;height:min(62vh,560px);display:block;border:1px solid #b6e7fa14;background:radial-gradient(ellipse at center,#0b1620,#04070b 70%)}
-.morph-links{display:flex;flex-direction:column}
-.morph-link{display:grid;grid-template-columns:42px 1fr auto;align-items:baseline;gap:10px;padding:17px 4px;border:0;border-bottom:1px solid #b6e7fa1e;background:none;text-align:left;font:inherit;color:#d6e8f1;transition:padding .35s,color .35s,background .35s;pointer-events:auto}
-.morph-link:hover,.morph-link:focus-visible{padding-left:16px;color:#fff;background:linear-gradient(90deg,#9fd8f214,transparent)}
-.morph-link i{font:normal 10px monospace;color:#7fb2cc}
-.morph-link b{font-size:20px;font-weight:700;letter-spacing:-.5px}
-.morph-link small{font-size:9px;letter-spacing:1px;color:#6c8797}
-.epi-footer{padding:0 5vw 34px;position:relative}
-.epi-word{display:block;font-size:clamp(90px,21vw,360px);line-height:.8;letter-spacing:-.06em;font-weight:900;background:linear-gradient(180deg,#d9f3ff,#6f9bb2 55%,#0a1219);-webkit-background-clip:text;background-clip:text;color:transparent;transform:translate3d(calc((var(--local,.5) - .9) * -14vw),0,0)}
-.epi-footer div{display:flex;justify-content:space-between;gap:20px;border-top:1px solid #b6e7fa22;padding-top:18px;margin-top:20px;font-size:10px;letter-spacing:1px;color:#6e8593}
-.epi-footer a{pointer-events:auto;color:#a8c6d6}
 @media(max-width:900px){
- .manifest .copy{width:86%;top:16svh}.stat-grid{grid-template-columns:repeat(2,1fr)}.stat-grid div{padding-bottom:14px}.stat-grid div:nth-child(2){border-right:0}.recap-row b{font-size:11px}
+ .manifest .copy{width:86%;top:16svh}.stat-grid{grid-template-columns:repeat(2,1fr)}.stat-grid div{padding-bottom:14px}.stat-grid div:nth-child(2){border-right:0}
  #speed-pill{top:74px;height:24px;width:calc(120px + var(--speed,0) * 80px)}
- 
- .morph-stage{grid-template-columns:1fr}#morph-canvas{height:42vh}.morph-link b{font-size:16px}
- .epi-footer div{flex-direction:column}
+
 }
-/* journey-30: near-zero copy. Script-owned nodes stay in the DOM but out of sight. */
+/* journey-31: near-zero copy. Script-owned nodes stay in the DOM but out of sight. */
 .frame .label,.world-index,#speed-pill,.journey-readout,#render-mode,#model-hover,.passage-caption,footer,#load-title,#load-status,#charge-label,.loading .label{display:none!important}
 #model-hud{display:none!important}body:has(#retry-model:not([hidden])) #model-hud{display:flex!important}
 #model-hud #model-name,#model-hud #model-instruction{display:none}
 .jump-charge{gap:16px}
-#together{height:190svh;min-height:1300px}
-#together .copy{top:12svh}
-#together h2{font-size:clamp(40px,4.6vw,76px);text-shadow:0 4px 30px #1a0d06cc}
+/* journey-31: the walk from the porch into the living room ends the page. */
+#together{height:230svh;min-height:1500px}
+#together .copy{top:9svh;width:46%}
+#together h2{font-size:clamp(38px,4.2vw,68px);text-shadow:0 4px 30px #1a0d06cc}
+#together h2 span{color:#ffd7a8}
 #together .giant-type{color:#ffcf9f0a}
-.morph-link{grid-template-columns:42px 1fr}
-/* journey-30: one short frame per world; the camera plateau no longer spans two screens of still scrolling. */
+.together-credits{display:inline-block;margin-top:22px;font-size:10px;letter-spacing:1.5px;color:#f2d6b6a8;pointer-events:auto;text-decoration:none;border-bottom:1px solid #f2d6b640;padding-bottom:3px}
+.together-credits:hover,.together-credits:focus-visible{color:#fff3e2}
+@media(max-width:800px){#together .copy{top:7svh;width:86%}#together h2{font-size:clamp(30px,8vw,44px)}}
+/* journey-31: one short frame per world; the camera plateau no longer spans two screens of still scrolling. */
 #equipment,#companion,#drive{height:118svh;min-height:800px}
+/* Readability over bright warp glows: a soft dark halo behind every chapter title. */
+.frame h1,.frame h2{text-shadow:0 2px 22px #050a10c0,0 0 70px #050a1080}

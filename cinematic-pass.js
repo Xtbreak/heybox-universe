@@ -45,7 +45,7 @@ export function createCinematicPass() {
         color.b=texture2D(tDiffuse,bound(uv-radial*split)).b;
         color*=1.-smoothstep(.08,.48,edge)*(.25+uCharge*.4);
         color+=(grain(vUv*vec2(1920.,1080.)+floor(uTime*24.))-.5)*.009;
-        color=mix(color,vec3(3.),uFlash*uMotion*.85);
+        color=mix(color,color*1.35+vec3(.18,.2,.24),uFlash*uMotion*.6);
         gl_FragColor=vec4(max(color,vec3(0.)),1.);
       }`
   });
