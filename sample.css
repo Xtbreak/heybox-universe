@@ -189,12 +189,12 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
  #speed-pill{top:74px;height:24px;width:calc(120px + var(--speed,0) * 80px)}
 
 }
-/* journey-33: near-zero copy. Script-owned nodes stay in the DOM but out of sight. */
+/* journey-34: near-zero copy. Script-owned nodes stay in the DOM but out of sight. */
 .frame .label,.world-index,#speed-pill,.journey-readout,#render-mode,#model-hover,.passage-caption,footer,#load-title,#load-status,#charge-label,.loading .label{display:none!important}
 #model-hud{display:none!important}body:has(#retry-model:not([hidden])) #model-hud{display:flex!important}
 #model-hud #model-name,#model-hud #model-instruction{display:none}
 .jump-charge{gap:16px}
-/* journey-33: the walk from the porch into the living room ends the page. */
+/* journey-34: the walk from the porch into the living room ends the page. */
 #together{height:230svh;min-height:1500px}
 #together .copy{top:9svh;width:46%}
 #together h2{font-size:clamp(38px,4.2vw,68px);text-shadow:0 4px 30px #1a0d06cc}
@@ -203,7 +203,7 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
 .together-credits{display:inline-block;margin-top:22px;font-size:10px;letter-spacing:1.5px;color:#f2d6b6a8;pointer-events:auto;text-decoration:none;border-bottom:1px solid #f2d6b640;padding-bottom:3px}
 .together-credits:hover,.together-credits:focus-visible{color:#fff3e2}
 @media(max-width:800px){#together .copy{top:7svh;width:86%}#together h2{font-size:clamp(30px,8vw,44px)}}
-/* journey-33: one short frame per world; the camera plateau no longer spans two screens of still scrolling. */
+/* journey-34: one short frame per world; the camera plateau no longer spans two screens of still scrolling. */
 #equipment,#companion,#drive{height:118svh;min-height:800px}
 /* Readability over bright warp glows: a soft dark halo behind every chapter title. */
 .frame h1,.frame h2{text-shadow:0 2px 22px #050a10c0,0 0 70px #050a1080}
@@ -217,3 +217,61 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
 @media(pointer:coarse){.toy-space #ability-status{top:118px}.toy-space #touch-pad .touch-abilities{grid-template-columns:repeat(2,64px)}.toy-space #touch-pad .touch-abilities button{width:64px;height:56px}}
 .roaming .pause-card #next-difficulty{background:#2a6fc4;color:#fff3df;border-color:#1f5aa3}
 .pause-card{box-sizing:border-box;width:min(580px,100%)}
+/* journey-34: chapter copy = kicker, title, one short lede and a play button you cannot miss. */
+.frame h1,.frame h2{letter-spacing:-.03em}
+.kicker{display:flex;align-items:center;gap:10px;margin:0 0 18px;font-size:13px;font-weight:600;letter-spacing:2px;color:#bfe4f4;text-shadow:0 1px 10px #050a10}
+.kicker b{display:inline-grid;place-items:center;min-width:32px;height:22px;padding:0 7px;border:1px solid #bfe4f466;border-radius:11px;font:700 11px/1 system-ui,sans-serif;letter-spacing:1px}
+.cinematic .kicker{justify-content:center;opacity:.85}
+.lede{margin:0 0 30px;max-width:30em;font-size:17px;line-height:1.75;color:#cfdee6;text-shadow:0 1px 12px #050a10e0}
+.launch .copy{top:24svh}.launch .lede{margin:-4px 0 0;font-size:18px}
+.landing h2{margin-bottom:16px}
+.play-cta{position:relative;display:inline-flex;align-items:center;gap:14px;height:64px;padding:0 14px 0 13px;border:0;border-radius:32px;background:linear-gradient(135deg,#f4fcff,#9fd8f0);color:#06121b;font-family:inherit;font-size:19px;font-weight:800;letter-spacing:1px;cursor:pointer;pointer-events:auto;box-shadow:0 12px 36px #6cc8f050,inset 0 0 0 1px #ffffffa0;transition:transform .2s,box-shadow .2s}
+.play-cta i{position:relative;flex:none;width:40px;height:40px;border-radius:50%;background:#06121b}
+.play-cta i:after{content:'';position:absolute;left:16px;top:13px;border-left:12px solid #bfeaff;border-top:7px solid transparent;border-bottom:7px solid transparent}
+.play-cta kbd{margin-left:4px;padding:6px 9px;border-radius:8px;background:#06121b14;font:600 11px system-ui,sans-serif;letter-spacing:.5px;color:#25485c}
+.play-cta:before{content:'';position:absolute;inset:-7px;border:2px solid #9fd8f0;border-radius:40px;opacity:0;pointer-events:none;animation:cta-ring 2.4s ease-out infinite}
+.play-cta:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 18px 48px #6cc8f080,inset 0 0 0 1px #fff}
+.play-cta:active{transform:scale(.98)}
+.play-cta:focus-visible{outline:3px solid #fff;outline-offset:6px}
+@keyframes cta-ring{0%{opacity:.75;transform:scale(.97)}70%,100%{opacity:0;transform:scale(1.12,1.5)}}
+.play-alt{margin:18px 0 0 6px;font-size:12px;letter-spacing:.5px;color:#a3bac7;text-shadow:0 1px 8px #050a10}
+#drive .kicker{color:#f6cf9f}#drive .kicker b{border-color:#f6cf9f66}
+#drive .play-cta{background:linear-gradient(135deg,#fff3e0,#ffb26b);box-shadow:0 12px 36px #ff9a4a50,inset 0 0 0 1px #ffffffa0}
+#drive .play-cta i:after{border-left-color:#ffc896}#drive .play-cta:before{border-color:#ffb26b}#drive .play-cta kbd{color:#6b3a1c}
+/* Three game shortcuts under "一个黑盒，三种玩法". */
+.world-links{display:flex;flex-direction:column;gap:10px;width:min(300px,100%);margin-top:6px}
+.world-links a{display:flex;align-items:center;gap:14px;padding:13px 16px;border:1px solid #b6e7fa30;border-radius:14px;background:#0a151ea8;backdrop-filter:blur(10px);color:#eaf6fb;text-decoration:none;transition:border-color .2s,transform .2s,background .2s}
+.world-links a:hover,.world-links a:focus-visible{border-color:#b6e7fa90;background:#10212db8;transform:translateX(4px)}
+.world-links b{font:700 12px system-ui,sans-serif;color:#7fc7e4;letter-spacing:1px}
+.world-links span{display:flex;flex-direction:column;gap:3px;font-size:17px;font-weight:700}
+.world-links small{font-size:11px;font-weight:400;color:#8fa9b7;letter-spacing:.5px}
+.world-links i{margin-left:auto;font-style:normal;color:#7fc7e4}
+/* Finale: jump straight back to any world. */
+.replay-links{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:4px;font-size:13px}
+.replay-links span{margin-right:4px;color:#f2d6b6c0;letter-spacing:1px}
+.replay-links a{padding:8px 14px;border:1px solid #ffd7a855;border-radius:18px;background:#2a160bb8;color:#ffe6c8;text-decoration:none;pointer-events:auto;transition:background .2s}
+.replay-links a:hover,.replay-links a:focus-visible{background:#5a3015d8}
+#together .kicker{color:#ffd7a8}
+/* Side nav: readable numbers, names next to the active and hovered chapters. */
+.side-nav a{font-size:11px;color:#71838f;text-decoration:none}
+.side-nav a:after{content:attr(data-name);position:absolute;right:calc(100% + 24px);top:50%;transform:translate(6px,-50%);white-space:nowrap;font-size:12px;letter-spacing:1px;color:#dcf3fc;text-shadow:0 1px 8px #000;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.side-nav a:hover:after,.side-nav a.active:after{opacity:1;transform:translate(0,-50%)}
+/* Hover-to-enter feedback next to the model, with a fill bar for the one-second dwell. */
+#model-hover:not([hidden]){display:flex!important}
+#model-hover{left:61%;bottom:13vh;min-width:230px;padding:13px 22px 15px;gap:6px;border:1px solid #b6e7fa55;border-radius:22px;background:#08131bd0;backdrop-filter:blur(10px)}
+#model-hover span{font-size:15px;font-weight:700;letter-spacing:2px;color:#eef9fd}
+#model-hover small{font-size:11px;letter-spacing:1px;color:#8fb0c0}
+#model-hover:after{content:'';display:block;align-self:stretch;height:4px;margin-top:4px;border-radius:2px;background:linear-gradient(90deg,#bfeaff calc(var(--p,0) * 100%),#ffffff22 0)}
+#model-hover[data-world="car"]:after{background:linear-gradient(90deg,#ffc896 calc(var(--p,0) * 100%),#ffffff22 0)}
+@media(prefers-reduced-motion:reduce){.play-cta:before{animation:none}}
+@media(pointer:coarse){.play-cta kbd{display:none}#model-hover:not([hidden]){display:none!important}.play-alt{font-size:0}.play-alt:after{content:'也可以直接轻触模型';font-size:12px}}
+@media(max-width:800px){
+ .kicker{font-size:11px;letter-spacing:1px;margin-bottom:12px}
+ .lede{font-size:14px;line-height:1.65;margin-bottom:0}.landing .lede br{display:none}
+ .launch .copy{top:18svh}.launch .lede{font-size:15px}
+ .landing .copy{display:flex;flex-direction:column;align-items:flex-start;height:62svh}
+ .landing .play-cta{margin-top:auto;height:56px;font-size:17px}.play-cta i{width:34px;height:34px}.play-cta i:after{left:13px;top:10px}
+ .play-alt{margin-top:12px}
+ .world-links{width:calc(100% - 34px)}.world-links a{padding:11px 14px}.world-links span{font-size:15px}
+ .side-nav a:after{display:none}
+}

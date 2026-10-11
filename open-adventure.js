@@ -1,28 +1,28 @@
 import { EffectComposer } from './vendor/EffectComposer.js';
 import { RenderPass } from './vendor/RenderPass.js';
 import { UnrealBloomPass } from './vendor/UnrealBloomPass.js';
-import { createCinematicPass } from './cinematic-pass.js?v=journey-33';
-import { normalizeQuality } from './journey-quality.js?v=journey-33';
+import { createCinematicPass } from './cinematic-pass.js?v=journey-34';
+import { normalizeQuality } from './journey-quality.js?v=journey-34';
 import { OutputPass } from './vendor/OutputPass.js';
-import { createSpatialRefraction } from './spatial-refraction.js?v=journey-33';
-import {createMiniatureCar} from './miniature-car.js?v=journey-33';
-import {createToyShip} from './toy-ship.js?v=journey-33';
-import {createTexturePrewarm} from './texture-prewarm.js?v=journey-33';
-import {createDestinationArrival} from './destination-arrival.js?v=journey-33';
-import {createPortalEntry} from './portal-entry.js?v=journey-33';
-import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-33';
+import { createSpatialRefraction } from './spatial-refraction.js?v=journey-34';
+import {createMiniatureCar} from './miniature-car.js?v=journey-34';
+import {createToyShip} from './toy-ship.js?v=journey-34';
+import {createTexturePrewarm} from './texture-prewarm.js?v=journey-34';
+import {createDestinationArrival} from './destination-arrival.js?v=journey-34';
+import {createPortalEntry} from './portal-entry.js?v=journey-34';
+import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-34';
 import * as THREE from './vendor/three.module.js';
 import { MeshoptDecoder } from './vendor/meshopt_decoder.module.js';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { RoomEnvironment } from './vendor/RoomEnvironment.js';
-import { createCosmicJourney } from './cosmic-journey.js?v=journey-33';
+import { createCosmicJourney } from './cosmic-journey.js?v=journey-34';
 
 // One renderer, three independently owned worlds, and the original cinematic journey.
 export async function createWorld(canvas, { onReady, onError, onState, audio = null, onFrame, onContextLost, recoverySnapshot = null, signal } = {}) {
   if(signal?.aborted)throw new Error('World creation cancelled');
   const names=['helmet','robot','car'];
   // Game code and game-only models load when an entry starts and are released on exit; only gallery models stay resident.
-  const gameModules={helmet:'./flight-game.js?v=journey-33',robot:'./sandbox-game.js?v=journey-33',car:'./driving-game.js?v=journey-33'};
+  const gameModules={helmet:'./flight-game.js?v=journey-34',robot:'./sandbox-game.js?v=journey-34',car:'./driving-game.js?v=journey-34'};
   const gameExtras={robot:['weapon','./models/fps-pistol.glb']};
   const files={robot:'RobotExpressive.glb'};
   const instructions={helmet:'悬停星舰 1 秒，进入深空救援',robot:'悬停作战装置 1 秒，突入空间设施',car:'悬停遥控车 1 秒，驶入玩具公园'};
@@ -166,7 +166,7 @@ export async function createWorld(canvas, { onReady, onError, onState, audio = n
   function buildGame(expectedSession=travelSession,{arrival=false}={}){if(disposed||contextLost||mode!=='travel'||expectedSession!==sessionId)return false;clearInput();completionHandled=false;gamePaused=false;pauseReason=null;journey.setVisible(false);gameScene=new THREE.Scene();gameScene.background=new THREE.Color('#02070d');gameScene.environment=world==='car'?null:environment.texture;gameScene.environmentIntensity=world==='robot'?.3:world==='car'?.5:.4;if(world!=='car'){gameScene.add(new THREE.HemisphereLight(0xb8def4,0x111526,world==='robot'?.85:1.5));for(const [color,intensity,x,y,z] of [[0xe4f6ff,world==='robot'?1.5:2.8,-7,14,5],[0x69bde8,world==='robot'?.5:2,9,5,-9]]){const light=new THREE.DirectionalLight(color,intensity);light.position.set(x,y,z);gameScene.add(light);}}const object=entries[world].object;visitSnapshot={object,parent:object.parent,nodes:takeTransforms(object)};camera.fov=52;camera.near=.1;camera.far=1600;camera.up.set(0,1,0);camera.updateProjectionMatrix();try{if(!entries[world].create)throw new Error(`${world} game is not loaded`);game=entries[world].create({THREE,scene:gameScene,camera,model:object,playAnimation,emit:text=>emit(text),width,height,reduced,assets,difficulty:world==='robot'?robotDifficulty:1,sound:(name,params)=>audio?.play(name,params)});if(resumeVisit&&checkpoints.has(world)){const restored=game.restore?.(checkpoints.get(world));if(restored===false){if(recoverySnapshot)throw new Error('Recovery checkpoint rejected');checkpoints.delete(world);console.warn('[open-adventure] saved progress rejected; starting a fresh safe session');}if(world==='robot')robotDifficulty=game.getState?.().difficulty||robotDifficulty;}resumeVisit=false;mode='game';lifecycle='await-control';awaitingControl=true;controlRequested=false;game?.setPaused?.(true);texturePrewarm.sync();audio?.setScene(world);audio?.setPaused(true);lastEmit=time;game.resize?.(width,height);canvas.style.cursor=world==='robot'?'crosshair':'default';if(arrival){destinationArrival.begin({world,reduced});lifecycle='arrival';canvas.style.cursor='wait';}const state=game.getState?.()||{};if(state.dead||state.lost)pauseGame('dead');else if(state.completed||state.won){completionHandled=true;pauseGame('completed');}emit();resolveRecovery();}catch(error){rejectRecovery(error);destroyGame();exitGame({immediate:true});onError?.(error);}}
   function restart(){if(mode!=='game'||disposed)return;releaseLock();clearInput();checkpoints.delete(world);resumeVisit=false;destroyGame();mode='travel';travelSession=++sessionId;buildGame();}
   function nextDifficulty(){if(mode!=='game'||disposed)return;const state=game?.getState?.();if(!state?.completed||!state.nextDifficultyAvailable)return;releaseLock();clearInput();completionHandled=false;checkpoints.delete(world);if(world==='robot'){robotDifficulty++;destroyGame();mode='travel';travelSession=++sessionId;buildGame();}else{game?.action?.(world==='car'?'nextChallenge':'nextDifficulty');gamePaused=false;awaitingControl=true;lifecycle='await-control';pauseReason=null;game?.setPaused?.(true);}emit('已进入更高难度 · 点击接管后开始');}
-  function canvasClick(payload={}){if(mode==='travel'){if(entries[world].state==='error'||entries[world].gameState==='error')prepare(world,true);return;}if(mode==='game'){if(gamePaused||paused||awaitingControl||suppressPrimaryUntilRelease)return;game.action?.('click',{x:pointerX,y:pointerY,...payload});emit();return;}if(payload.pointerType!=='touch')return;scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);pointer.set(pointerX,pointerY);raycaster.setFromCamera(pointer,camera);const visible=names.filter(id=>entries[id].group.visible&&entries[id].state==='loaded'),hits=raycaster.intersectObjects(visible.map(id=>entries[id].group),true);if(!hits.length)return;let object=hits[0].object;while(object&&!visible.some(id=>entries[id].group===object))object=object.parent;const id=visible.find(id=>entries[id].group===object);if(id)enter(id);}
+  function canvasClick(payload={}){if(mode==='travel'){if(entries[world].state==='error'||entries[world].gameState==='error')prepare(world,true);return;}if(mode==='game'){if(gamePaused||paused||awaitingControl||suppressPrimaryUntilRelease)return;game.action?.('click',{x:pointerX,y:pointerY,...payload});emit();return;}scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);pointer.set(pointerX,pointerY);raycaster.setFromCamera(pointer,camera);const visible=progress>.9?[]:names.filter(id=>entries[id].group.visible&&entries[id].state==='loaded'),hits=raycaster.intersectObjects(visible.map(id=>entries[id].group),true);if(!hits.length)return;let object=hits[0].object;while(object&&!visible.some(id=>entries[id].group===object))object=object.parent;const id=visible.find(id=>entries[id].group===object);if(id&&!(hoverState.target===id&&hoverState.progress>0))enter(id);}
   const readPointer=event=>{const rect=canvas.getBoundingClientRect();pointerClientX=event.clientX;pointerClientY=event.clientY;pointerX=clamp((event.clientX-rect.left)/Math.max(1,rect.width)*2-1,-1,1);pointerY=clamp(1-(event.clientY-rect.top)/Math.max(1,rect.height)*2,-1,1);const within=event.clientX>=rect.left&&event.clientX<=rect.left+rect.width&&event.clientY>=rect.top&&event.clientY<=rect.top+rect.height;const hit=document.elementFromPoint?.(event.clientX,event.clientY);showcasePointer=within&&(!hit||hit===canvas)&&event.pointerType!=='touch';pointerActive=within&&(!hit||hit===canvas)&&mode==='game'&&!gamePaused&&!paused;return rect;};
   const capture=id=>{try{canvas.setPointerCapture?.(id);captured.add(id);}catch{}};
   const startDown=event=>{down={pointerType:event.pointerType,x:event.clientX,y:event.clientY,moved:0,id:event.pointerId,time:performance.now(),wasHeld:false,touchLook:mode==='game'&&(world==='helmet'||world==='robot')&&event.pointerType==='touch'};pointerDownX=pointerX;pointerDownY=pointerY;pointerDragging=false;pointerDragX=0;if(mode==='game'){pointerDown=!down.touchLook;pointerPressed=pointerDown;if(down.touchLook)pointerRightDown=true;capture(event.pointerId);}};
@@ -236,7 +236,10 @@ export async function createWorld(canvas, { onReady, onError, onState, audio = n
         if(candidate){hit=candidate.id;if(settled)hoverFootprint=candidate;}
       }
     }else hoverFootprint=null;
-    hoverState=hoverEntry.update(now,hit,hoverEntry.isExplicit?(!paused&&!document.hidden):eligible,{intent:pointerIntent,stable:settled,settling:!scrolling});pointerIntent=false;lifecycle=hoverState.target?'anticipate':'browse';
+    // A click or tap starts an explicit entry; the press itself reads as "scrolling"
+    // for a moment, so only real page motion cancels it.
+    const moving=scrollState.snapping||Math.abs(scrollState.velocity)>=5||Math.abs(progress-targetProgress)>=.0008;
+    hoverState=hoverEntry.update(now,hit,hoverEntry.isExplicit?(!paused&&!document.hidden):eligible,{intent:pointerIntent,stable:hoverEntry.isExplicit?!moving:settled,settling:!scrolling});pointerIntent=false;lifecycle=hoverState.target?'anticipate':'browse';
     if(hoverState.target){loadGame(hoverState.target);portalEntry.charge({entry:entries[hoverState.target],world:hoverState.target,progress:hoverState.progress,time,reduced});}else portalEntry.clearCharge();
     canvas.style.cursor=hit?'pointer':'default';
     onFrame?.({...lifecycleState(),mode:'showcase',world,hover: {...hoverState,x:pointerX,y:pointerY}});
