@@ -5,7 +5,7 @@ export function createTitleDecode({ root=document }={}) {
   for(const title of titles){
     const walker=document.createTreeWalker(title,NodeFilter.SHOW_TEXT),nodes=[];
     while(walker.nextNode())nodes.push({node:walker.currentNode,text:walker.currentNode.textContent});
-    originals.set(title,nodes);title.setAttribute('aria-label',title.textContent.trim());
+    originals.set(title,nodes);if(!title.hasAttribute('aria-label'))title.setAttribute('aria-label',title.textContent.trim());
   }
   function restore(title){for(const item of originals.get(title)||[])item.node.textContent=item.text;title.classList.remove('decoding');jobs.delete(title);}
   function tick(now){

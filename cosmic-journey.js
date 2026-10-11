@@ -1,8 +1,8 @@
-import { createSpaceBackdrop } from './space-backdrop.js?v=journey-34';
-import { createJourneyUltra } from './journey-ultra.js?v=journey-34';
-import { createHeyboxCore } from './refined-heybox-core.js?v=journey-34';
-import { createJourneyParticles } from './journey-particles.js?v=journey-34';
-import { createCommunityPlaza } from './community-plaza.js?v=journey-34';
+import { createSpaceBackdrop } from './space-backdrop.js?v=journey-35';
+import { createJourneyUltra } from './journey-ultra.js?v=journey-35';
+import { createHeyboxCore } from './refined-heybox-core.js?v=journey-35';
+import { createJourneyParticles } from './journey-particles.js?v=journey-35';
+import { createCommunityPlaza } from './community-plaza.js?v=journey-35';
 
 const coarsePointer=globalThis.matchMedia?.('(pointer: coarse)');
 // A continuous, scene-space expedition. Imported GLB transforms are never modified.
@@ -32,6 +32,8 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
   // The actual app mark becomes a split, bevelled, hollow 3D gateway.
   const heyboxCore=createHeyboxCore({THREE}),cube=heyboxCore.group;
   root.add(cube);cube.position.set(1.55,.2,0);
+  const HERO_OPEN=.4;let introStart=null;
+  const heroLight=new THREE.PointLight(0xa8e4ff,0,9,1.6);root.add(heroLight);
   // The shared GPU particle layer owns the background stars and travel dust.
   // Nebular scattering is additive and mostly transparent, leaving silhouettes readable.
   for(let i=0;i<10;i++){const g=glow(root,35+random()*45,[(random()-.5)*90,(random()-.5)*60,-35-i*47],.045);g.scale.y*=.5;}
@@ -165,11 +167,17 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     camera.position.lerp(focus,hoverApproach);
     camera.lookAt(focus);if(!reduced)camera.rotateZ(Math.sin(p*Math.PI*9)*flight*.045);
     const fov=(ultra&&!reduced?THREE.MathUtils.lerp(pose[6],52+18*ultraEffects.rift(p),ultraEffects.rift(p)):pose[6])+(mobile?5+17*indoor:0);if(Math.abs(fov-lastFov)>.01 || Math.abs(camera.fov-fov)>.01 || camera.far<900){camera.fov=fov;camera.far=Math.max(camera.far,900);camera.updateProjectionMatrix();lastFov=fov;}
-    const open=smooth(.035,.18,p);cube.visible=p<.205;
-    cube.position.set(1.55*(1-open),(.14+(reduced?0:Math.sin(t*.45)*.045))*(1-open),0);
+    // Landing pose: after the model arrives the box cracks open and its throat ignites
+    // with a flash, then holds that hero pose until scrolling takes it the rest of the way.
+    if(introStart===null&&heyboxCore.status!=='loading')introStart=t;
+    const since=introStart===null?-1:t-introStart,intro=reduced?1:smooth(.25,1.7,since),flash=reduced?0:Math.exp(-(((since-1.35)/.38)**2));
+    const travel=smooth(.035,.18,p),open=Math.max(HERO_OPEN*intro,travel);cube.visible=p<.205;
+    const glow=1+flash*2.4+(reduced?0:.18*Math.sin(t*1.6))*intro*(1-travel);
+    heroLight.intensity=(intro*(1-travel)*(5+3*Math.sin(t*1.6))+flash*30)*(cube.visible?1:0);heroLight.position.set(cube.position.x,cube.position.y,cube.position.z-.4);
+    cube.position.set(1.55*(1-travel),(.14+(reduced?0:Math.sin(t*.45)*.045))*(1-open),0);
     // A bounded presentation angle keeps the brand readable, even after a long idle.
-    cube.rotation.set(.095*(1-open),(.26+(reduced?0:Math.sin(t*.19)*.028))*(1-open),-.03*(1-open));
-    heyboxCore.update(open,t,{reduced,ultra,opacity:1});
+    cube.rotation.set(.095*(1-travel),(.26+(reduced?0:Math.sin(t*.19)*.028))*(1-travel),-.03*(1-travel));
+    heyboxCore.update(open,t,{reduced,ultra,opacity:1,glow});
     for(let i=0;i<tunnels.length;i++){const q=tunnels[i],w=tunnelWindows[i],alpha=windowFade(p,...w);q.g.visible=alpha>.0001;
       q.mat.uniforms.time.value=reduced?0:t;q.mat.uniforms.strength.value=alpha*(.12+flight*.10);}
     plaza.update({progress:p,time:t,dt,reduced,camera,quality:options.quality});
@@ -188,7 +196,7 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     ultraEffects.update({progress:pj,time:t,dt,reduced,quality:options.quality,hoverTarget:hovered,hoverProgress:options.hoverProgress||0});
     particles.update({progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,hoverTarget:hovered,hoverProgress:options.hoverProgress||0,flight});
     optics.center.copy(hovered&&entries[hovered]?.group?entries[hovered].group.position:p<.23?cube.position:focus);
-    optics.strength=reduced?0:Math.max(windowFade(p,.045,.10,.15,.205)*.65,hovered?clamp(options.hoverProgress)*.55:0,flight*.16);
+    optics.strength=reduced?0:Math.max(windowFade(p,.045,.10,.15,.205)*.65,intro*(1-travel)*.3+flash*.5,hovered?clamp(options.hoverProgress)*.55:0,flight*.16);
     optics.radius=hovered?.20:.25;
     active=p<.49?'helmet':p<.715?'robot':'car';return active;
   }

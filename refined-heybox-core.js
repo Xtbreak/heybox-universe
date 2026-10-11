@@ -79,7 +79,7 @@ export function createHeyboxCore({ THREE, url = DEFAULT_URL, loadAsset = loadDef
   const borrow = acquire(url, loadAsset);
   let status = 'loading', error = null, disposed = false, fallback = null;
   let model = null, halves = [], throat = null;
-  let state = { open: 0, time: 0, reduced: false, opacity: 1 };
+  let state = { open: 0, time: 0, reduced: false, opacity: 1, glow: 1 };
   const setStatus = value => { status = value; group.userData.coreAssetStatus = value; };
   setStatus(status);
 
@@ -91,7 +91,7 @@ export function createHeyboxCore({ THREE, url = DEFAULT_URL, loadAsset = loadDef
       return;
     }
     if (!model) return;
-    const { open, reduced, opacity, ultra } = state;
+    const { open, reduced, opacity, ultra, glow } = state;
     const time = reduced ? 0 : state.time;
     const travel = ease(.025, .98, open), reveal = ease(.04, .52, open);
     for (let index = 0; index < halves.length; index++) {
@@ -111,12 +111,12 @@ export function createHeyboxCore({ THREE, url = DEFAULT_URL, loadAsset = loadDef
       const { material, alpha, depthWrite, emission, light } = item;
       material.opacity = alpha * opacity;
       material.depthWrite = depthWrite && opacity > .995;
-      if (light) material.emissiveIntensity = emission * (ultra ? 6.5 + (reduced ? 0 : Math.sin(travel*Math.PI)**8*4) : 1) * (1 + reveal * .55) * (reduced ? 1 : 1 + Math.sin(time * .6) * .025 * reveal);
+      if (light) material.emissiveIntensity = emission * (ultra ? 6.5 + (reduced ? 0 : Math.sin(travel*Math.PI)**8*4) : 1) * (1 + reveal * .55) * (reduced ? 1 : 1 + Math.sin(time * .6) * .025 * reveal) * glow;
     }
   }
 
-  function update(openFraction = 0, time = 0, { reduced = false, opacity = 1, ultra = false } = {}) {
-    state = { open: clamp(openFraction), time: Number.isFinite(time) ? time : 0, reduced: !!reduced, ultra: !!ultra, opacity: clamp(opacity) };
+  function update(openFraction = 0, time = 0, { reduced = false, opacity = 1, ultra = false, glow = 1 } = {}) {
+    state = { open: clamp(openFraction), time: Number.isFinite(time) ? time : 0, reduced: !!reduced, ultra: !!ultra, opacity: clamp(opacity), glow: Math.max(0, Number(glow) || 0) };
     apply();
   }
 

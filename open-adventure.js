@@ -1,28 +1,28 @@
 import { EffectComposer } from './vendor/EffectComposer.js';
 import { RenderPass } from './vendor/RenderPass.js';
 import { UnrealBloomPass } from './vendor/UnrealBloomPass.js';
-import { createCinematicPass } from './cinematic-pass.js?v=journey-34';
-import { normalizeQuality } from './journey-quality.js?v=journey-34';
+import { createCinematicPass } from './cinematic-pass.js?v=journey-35';
+import { normalizeQuality } from './journey-quality.js?v=journey-35';
 import { OutputPass } from './vendor/OutputPass.js';
-import { createSpatialRefraction } from './spatial-refraction.js?v=journey-34';
-import {createMiniatureCar} from './miniature-car.js?v=journey-34';
-import {createToyShip} from './toy-ship.js?v=journey-34';
-import {createTexturePrewarm} from './texture-prewarm.js?v=journey-34';
-import {createDestinationArrival} from './destination-arrival.js?v=journey-34';
-import {createPortalEntry} from './portal-entry.js?v=journey-34';
-import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-34';
+import { createSpatialRefraction } from './spatial-refraction.js?v=journey-35';
+import {createMiniatureCar} from './miniature-car.js?v=journey-35';
+import {createToyShip} from './toy-ship.js?v=journey-35';
+import {createTexturePrewarm} from './texture-prewarm.js?v=journey-35';
+import {createDestinationArrival} from './destination-arrival.js?v=journey-35';
+import {createPortalEntry} from './portal-entry.js?v=journey-35';
+import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-35';
 import * as THREE from './vendor/three.module.js';
 import { MeshoptDecoder } from './vendor/meshopt_decoder.module.js';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { RoomEnvironment } from './vendor/RoomEnvironment.js';
-import { createCosmicJourney } from './cosmic-journey.js?v=journey-34';
+import { createCosmicJourney } from './cosmic-journey.js?v=journey-35';
 
 // One renderer, three independently owned worlds, and the original cinematic journey.
 export async function createWorld(canvas, { onReady, onError, onState, audio = null, onFrame, onContextLost, recoverySnapshot = null, signal } = {}) {
   if(signal?.aborted)throw new Error('World creation cancelled');
   const names=['helmet','robot','car'];
   // Game code and game-only models load when an entry starts and are released on exit; only gallery models stay resident.
-  const gameModules={helmet:'./flight-game.js?v=journey-34',robot:'./sandbox-game.js?v=journey-34',car:'./driving-game.js?v=journey-34'};
+  const gameModules={helmet:'./flight-game.js?v=journey-35',robot:'./sandbox-game.js?v=journey-35',car:'./driving-game.js?v=journey-35'};
   const gameExtras={robot:['weapon','./models/fps-pistol.glb']};
   const files={robot:'RobotExpressive.glb'};
   const instructions={helmet:'悬停星舰 1 秒，进入深空救援',robot:'悬停作战装置 1 秒，突入空间设施',car:'悬停遥控车 1 秒，驶入玩具公园'};
@@ -242,7 +242,13 @@ export async function createWorld(canvas, { onReady, onError, onState, audio = n
     hoverState=hoverEntry.update(now,hit,hoverEntry.isExplicit?(!paused&&!document.hidden):eligible,{intent:pointerIntent,stable:hoverEntry.isExplicit?!moving:settled,settling:!scrolling});pointerIntent=false;lifecycle=hoverState.target?'anticipate':'browse';
     if(hoverState.target){loadGame(hoverState.target);portalEntry.charge({entry:entries[hoverState.target],world:hoverState.target,progress:hoverState.progress,time,reduced});}else portalEntry.clearCharge();
     canvas.style.cursor=hit?'pointer':'default';
-    onFrame?.({...lifecycleState(),mode:'showcase',world,hover: {...hoverState,x:pointerX,y:pointerY}});
+    // A hover beacon sits on the current chapter's model while the camera rests there.
+    let beacon=null;const pose={helmet:.395,robot:.6,car:.835}[world];
+    if(!hoverState.target&&progress<=.9&&Math.abs(progress-pose)<.05&&entries[world]?.group.visible&&entries[world].state==='loaded'){
+      scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);const hull=projectModelHoverHull(THREE,entries[world].object,camera);
+      if(hull.length>2){let x=0,y=0,top=-Infinity;for(const q of hull){x+=q.x;y+=q.y;top=Math.max(top,q.y);}beacon={id:world,x:x/hull.length,y:y/hull.length,top};}
+    }
+    onFrame?.({...lifecycleState(),mode:'showcase',world,beacon,hover: {...hoverState,x:pointerX,y:pointerY}});
     if(hoverState.enter)commitEnter(hoverState.enter);
   }
   function tick(now){if(disposed||contextLost)return;frame=requestAnimationFrame(safeTick);const elapsed=(now-last)/1000,dt=clamp(elapsed,.001,.05);last=now;
