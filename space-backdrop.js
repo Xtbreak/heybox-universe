@@ -15,8 +15,8 @@ export function createSpaceBackdrop({ THREE:T, root }) {
         float cloud=fbm(p+vec2(uTime*.009,uProgress*2.));float wisps=fbm(p*2.3+cloud*2.-uTime*.012);
         float density=pow(clamp(cloud*wisps*1.8-.23,0.,1.),1.8);
         float tint=smoothstep(.47,.72,uProgress)*(1.-smoothstep(.76,.9,uProgress));
-        vec3 color=mix(vec3(.06,.35,.72),vec3(.36,.2,.62),tint*.85);
-        color=mix(color,vec3(.61,.27,.1),smoothstep(.80,1.,uProgress)*.5);
+        vec3 color=mix(vec3(.16,.22,.27),vec3(.21,.22,.25),tint*.85);
+        color=mix(color,vec3(.27,.23,.2),smoothstep(.80,1.,uProgress)*.5);
         float title=.25+.75*smoothstep(.24,.67,length((vUv-vec2(.40,.55))*vec2(1.,1.4)));
         gl_FragColor=vec4(color*density*.7,title*.75);
       }`
@@ -30,7 +30,7 @@ export function createSpaceBackdrop({ THREE:T, root }) {
       void main(){float layer=position.z+1.;vec2 p=fract(position.xy+uPointer*.005*layer+vec2(uDepth*.00017*layer,uTime*.0008*layer));
       gl_Position=vec4(p*2.-1.,.9998,1.);gl_PointSize=.7+layer*.5;vLight=.13+position.x*.36;}`,
     fragmentShader:`varying float vLight;void main(){float r=length(gl_PointCoord-.5);if(r>.5)discard;
-      gl_FragColor=vec4(vec3(.5,1.15,1.65),(1.-smoothstep(.06,.5,r))*vLight);}`
+      gl_FragColor=vec4(vec3(.95,1.05,1.15),(1.-smoothstep(.06,.5,r))*vLight);}`
   }));
   const stars=new T.Points(starGeo,starMat);stars.frustumCulled=false;stars.renderOrder=-19;stars.raycast=()=>{};group.add(stars);
   group.visible=false;

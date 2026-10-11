@@ -189,12 +189,12 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
  #speed-pill{top:74px;height:24px;width:calc(120px + var(--speed,0) * 80px)}
 
 }
-/* journey-36: near-zero copy. Script-owned nodes stay in the DOM but out of sight. */
+/* journey-37: near-zero copy. Script-owned nodes stay in the DOM but out of sight. */
 .frame .label,.world-index,#speed-pill,.journey-readout,#render-mode,#model-hover,.passage-caption,footer,#load-title,#load-status,#charge-label,.loading .label{display:none!important}
 #model-hud{display:none!important}body:has(#retry-model:not([hidden])) #model-hud{display:flex!important}
 #model-hud #model-name,#model-hud #model-instruction{display:none}
 .jump-charge{gap:16px}
-/* journey-36: the walk from the porch into the living room ends the page. */
+/* journey-37: the walk from the porch into the living room ends the page. */
 #together{height:230svh;min-height:1500px}
 #together .copy{top:9svh;width:46%}
 #together h2{font-size:clamp(38px,4.2vw,68px);text-shadow:0 4px 30px #1a0d06cc}
@@ -203,7 +203,7 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
 .together-credits{display:inline-block;margin-top:22px;font-size:10px;letter-spacing:1.5px;color:#f2d6b6a8;pointer-events:auto;text-decoration:none;border-bottom:1px solid #f2d6b640;padding-bottom:3px}
 .together-credits:hover,.together-credits:focus-visible{color:#fff3e2}
 @media(max-width:800px){#together .copy{top:7svh;width:86%}#together h2{font-size:clamp(30px,8vw,44px)}}
-/* journey-36: one short frame per world; the camera plateau no longer spans two screens of still scrolling. */
+/* journey-37: one short frame per world; the camera plateau no longer spans two screens of still scrolling. */
 #equipment,#companion,#drive{height:118svh;min-height:800px}
 /* Readability over bright warp glows: a soft dark halo behind every chapter title. */
 .frame h1,.frame h2{text-shadow:0 2px 22px #050a10c0,0 0 70px #050a1080}
@@ -217,7 +217,7 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
 @media(pointer:coarse){.toy-space #ability-status{top:118px}.toy-space #touch-pad .touch-abilities{grid-template-columns:repeat(2,64px)}.toy-space #touch-pad .touch-abilities button{width:64px;height:56px}}
 .roaming .pause-card #next-difficulty{background:#2a6fc4;color:#fff3df;border-color:#1f5aa3}
 .pause-card{box-sizing:border-box;width:min(580px,100%)}
-/* journey-36: show, don't tell. Titles only; the scene and the hover beacon guide the way. */
+/* journey-37: show, don't tell. Titles only; the scene and the hover beacon guide the way. */
 .frame h1,.frame h2{letter-spacing:-.03em}
 .frame .ch{display:inline-block;opacity:0;transform:translate3d(0,.5em,0) rotateX(-75deg) scale(.9);filter:blur(10px);transform-origin:50% 100%;
  transition:opacity .55s,transform .85s cubic-bezier(.16,1.3,.3,1),filter .7s;transition-delay:calc(var(--i) * 45ms)}
@@ -258,7 +258,7 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
 @media(prefers-reduced-motion:reduce){.frame .ch{transition:none;opacity:1;transform:none;filter:none}.frame.lit .ch{animation:none}#entry-beacon *{animation:none!important}}
 /* The landing's scroll cue: just the charging orbit, centred low. */
 .launch .jump-charge{margin-top:46px}
-/* journey-36: the opening ritual. A closed, leaking box; first gesture bursts it open. */
+/* journey-37: the opening ritual. A closed, leaking box; first gesture bursts it open. */
 .launch h1{font-size:clamp(96px,13vw,210px);letter-spacing:-.04em;line-height:.9}
 .launch h1 span .ch{color:#7fd4ff;-webkit-text-stroke:0;text-shadow:0 0 30px #59c4ff,0 0 80px #59c4ff80}
 .launch .copy{top:30svh}
@@ -278,3 +278,46 @@ body[data-quality="ultra"] .decoding{animation:title-glitch 640ms steps(1) both}
 .loading.done .boot-emblem{animation:none;transform:scale(2.6);opacity:0;filter:drop-shadow(0 0 40px #b8dfee);transition:transform 1.1s cubic-bezier(.5,0,.2,1),opacity .9s .15s}
 #dive.lit h2 span .ch{animation:dots 1.2s calc(var(--i) * 160ms) steps(1) infinite}
 @keyframes dots{0%{opacity:.15}50%{opacity:1}}
+/* journey-37: graphite + one accent. No slogans: monospace, bracketed, decoded labels only. */
+:root{--mono:'JetBrains Mono','SFMono-Regular',Menlo,Consolas,'PingFang SC',monospace;--accent:#8fdcff;--graphite:#0b0c0e;--ink:#c9d3da;--dim:#5d666d}
+body{background:var(--graphite)}
+.sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.vignette{background:radial-gradient(ellipse at 55% 50%,transparent 45%,#0b0c0e99 100%)}.noise{opacity:.035}
+header{padding:24px 3.2vw;font-family:var(--mono)}
+.brand{font:500 11px var(--mono);letter-spacing:.12em;color:var(--ink)}
+.header-right #render-mode{display:none!important}.corner-tag{font:10px var(--mono);letter-spacing:.14em;color:var(--dim)}
+.side-nav{right:3.2vw;gap:16px;font-family:var(--mono)}.side-nav a{font:10px var(--mono);color:#454c52}.side-nav a.active{color:var(--accent)}.side-nav a.active:before{background:var(--accent);left:-14px;width:6px;height:1px;top:11px}
+.scroll-meter i{background:var(--accent);box-shadow:none;height:1px}
+.giant-type{display:none}
+/* Chapter labels */
+.frame .copy,.cinematic .copy,.landing .copy,.launch .copy,.manifest .copy{position:sticky;top:auto;bottom:0;margin:0;width:auto;max-width:none;text-align:left;padding:0}
+.frame .copy{top:calc(100svh - 92px);margin-left:3.2vw}
+.frame h1.tag,.frame h2.tag{font:500 12px/1.4 var(--mono)!important;letter-spacing:.16em!important;color:var(--ink);text-shadow:none!important;margin:0;transform:none!important;display:inline-flex;align-items:center;gap:0;padding:9px 14px;position:relative}
+.frame .tag i{font-style:normal;color:var(--accent);margin-right:2px}
+.frame .tag::before,.frame .tag::after{content:'';position:absolute;width:7px;height:7px;border:1px solid #c9d3da80}
+.frame .tag::before{left:0;top:0;border-right:0;border-bottom:0}.frame .tag::after{right:0;bottom:0;border-left:0;border-top:0}
+.frame .tag .ch{display:inline;opacity:1!important;transform:none!important;filter:none!important;animation:none!important;text-shadow:none!important;color:inherit!important;-webkit-text-stroke:0!important;white-space:pre}
+.frame:not(.lit) .tag{opacity:.0;transition:opacity .3s}.frame.lit .tag{opacity:1;transition:opacity .2s}
+.landing .tag{color:#fff}
+/* Finale: one quiet line. */
+#together .copy{position:sticky;top:16svh;margin:0 auto;width:100%;text-align:center}
+#together h2.welcome{font:300 clamp(30px,3.4vw,52px)/1 var(--mono)!important;letter-spacing:.42em!important;margin:0 0 0 .42em;color:#fff3e6;text-shadow:0 0 30px #1a0d06!important;transform:none!important}
+#together h2.welcome .ch{display:inline-block;opacity:0;transform:translateY(.25em);filter:blur(6px);transition:opacity .9s,transform 1.2s cubic-bezier(.16,1,.3,1),filter 1s;transition-delay:calc(var(--i) * 160ms + .2s);animation:none!important;color:inherit!important;text-shadow:inherit!important}
+#together.lit h2.welcome .ch{opacity:1;transform:none;filter:none}
+.together-credits{position:absolute;right:3.2vw;bottom:24px;font:10px var(--mono);letter-spacing:.14em;color:#8d7a68;border:0;margin:0}
+/* Loading: a single monospace line. */
+.loading.mono-boot{background:var(--graphite);transition:opacity .45s,visibility .45s}
+#load-line{margin:0;font:12px/1.9 var(--mono);letter-spacing:.06em;color:var(--ink);white-space:pre}
+#scroll-cue{width:auto;height:auto;margin:0;left:50%;transform:translateX(-50%);border:0;border-radius:0;box-shadow:none;bottom:30px;font:10px var(--mono);letter-spacing:.2em;color:var(--dim);animation:cue-blink 2s steps(2) infinite}
+#scroll-cue i{display:none}
+@keyframes cue-blink{50%{color:#c9d3da}}
+/* Entry beacon and hover ring in the accent, finer lines. */
+#entry-beacon .b-ping{border-width:1px;border-color:var(--accent);box-shadow:none;width:72px;height:72px;left:-36px;top:-36px}
+#entry-beacon .b-core{width:8px;height:8px;left:-4px;top:-4px;border-radius:0;background:var(--accent);box-shadow:0 0 18px var(--accent)}
+#entry-beacon .b-cursor{display:none}
+#entry-beacon .b-text{font:500 11px var(--mono);letter-spacing:.2em;top:48px;text-shadow:none;color:var(--ink)}
+#entry-beacon .b-text::before{content:'[ '}#entry-beacon .b-text::after{content:' ]'}
+#entry-beacon[data-world] .b-ping{border-color:var(--accent);box-shadow:none}#entry-beacon[data-world] .b-core{box-shadow:0 0 18px var(--accent)}#entry-beacon[data-world] .b-text{text-shadow:none}
+#model-hover circle{stroke:#ffffff1a;stroke-width:1.5}#model-hover circle.fill,#model-hover[data-world] circle.fill{stroke:var(--accent);stroke-width:2;stroke-linecap:butt;filter:none}
+#model-hover span{font:500 11px var(--mono);letter-spacing:.2em;text-shadow:none;top:52px}
+@media(max-width:760px){.frame .copy{top:calc(100svh - 120px);margin-left:5vw}.corner-tag{display:none}.frame h1.tag,.frame h2.tag{font-size:11px!important;letter-spacing:.1em!important}#together h2.welcome{letter-spacing:.3em!important}#load-line{font-size:9px}}

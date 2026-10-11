@@ -1,8 +1,8 @@
-import { createSpaceBackdrop } from './space-backdrop.js?v=journey-36';
-import { createJourneyUltra } from './journey-ultra.js?v=journey-36';
-import { createHeyboxCore } from './refined-heybox-core.js?v=journey-36';
-import { createJourneyParticles } from './journey-particles.js?v=journey-36';
-import { createCommunityPlaza } from './community-plaza.js?v=journey-36';
+import { createSpaceBackdrop } from './space-backdrop.js?v=journey-37';
+import { createJourneyUltra } from './journey-ultra.js?v=journey-37';
+import { createVoxelHeybox } from './voxel-heybox.js?v=journey-37';
+import { createJourneyParticles } from './journey-particles.js?v=journey-37';
+import { createCommunityPlaza } from './community-plaza.js?v=journey-37';
 
 const coarsePointer=globalThis.matchMedia?.('(pointer: coarse)');
 // A continuous, scene-space expedition. Imported GLB transforms are never modified.
@@ -17,7 +17,7 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
   for (const name of names) { const g=entries[name]?.group; if(g){originalParents.set(g,g.parent);root.add(g);} }
   const group=(parent=root,p=[0,0,0])=>{const g=new THREE.Group();g.position.set(...p);parent.add(g);return g;};
   const material=(color,options={})=>keep(new THREE.MeshStandardMaterial({color,metalness:.83,roughness:.29,...options}));
-  const black=material(0x080e15), silver=material(0x8395a3), dark=material(0x21313d), lunar=material(0x697780,{metalness:.16,roughness:.92});
+  const black=material(0x080e15), silver=material(0x4c5761), dark=material(0x1a2128), lunar=material(0x3c444b,{metalness:.16,roughness:.92});
   const ice=keep(new THREE.MeshBasicMaterial({color:0xa7dfff})); ice.color.multiplyScalar(.82);
   const faint=keep(new THREE.MeshBasicMaterial({color:0x759bb3,transparent:true,opacity:.26,depthWrite:false}));
   const wire=keep(new THREE.LineBasicMaterial({color:0x7196ad,transparent:true,opacity:.25}));
@@ -28,20 +28,11 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
   const texData=new Uint8Array(64*64*4);for(let y=0;y<64;y++)for(let x=0;x<64;x++){const i=(y*64+x)*4,a=Math.pow(Math.max(0,1-Math.hypot(x-31.5,y-31.5)/32),2.8);texData.set([180,219,245,Math.round(a*255)],i);}
   const glowMap=keep(new THREE.DataTexture(texData,64,64));glowMap.needsUpdate=true;
   function glow(parent,size,pos=[0,0,0],opacity=.3){const s=new THREE.Sprite(keep(new THREE.SpriteMaterial({map:glowMap,color:0xa4dfff,transparent:true,opacity:opacity*.65,depthWrite:false,blending:THREE.AdditiveBlending})));s.position.set(...pos);s.scale.setScalar(size);parent.add(s);return s;}
-  function label(parent,text,pos,width=3.2){if(typeof document==='undefined')return null;const c=document.createElement('canvas');c.width=1024;c.height=128;const ctx=c.getContext('2d');if(!ctx)return null;ctx.fillStyle='#c5e5f4';ctx.font='500 34px system-ui,sans-serif';ctx.textAlign='center';ctx.fillText(text,512,74);const t=keep(new THREE.CanvasTexture(c));t.colorSpace=THREE.SRGBColorSpace;const s=new THREE.Sprite(keep(new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false})));s.position.set(...pos);s.scale.set(width,width/8,1);parent.add(s);return s;}
-  // The actual app mark becomes a split, bevelled, hollow 3D gateway.
-  const heyboxCore=createHeyboxCore({THREE}),cube=heyboxCore.group;
-  root.add(cube);cube.position.set(1.55,.2,0);
-  const HERO_OPEN=.4;let introStart=null,heroOpenAt=null,lastT=0,tiltX=0,tiltY=0;
-  const heroLight=new THREE.PointLight(0xa8e4ff,0,9,1.6);root.add(heroLight);
-  // Light shafts leak from behind the closed box and flare when it bursts open.
-  const shaftMaterial=keep(new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,uniforms:{uI:{value:0}},
-    vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader:'varying vec2 vUv;uniform float uI;void main(){float across=pow(1.-abs(vUv.x*2.-1.),2.4),along=pow(1.-vUv.y,1.7)*smoothstep(0.,.08,vUv.y);gl_FragColor=vec4(vec3(.6,.86,1.)*across*along*uI,1.);}'}));
-  const shafts=group(root);shafts.name='hero-light-shafts';
-  for(let i=0;i<16;i++){const len=5+random()*7,g=keep(new THREE.PlaneGeometry(.12+random()*.5,len));g.translate(0,len/2,0);const m=new THREE.Mesh(g,shaftMaterial);m.rotation.z=i/16*Math.PI*2+random()*.3;shafts.add(m);}
-  // The three worlds burst out of the box once, as a teaser.
-  const teaser={helmet:[-2.4,1.2,2.4,.42],robot:[2.5,.9,2,.4],car:[.1,-1.5,2.6,.32]};
+  function label(parent,text,pos,width=3.2){if(typeof document==='undefined')return null;const c=document.createElement('canvas');c.width=1024;c.height=128;const ctx=c.getContext('2d');if(!ctx)return null;ctx.fillStyle='#c9d3da';ctx.font="500 30px 'JetBrains Mono',Menlo,Consolas,monospace";ctx.textAlign='center';ctx.fillText(text,512,74);const t=keep(new THREE.CanvasTexture(c));t.colorSpace=THREE.SRGBColorSpace;const s=new THREE.Sprite(keep(new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false})));s.position.set(...pos);s.scale.set(width,width/8,1);parent.add(s);return s;}
+  // The black box is a field of small obsidian grains (voxel-heybox.js). It faces the
+  // camera at an angle; scrolling turns it square-on, where its logo channel lines up.
+  const heroAnchor=group(root,[1.1,.15,0]);heroAnchor.name='voxel-hero-anchor';const tableAnchor=new THREE.Group();tableAnchor.name='voxel-table-anchor';{const b=new THREE.Mesh(keep(new THREE.BoxGeometry(2.2,2.2,1.32)),keep(new THREE.MeshBasicMaterial({visible:false})));b.raycast=()=>{};tableAnchor.add(b);}
+  const REVEAL_AT=.07;let introStart=null,lastT=0,tiltX=0,tiltY=0,heroReveal=0;
   // The shared GPU particle layer owns the background stars and travel dust.
   // Nebular scattering is additive and mostly transparent, leaving silhouettes readable.
   for(let i=0;i<10;i++){const g=glow(root,35+random()*45,[(random()-.5)*90,(random()-.5)*60,-35-i*47],.045);g.scale.y*=.5;}
@@ -88,11 +79,19 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     ring(r,.085,silver,back);ring(r+.15,.013,ice,back);
     const inner=ring(r-.13,.022,ice,back);portalSpinners.push(inner);
     for(let i=0;i<16;i++){const a=i/16*Math.PI*2;const b=box(i%4===0?.13:.05,.26,.18,i%4===0?ice:dark,back,[Math.sin(a)*(r+.05),Math.cos(a)*(r+.05),.03]);b.rotation.z=-a;}
-    glow(back,r*3,[0,0,-.2],.21);label(g,'悬停 1 秒  ↗',[0,-2.35,.5],2.5);
+    glow(back,r*3,[0,0,-.2],.12);label(g,'[ 悬停 1s ]',[0,-2.35,.5],2.5);hologram(g,name);
     const floor=mesh(new THREE.CylinderGeometry(2.35,2.5,.18,64),black,g,[0,-1.8,-.1]);const floorR=ring(2.37,.018,ice,g,[0,-1.69,-.1]);floorR.rotation.x=Math.PI/2;
     const blob=mesh(new THREE.PlaneGeometry(1,1),contactShadow,g,[0,-1.695,0]);blob.rotation.x=-Math.PI/2;blob.scale.set(name==='car'?3.6:name==='robot'?2.2:2.6,name==='car'?2.4:name==='robot'?1.6:1.5,1);blob.renderOrder=1;
     return g;
   }
+  // Pedestal hologram: a triangulated wire cylinder with slow rising grains inside it.
+  const holoWire=keep(new THREE.LineBasicMaterial({color:0x9fb4c2,transparent:true,opacity:.13,depthWrite:false}));
+  const dustMaterial=keep(new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{uTime:{value:0}},
+    vertexShader:'attribute vec3 aSeed;uniform float uTime;varying float vA;void main(){float h=fract(aSeed.z+uTime*.035*(.5+aSeed.y));float a=aSeed.x*6.2832+uTime*.05;float r=.4+aSeed.y*1.4;vec3 p=vec3(cos(a)*r,-1.65+h*3.6,sin(a)*r);vA=sin(3.14159*h);vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;gl_PointSize=clamp(28./-mv.z,1.,3.);}',
+    fragmentShader:'varying float vA;void main(){gl_FragColor=vec4(vec3(.78,.84,.88),vA*.55);}'}));
+  const dustGeo=keep(new THREE.BufferGeometry());{const d=new Float32Array(220*3);for(let i=0;i<d.length;i++)d[i]=random();dustGeo.setAttribute('aSeed',new THREE.BufferAttribute(d,3));dustGeo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(220*3),3));}
+  function hologram(g,name){const r=name==='car'?2.2:1.85,c=keep(new THREE.WireframeGeometry(keep(new THREE.CylinderGeometry(r,r,3.6,14,4,true))));const w=new THREE.LineSegments(c,holoWire);w.position.y=.1;w.raycast=()=>{};g.add(w);
+    const d=new THREE.Points(dustGeo,dustMaterial);d.frustumCulled=false;d.raycast=()=>{};g.add(d);}
   const helmetStage=portal('helmet',2.55),robotStage=portal('robot',2.7),carStage=portal('car',2.65);
   // Orbital destination: fractured planet, tilted orbital paths and drifting debris.
   const orbitalScenery=group();
@@ -111,12 +110,12 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
   const highway=group(root,[2,-2.05,-338]);box(7,.18,87,black,highway,[0,0,-29]);
   for(const x of [-3.2,3.2])box(.035,.05,87,ice,highway,[x,.11,-29]);
   for(let i=0;i<24;i++){box(.06,.025,1.6,i%3===0?ice:silver,highway,[0,.12,8-i*3.3]);if(i%3===0){for(const x of [-3.8,3.8]){box(.21,7,.35,silver,highway,[x,3.4,-i*3.3]);box(.035,6.7,.04,ice,highway,[x-.14,3.4,.21-i*3.3]);}box(7.8,.2,.35,silver,highway,[0,6.9,-i*3.3]);}}
-  const particles=createJourneyParticles({THREE,root,camera,entries,core:heyboxCore});
+  const particles=createJourneyParticles({THREE,root,camera,entries,core:null,transport:false});
   const backdrop=createSpaceBackdrop({THREE,root});
-  const ultraEffects=createJourneyUltra({THREE,root,camera,entries,core:heyboxCore});
+  const ultraEffects=createJourneyUltra({THREE,root,camera,entries,core:null});
   // The same Heybox, small, waits on the friends' coffee table.
-  const tableCore=createHeyboxCore({THREE});tableCore.group.name='living-room-heybox';
-  const plaza=createCommunityPlaza({THREE,parent:root,core:tableCore});
+  const plaza=createCommunityPlaza({THREE,parent:root,core:{group:tableAnchor,ready:Promise.resolve(),update(){}}});
+  const voxels=createVoxelHeybox({THREE,root,camera,particles,heroAnchor,tableAnchor,modelLocations});
   const iceBase=ice.color.clone(),hdrMaterials=[];
   const optics={center:new THREE.Vector3(),strength:0,radius:.22};
   // Each scenic assembly owns a bounded set of fade materials; imported game assets are untouched.
@@ -158,7 +157,7 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
   }
   function update(progress,time=0,dt=0,options={}){
     const ultra=options.quality==='ultra';
-    ice.color.copy(iceBase).multiplyScalar(ultra?2.6:1);hdrMaterials.forEach(m=>m.color.copy(ice.color));
+    ice.color.copy(iceBase).multiplyScalar(ultra?1.35:.8);hdrMaterials.forEach(m=>m.color.copy(ice.color));
     const p=clampRail(progress),pj=Math.min(1,p),t=Number.isFinite(time)?time:0,{width=1280,height=800,reduced=options.reducedMotion||false,pointerX=0,pointerY=0}=options;
     const hovered=names.includes(options.hoverTarget)?options.hoverTarget:null;
     if(hovered!==hoverTarget){
@@ -175,25 +174,16 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
     camera.position.lerp(focus,hoverApproach);
     camera.lookAt(focus);if(!reduced)camera.rotateZ(Math.sin(p*Math.PI*9)*flight*.045);
     const fov=(ultra&&!reduced?THREE.MathUtils.lerp(pose[6],52+18*ultraEffects.rift(p),ultraEffects.rift(p)):pose[6])+(mobile?5+17*indoor:0);if(Math.abs(fov-lastFov)>.01 || Math.abs(camera.fov-fov)>.01 || camera.far<900){camera.fov=fov;camera.far=Math.max(camera.far,900);camera.updateProjectionMatrix();lastFov=fov;}
-    // Landing pose: after the model arrives the box cracks open and its throat ignites
-    // with a flash, then holds that hero pose until scrolling takes it the rest of the way.
-    // Opening ritual: the box arrives closed, centred and close, light leaking from its seams.
-    // The first gesture (or a short idle) bursts it open; it then glides aside for the title.
-    lastT=t;if(introStart===null&&heyboxCore.status!=='loading')introStart=t;if(heroOpenAt===null&&p>.012)heroOpenAt=t;
-    const since=introStart===null?-1:t-introStart,intro=reduced?1:smooth(0,1.3,since),burst=heroOpenAt===null?-1:reduced?9:t-heroOpenAt;
-    const opened=smooth(0,.85,burst),settle=smooth(.1,1.5,burst),flash=burst<0?0:Math.exp(-(((burst-.14)/.22)**2));
-    const travel=smooth(.035,.18,p),open=Math.max(.045*intro+(HERO_OPEN-.045)*opened,travel),hero=1-travel;cube.visible=p<.205;
+    // Opening: the construction sketch draws itself, then the grains settle in layer by layer.
+    lastT=t;if(introStart===null&&p>.01)introStart=t-9;
+    const since=introStart===null?0:reduced?99:t-introStart;
+    const intro={draw:smooth(.1,1.9,since),build:smooth(1.5,3.6,since),sketch:1-.55*smooth(3.4,4.8,since)};
     tiltX=THREE.MathUtils.damp(tiltX,reduced?0:pointerX,3.5,Math.max(0,dt));tiltY=THREE.MathUtils.damp(tiltY,reduced?0:pointerY,3.5,Math.max(0,dt));
-    const pulse=reduced?0:Math.sin(t*(heroOpenAt===null?2.4:1.6));
-    const glow=(1+flash*3+(.2+.25*(1-opened))*pulse)*intro;
-    cube.position.set((1.1+(mobile?.45:.95)*settle)*hero,(.1+.04*settle+(reduced?0:Math.sin(t*.45)*.045))*(1-open),(mobile?1:2.1)*(1-settle)*hero);
-    cube.scale.setScalar(1+(.12*(1-settle)-.25*(1-intro))*hero);
-    // A bounded presentation angle keeps the brand readable; the pointer tilts it.
-    cube.rotation.set((.095-tiltY*.22)*hero,(.26*settle+(reduced?0:Math.sin(t*.19)*.028)+tiltX*.38)*hero,-.03*hero);
-    heroLight.intensity=(intro*hero*(5+3*pulse)*(1+opened)+flash*45)*(cube.visible?1:0);heroLight.position.set(cube.position.x+tiltX*.9,cube.position.y+tiltY*.6,cube.position.z-.5);
-    shafts.visible=cube.visible&&intro>0;shafts.position.set(cube.position.x,cube.position.y,cube.position.z-.55);shafts.rotation.z=reduced?0:t*.05;
-    shafts.scale.setScalar(.6+.5*opened+flash*.6);shaftMaterial.uniforms.uI.value=intro*hero*(.16+.07*pulse+.14*opened+flash*1.2);
-    heyboxCore.update(open,t,{reduced,ultra,opacity:intro,glow});
+    // Scroll turns the box square to the camera; at REVEAL_AT the channel is exactly aligned.
+    const align=smooth(0,REVEAL_AT,p),off=1-align,drift=reduced?0:Math.sin(t*.21)*.05*off;
+    heroAnchor.position.set(1.1,.15+(reduced?0:Math.sin(t*.45)*.04*off),0);heroAnchor.scale.setScalar(mobile?.9:1.08);
+    heroAnchor.lookAt(camera.position);heroAnchor.rotateY((.62+drift)*off+tiltX*.16*off);heroAnchor.rotateX((-.2*off+tiltY*.1*off));
+    heroReveal=Math.max(0,1-Math.abs(.62*off+tiltX*.16*off)/.3)**2*smooth(.5,1,intro.build);
     for(let i=0;i<tunnels.length;i++){const q=tunnels[i],w=tunnelWindows[i],alpha=windowFade(p,...w);q.g.visible=alpha>.0001;
       q.mat.uniforms.time.value=reduced?0:t;q.mat.uniforms.strength.value=alpha*(.12+flight*.10);}
     plaza.update({progress:p,time:t,dt,reduced,camera,quality:options.quality});
@@ -206,18 +196,17 @@ export function createCosmicJourney({ THREE, scene, camera, entries }) {
       g.scale.setScalar(name==='car'?1.38:name==='robot'?1.05:1.07);
       worldFades[i](i===0?windowFade(p,.265,.30,.475,.51):i===1?windowFade(p,.47,.51,.67,.70):windowFade(p,.70,.75,.895,.915));portalSpinners[i].rotation.z=reduced?0:t*(i%2?-.1:.12);
     }
-    const tease=burst>.12&&burst<1.75&&p<.05&&!reduced?(burst-.12)/1.6:-1,reveal=[];
-    if(tease>=0)for(const name of names){const g=entries[name]?.group,d=teaser[name];if(!g||!entries[name].object)continue;const u=tease,e=1-(1-u)**3;
-      g.visible=true;reveal.push(name);g.position.set(cube.position.x+d[0]*e,cube.position.y+d[1]*e,cube.position.z+d[2]*e);g.rotation.set(.3*e,(name==='car'?-.6:name==='helmet'?Math.PI-1:-.2)+u*3.2,0);g.scale.setScalar(d[3]*Math.sin(Math.PI*Math.min(1,u*1.08))**.7);}
     sceneryFades[0](windowFade(p,.255,.29,.51,.56));sceneryFades[1](windowFade(p,.465,.50,.67,.70));sceneryFades[2](windowFade(p,.70,.745,.925,.95));
     planet.rotation.y=reduced?0:t*.012;skyRing.rotation.z=reduced?0:t*.025;
     backdrop.update({quality:options.quality,progress:pj,time:t,reduced,width,height,pointerX,pointerY,desktop:!coarsePointer?.matches,cameraZ:camera.position.z});
     ultraEffects.update({progress:pj,time:t,dt,reduced,quality:options.quality,hoverTarget:hovered,hoverProgress:options.hoverProgress||0});
-    particles.update({reveal,progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,hoverTarget:hovered,hoverProgress:options.hoverProgress||0,flight});
-    optics.center.copy(hovered&&entries[hovered]?.group?entries[hovered].group.position:p<.23?cube.position:focus);
-    optics.strength=reduced?0:Math.max(windowFade(p,.045,.10,.15,.205)*.65,intro*hero*.3+flash*.6,hovered?clamp(options.hoverProgress)*.55:0,flight*.16);
+    particles.update({cut:{car:smooth(.862,.9,p)},progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,hoverTarget:hovered,hoverProgress:options.hoverProgress||0,flight});
+    dustMaterial.uniforms.uTime.value=reduced?0:t;
+    voxels.update({progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,peel:!!options.peel&&!coarsePointer?.matches,intro,reveal:heroReveal});
+    optics.center.copy(hovered&&entries[hovered]?.group?entries[hovered].group.position:p<.23?heroAnchor.position:focus);
+    optics.strength=reduced?0:Math.max(windowFade(p,.085,.11,.15,.205)*.55,heroReveal*.25,hovered?clamp(options.hoverProgress)*.55:0,flight*.16);
     optics.radius=hovered?.20:.25;
     active=p<.49?'helmet':p<.715?'robot':'car';return active;
   }
-  return {root,update,setQuality(value){ultraEffects.setQuality(value);backdrop.setQuality(value);particles.setQuality?.(value);},getRift:p=>ultraEffects.rift(p),riftEnd:ultraEffects.end,getParticleCount:()=>particles.getCount(),loadPlaza:()=>plaza.load(),ready:heyboxCore.ready,getOptics:()=>optics,getIndoor:()=>indoorMix,getWorld:()=>active,openHero(instant=false){if(heroOpenAt!==null)return false;heroOpenAt=instant?-1e3:lastT;return true;},getHeroCenter:()=>cube.position,setVisible(value){root.visible=!!value;particles.setVisible?.(!!value);},samplePose(progress){return sample(clampRail(progress)).slice();},dispose(){plaza.dispose();backdrop.dispose();ultraEffects.dispose();particles.dispose();tableCore.dispose();heyboxCore.dispose();for(const [g,parent] of originalParents)if(parent)parent.add(g);root.removeFromParent();resources.forEach(r=>r.dispose?.());resources.clear();}};
+  return {root,update,setQuality(value){ultraEffects.setQuality(value);backdrop.setQuality(value);particles.setQuality?.(value);},getRift:p=>ultraEffects.rift(p),riftEnd:ultraEffects.end,getParticleCount:()=>particles.getCount(),loadPlaza:()=>plaza.load(),ready:null,REVEAL_AT,getReveal:()=>heroReveal,flashHero(){voxels.flash();},startIntro(instant=false){if(introStart===null)introStart=instant?lastT-9:lastT;},getOptics:()=>optics,getIndoor:()=>indoorMix,getWorld:()=>active,openHero(){return false;},getHeroCenter:()=>heroAnchor.position,setVisible(value){root.visible=!!value;particles.setVisible?.(!!value);},samplePose(progress){return sample(clampRail(progress)).slice();},dispose(){plaza.dispose();backdrop.dispose();ultraEffects.dispose();voxels.dispose();particles.dispose();for(const [g,parent] of originalParents)if(parent)parent.add(g);root.removeFromParent();resources.forEach(r=>r.dispose?.());resources.clear();}};
 }

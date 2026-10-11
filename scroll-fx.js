@@ -78,9 +78,8 @@ export function createScrollFx({ root = document, isPaused = () => false } = {})
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round';
       for (let i = 1; i < points.length; i++) {
         const a = points[i - 1], b = points[i], life = 1 - (now - b.t) / 420, k = i / points.length;
-        const hue = 195 + k * 120;
-        ctx.strokeStyle = `hsla(${hue},90%,${68 + k * 18}%,${life * k * .55})`;
-        ctx.lineWidth = 1 + k * 7 * life;
+        ctx.strokeStyle = `hsla(198,70%,${72 + k * 18}%,${life * k * .4})`;
+        ctx.lineWidth = 1 + k * 2.5 * life;
         ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
       }
     }

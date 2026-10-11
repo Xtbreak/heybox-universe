@@ -14,7 +14,7 @@ export function evaluateJourneyTransition(progress,index,sourceOrder=.5,targetOr
   return{leave,arrive,t:smooth(leave,arrive,progress),alpha:smooth(leave,leave+.006,progress)*(1-smooth(arrive-.006,arrive+.002,progress))};
 }
 const erosionGLSL='float journeyOrder(vec3 p){return clamp((.3+p.x*.115+p.y*.09+sin(p.x*8.+p.y*6.+p.z*5.)*.035)/.6,0.,1.);}';
-export function createJourneyParticles({THREE:T,root,camera,entries={},core}){
+export function createJourneyParticles({THREE:T,root,camera,entries={},core,transport=true}){
   const count=72000,standardCount=18000,resources=new Set(),originals=new Map(),states=new Map(),jobs=new Map(),materialCopies=[];let disposed=false,clock=0,active=-1,quality='standard',drawCount=standardCount;
   const own=x=>(resources.add(x),x),names=['core','helmet','robot','car'];
   const getGroup=n=>n==='core'?core?.group:entries[n]?.group;
@@ -106,7 +106,7 @@ fragmentShader:`uniform float uUltra,uProgress;varying float vAlpha,vSeed,vEnerg
   starGeo.setAttribute('position',new T.BufferAttribute(starPositions,3));
   const starMat=own(new T.PointsMaterial({color:0x7893a2,size:.075,transparent:true,opacity:.32,depthWrite:false,sizeAttenuation:true}));
   const stars=new T.Points(starGeo,starMat);stars.name='quiet-distant-stars';stars.raycast=()=>{};root.add(stars);
-  function fillPositions(state,array){
+  function fillPositions(state,array,total=drawCount){
     const skeletons=new Set();
     for(const [mesh,matrix] of state.matrices){
       matrix.multiplyMatrices(inverseRoot,mesh.matrixWorld);
@@ -117,7 +117,7 @@ fragmentShader:`uniform float uUltra,uProgress;varying float vAlpha,vSeed,vEnerg
         for(let i=0;i<position.count;i++){mesh.getVertexPosition(i,v);cache[i*3]=v.x;cache[i*3+1]=v.y;cache[i*3+2]=v.z;}
       }else state.posed.delete(mesh);
     }
-    for(let i=0;i<drawCount;i++){
+    for(let i=0;i<total;i++){
       const s=state.samples[i],e=state.matrices.get(s.mesh).elements,cache=state.posed.get(s.mesh);let x=s.x,y=s.y,z=s.z;
       if(cache){x=0;y=0;z=0;for(let k=0;k<3;k++){const at=s.ids[k]*3,weight=s.w[k];x+=cache[at]*weight;y+=cache[at+1]*weight;z+=cache[at+2]*weight;}}
       array[i*3]=e[0]*x+e[4]*y+e[8]*z+e[12];array[i*3+1]=e[1]*x+e[5]*y+e[9]*z+e[13];array[i*3+2]=e[2]*x+e[6]*y+e[10]*z+e[14];
@@ -148,11 +148,12 @@ fragmentShader:`uniform float uUltra,uProgress;varying float vAlpha,vSeed,vEnerg
       let fill=incoming?clamp((p-incoming.arrive[0])/(incoming.arrive[1]-incoming.arrive[0])):1;
       let cut=outgoing&&states.has(outgoing.to)?clamp((p-outgoing.leave[0])/(outgoing.leave[1]-outgoing.leave[0])):0;
       if(options.reveal?.includes(name)){fill=1;cut=0;}
+      if(options.cut?.[name]!==undefined)cut=Math.max(cut,clamp(options.cut[name]));
       state.uniforms.uJourneyFill.value=fill<=0?-.01:fill>=1?1.01:fill;
       state.uniforms.uJourneyCut.value=cut<=0?-.01:cut>=1?1.01:cut;
     }
     const index=JOURNEY_TRANSITIONS.findIndex(r=>p>=r.leave[0]&&p<=r.arrive[1]+.003),range=JOURNEY_TRANSITIONS[index],from=range&&states.get(range.from),to=range&&states.get(range.to);
-    points.visible=!!from&&!!to&&index>=0;
+    points.visible=transport&&!!from&&!!to&&index>=0;
     if(points.visible){
       drawCount=Math.min(quality==='ultra'?count:standardCount,from.samples.length,to.samples.length);
       material.blending=quality==='ultra'?T.AdditiveBlending:T.NormalBlending;uniforms.uUltra.value=quality==='ultra'?1:0;uniforms.uAspect.value=(options.width||1280)/(options.height||800);uniforms.uPointer.value.set(options.pointerX||0,options.pointerY||0);uniforms.uField.value=quality==='ultra'&&!options.reduced&&!coarsePointer?.matches?1:0;
@@ -163,5 +164,7 @@ fragmentShader:`uniform float uUltra,uProgress;varying float vAlpha,vSeed,vEnerg
       geometry.setDrawRange(0,options.reduced?7000:quality==='ultra'?drawCount:(options.width||1280)<700?11000:standardCount);
     }
   }
-  return{update,setQuality:value=>{quality=value;},getCount:()=>drawCount,isPrepared:name=>states.has(name),setVisible(value){stars.visible=!!value;if(!value){points.visible=false;for(const state of states.values()){state.uniforms.uJourneyFill.value=1.01;state.uniforms.uJourneyCut.value=-.01;}}},dispose(){if(disposed)return;disposed=true;for(const [mesh,material] of originals)mesh.material=material;originals.clear();states.clear();for(const job of jobs.values())job.iterator.return();jobs.clear();materialCopies.length=0;points.removeFromParent();stars.removeFromParent();for(const r of resources)r.dispose?.();resources.clear();}};
+  // Root-local positions of the first `count` surface samples, with their erosion order.
+  function sample(name,out,orders,count){const state=states.get(name);if(!state||state.samples.length<count)return false;fillPositions(state,out,count);if(orders)for(let i=0;i<count;i++)orders[i]=state.samples[i].order;return true;}
+  return{update,sample,setQuality:value=>{quality=value;},getCount:()=>drawCount,isPrepared:name=>states.has(name),setVisible(value){stars.visible=!!value;if(!value){points.visible=false;for(const state of states.values()){state.uniforms.uJourneyFill.value=1.01;state.uniforms.uJourneyCut.value=-.01;}}},dispose(){if(disposed)return;disposed=true;for(const [mesh,material] of originals)mesh.material=material;originals.clear();states.clear();for(const job of jobs.values())job.iterator.return();jobs.clear();materialCopies.length=0;points.removeFromParent();stars.removeFromParent();for(const r of resources)r.dispose?.();resources.clear();}};
 }

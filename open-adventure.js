@@ -1,28 +1,28 @@
 import { EffectComposer } from './vendor/EffectComposer.js';
 import { RenderPass } from './vendor/RenderPass.js';
 import { UnrealBloomPass } from './vendor/UnrealBloomPass.js';
-import { createCinematicPass } from './cinematic-pass.js?v=journey-36';
-import { normalizeQuality } from './journey-quality.js?v=journey-36';
+import { createCinematicPass } from './cinematic-pass.js?v=journey-37';
+import { normalizeQuality } from './journey-quality.js?v=journey-37';
 import { OutputPass } from './vendor/OutputPass.js';
-import { createSpatialRefraction } from './spatial-refraction.js?v=journey-36';
-import {createMiniatureCar} from './miniature-car.js?v=journey-36';
-import {createToyShip} from './toy-ship.js?v=journey-36';
-import {createTexturePrewarm} from './texture-prewarm.js?v=journey-36';
-import {createDestinationArrival} from './destination-arrival.js?v=journey-36';
-import {createPortalEntry} from './portal-entry.js?v=journey-36';
-import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-36';
+import { createSpatialRefraction } from './spatial-refraction.js?v=journey-37';
+import {createMiniatureCar} from './miniature-car.js?v=journey-37';
+import {createToyShip} from './toy-ship.js?v=journey-37';
+import {createTexturePrewarm} from './texture-prewarm.js?v=journey-37';
+import {createDestinationArrival} from './destination-arrival.js?v=journey-37';
+import {createPortalEntry} from './portal-entry.js?v=journey-37';
+import {createModelHoverEntry,projectModelHoverHull,isInsideModelHoverHull} from './model-hover-entry.js?v=journey-37';
 import * as THREE from './vendor/three.module.js';
 import { MeshoptDecoder } from './vendor/meshopt_decoder.module.js';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { RoomEnvironment } from './vendor/RoomEnvironment.js';
-import { createCosmicJourney } from './cosmic-journey.js?v=journey-36';
+import { createCosmicJourney } from './cosmic-journey.js?v=journey-37';
 
 // One renderer, three independently owned worlds, and the original cinematic journey.
 export async function createWorld(canvas, { onReady, onError, onState, audio = null, onFrame, onContextLost, recoverySnapshot = null, signal } = {}) {
   if(signal?.aborted)throw new Error('World creation cancelled');
   const names=['helmet','robot','car'];
   // Game code and game-only models load when an entry starts and are released on exit; only gallery models stay resident.
-  const gameModules={helmet:'./flight-game.js?v=journey-36',robot:'./sandbox-game.js?v=journey-36',car:'./driving-game.js?v=journey-36'};
+  const gameModules={helmet:'./flight-game.js?v=journey-37',robot:'./sandbox-game.js?v=journey-37',car:'./driving-game.js?v=journey-37'};
   const gameExtras={robot:['weapon','./models/fps-pistol.glb']};
   const files={robot:'RobotExpressive.glb'};
   const instructions={helmet:'悬停星舰 1 秒，进入深空救援',robot:'悬停作战装置 1 秒，突入空间设施',car:'悬停遥控车 1 秒，驶入玩具公园'};
@@ -34,7 +34,7 @@ export async function createWorld(canvas, { onReady, onError, onState, audio = n
   if(renderer.shadowMap){renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;}
   try {
   renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.95;
-  const scene=new THREE.Scene();scene.background=new THREE.Color('#030609');
+  const scene=new THREE.Scene();scene.background=new THREE.Color('#0a0b0d');
   const camera=new THREE.PerspectiveCamera(52,1,.1,1200);
   const pmrem=new THREE.PMREMGenerator(renderer),room=new RoomEnvironment(),environment=pmrem.fromScene(room,.035);room.dispose();pmrem.dispose();scene.environment=environment.texture;
   scene.add(new THREE.HemisphereLight(0xcbdbe6,0x101721,1.2));
@@ -60,9 +60,9 @@ export async function createWorld(canvas, { onReady, onError, onState, audio = n
     cinematicPass?.configure(ultra, width, height);
     renderer.toneMappingExposure = homepage ? .95 : 1;
     if (bloomPass) {
-      bloomPass.strength = homepage ? (ultra ? .96 - .62 * indoor : .22 - .06 * indoor) : .48;
+      bloomPass.strength = homepage ? (ultra ? .5 - .25 * indoor : .2 - .06 * indoor) : .48;
       bloomPass.radius = homepage ? (ultra ? .65 - .25 * indoor : .35) : .45;
-      bloomPass.threshold = homepage ? (ultra ? .8 + .9 * indoor : 1.2 + .4 * indoor) : 1.05;
+      bloomPass.threshold = homepage ? (ultra ? 1 + .7 * indoor : 1.2 + .4 * indoor) : 1.05;
     }
     const bloomAllowed = !playing;
     if (composer && bloomAllowed) {
@@ -254,6 +254,10 @@ export async function createWorld(canvas, { onReady, onError, onState, audio = n
   function tick(now){if(disposed||contextLost)return;frame=requestAnimationFrame(safeTick);const elapsed=(now-last)/1000,dt=clamp(elapsed,.001,.05);last=now;
     if(paused||gamePaused||document.hidden)return;time+=dt;
     if(mode==='showcase'&&quality==='ultra'&&!reduced&&previousRiftProgress>journey.riftEnd-.025&&previousRiftProgress<journey.riftEnd&&progress>=journey.riftEnd)cinematicPass?.flash();
+    if(mode==='showcase'){const a=previousRiftProgress,b=progress,crossed=x=>a<x&&b>=x;
+      if(crossed(journey.REVEAL_AT-.004)&&journey.getReveal()>.5){journey.flashHero();if(!reduced){root3dCenter(impactCenter);cinematicPass?.burst(impactCenter,camera);}audio?.play('warp',{intensity:.8});}
+      for(const x of [.088,.432,.647,.862])if(crossed(x)){cinematicPass?.glitch(x===.088?1:.75);audio?.play('impact',{intensity:.35});}
+      for(const x of [.36,.567,.792,.97])if(crossed(x))cinematicPass?.glitch(.45);}
     previousRiftProgress=progress;
     cinematicPass?.advance(dt,{velocity:mode==='showcase'?scrollState.velocity:0,rift:mode==='showcase'?journey.getRift(progress):0,charge:mode==='showcase'?hoverState.progress:0,reduced,pointerX,pointerY,field:mode==='showcase'&&showcasePointer&&!matchMedia('(pointer: coarse)').matches});
     if(lifecycle==='return'){returnElapsed+=dt;if(returnPhase==='fade'){const veil=Math.min(1,returnElapsed/.12);onFrame?.({...lifecycleState(),mode,world,travel:{veil,phase:'return',done:false}});renderScene(gameScene);if(veil>=1)restoreShowcase(true);}else{const tx=portalEntry.update(dt,{time,reduced});onFrame?.({...lifecycleState(),mode,world,travel:tx});renderScene(scene);if(tx.done||!tx.active){portalEntry.cancel();if(returnSnapshot){world=returnSnapshot.world;restoreCamera(returnSnapshot.camera);}returnSnapshot=null;returnPhase=null;mode='showcase';lifecycle='browse';resetHover(500);audio?.setPaused(false);audio?.setScene('showcase');texturePrewarm.sync();emit('已返回星际旅程');}}return;}
@@ -277,7 +281,7 @@ export async function createWorld(canvas, { onReady, onError, onState, audio = n
       onFrame?.({...lifecycleState(),mode:'travel',world,preparing,travel});renderScene(scene);
       if(readyToArrive&&!preparing){preparingCar=false;destinationArrival.capture();portalProxy.visible=false;portalEntry.finish();buildGame(travelSession,{arrival:true});}return;
     }
-    audio?.update({mode:'showcase',progress},dt);progress=reduced?targetProgress:THREE.MathUtils.damp(progress,targetProgress,9,dt);if(entries.robot.group.visible&&!reduced&&hoverState.target!=='robot')entries.robot.mixer?.update(dt);const active=journey.update(progress,reduced?0:time,dt,{width,height,quality,pointerX,pointerY,reducedMotion:reduced,reduced,mobile:width/height<.85,selected,hoverTarget:Math.abs(progress-targetProgress)<.0008?hoverState.target:null,hoverProgress:hoverState.progress});const next=names.includes(active)?active:journey.getWorld?.();if(names.includes(next)&&next!==world){world=next;emit();}
+    audio?.update({mode:'showcase',progress},dt);progress=reduced?targetProgress:THREE.MathUtils.damp(progress,targetProgress,9,dt);if(entries.robot.group.visible&&!reduced&&hoverState.target!=='robot')entries.robot.mixer?.update(dt);const active=journey.update(progress,reduced?0:time,dt,{width,height,quality,pointerX,pointerY,reducedMotion:reduced,reduced,mobile:width/height<.85,selected,hoverTarget:Math.abs(progress-targetProgress)<.0008?hoverState.target:null,hoverProgress:hoverState.progress,peel:showcasePointer&&!hoverState.target});const next=names.includes(active)?active:journey.getWorld?.();if(names.includes(next)&&next!==world){world=next;emit();}
     if(!ready&&journeyReady){ready=true;onReady?.();if(!recoverySnapshot?.resumeWorld)resolveRecovery();emit();}updateModelHover(now);portalEntry.updateCharge(dt);if(mode==='showcase')renderScene(scene);
   }
   function safeTick(now){try{tick(now);texturePrewarm.update();}catch(error){paused=true;texturePrewarm.sync();cancelAnimationFrame(frame);clearInput();onError?.(error);}}
@@ -293,7 +297,7 @@ export async function createWorld(canvas, { onReady, onError, onState, audio = n
   const api={
     getDiagnostics(){return {quality,reduced,mode,progress,fov:camera.fov,postprocessing:!!composer,cinematic:!!cinematicPass?.enabled,bloom:bloomPass?{strength:bloomPass.strength,radius:bloomPass.radius,threshold:bloomPass.threshold}:null,motion:cinematicPass?{speed:cinematicPass.uniforms.uSpeed.value,impact:cinematicPass.uniforms.uImpact.value,flash:cinematicPass.uniforms.uFlash.value,motion:cinematicPass.uniforms.uMotion.value}:null,particleCount:journey.getParticleCount(),drawCalls:renderer.info.render.calls,gpu:{...renderer.info.memory}};},
     recoveryReady,isContextAvailable:()=>!disposed&&!renderer.getContext().isContextLost(),enter,exit:exitGame,restart,retry(){prepare(world,true);},control(payload,pressed){if(typeof payload==='string')control(payload,!!pressed);else control(payload?.key,!!payload?.pressed);},
-    openHero({instant=false}={}){if(disposed||mode!=='showcase'||!journey.openHero?.(instant))return false;if(!instant&&quality==='ultra'&&!reduced){root3dCenter(impactCenter);cinematicPass?.burst(impactCenter,camera);}return true;},
+    startIntro({instant=false}={}){if(disposed)return;journey.startIntro?.(instant);},
     setScrollState(value={}){scrollState={...scrollState,...value};if(scrollState.scrolling||scrollState.snapping||Math.abs(scrollState.velocity)>=5)resetHover(250);},
     setProgress(value){if(mode!=='showcase')return;const next=clamp(Number(value)||0,0,1);if(next>=.66)load('car');if(next>=.78)journey.loadPlaza?.();if(Math.abs(next-targetProgress)>.0008)resetHover(250);if(Math.abs(next-targetProgress)>.004)selected=null;targetProgress=next;},
     setPointer(x,y){pointerX=clamp(Number(x)||0,-1,1);pointerY=clamp(Number(y)||0,-1,1);},

@@ -1,4 +1,4 @@
-import { riftEnvelope } from './cinematic-pass.js?v=journey-36';
+import { riftEnvelope } from './cinematic-pass.js?v=journey-37';
 
 const smooth = (a, b, p) => { const t = Math.max(0, Math.min(1, (p - a) / (b - a))); return t*t*(3-2*t); };
 export function createJourneyUltra({ THREE: T, root, camera, entries, core }) {
@@ -27,7 +27,7 @@ export function createJourneyUltra({ THREE: T, root, camera, entries, core }) {
     fragmentShader:`uniform float uPower,uMix;varying vec2 vUv,vScreen;
       void main(){float edge=pow(1.-abs(vUv.x*2.-1.),1.5);float tail=sin(vUv.y*3.14159);
       float title=smoothstep(.16,.43,length((vScreen-vec2(.5,.51))*vec2(1.,1.4)));
-      vec3 color=mix(vec3(.3,1.9,3.6),vec3(1.5,.9,2.4),uMix*.7);
+      vec3 color=mix(vec3(.9,2.2,3.),vec3(2.4,2.5,2.6),uMix*.7);
       gl_FragColor=vec4(color,edge*tail*uPower*(.12+title*.88));}`
   }));
   const tunnel = new T.Mesh(streakGeo, tunnelMat); tunnel.name = 'hyperspace-light-tunnel';
@@ -90,7 +90,7 @@ export function createJourneyUltra({ THREE: T, root, camera, entries, core }) {
     if(charge.visible){
       source.updateWorldMatrix(true,true);bounds.setFromObject(source);bounds.getCenter(charge.position);bounds.getSize(size);
       charge.quaternion.copy(camera.quaternion);charge.scale.setScalar(Math.max(size.x,size.y,size.z)*.63);
-      energyMat.uniforms.uColor.value.set(hoverTarget==='robot'?0xffad52:hoverTarget==='car'?0xff713b:0x73deff);
+      energyMat.uniforms.uColor.value.set(0x8fdcff);
       energyMat.uniforms.uTime.value=clock;energyMat.uniforms.uPower.value=hoverProgress;
       for(let i=0;i<rings.length;i++){const ring=rings[i];ring.scale.setScalar(1.35+i*.18-hoverProgress*.40);ring.rotation.set(.17*i,.24*i,clock*(.3+hoverProgress*2)*(i%2?-1:1));}
     }
