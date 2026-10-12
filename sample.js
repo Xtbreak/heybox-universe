@@ -1,10 +1,10 @@
-import {createContextRecovery} from './context-recovery.js?v=journey-40';
-import {createIdleWorldSnap} from './idle-world-snap.js?v=journey-40';
-import {resultSummary, resultTitle, formatRunTime} from './game-session-ui.js?v=journey-40';
-import {createGameAudio} from './game-audio.js?v=journey-40';
-import { createTitleDecode } from './title-decode.js?v=journey-40';
-import { initialQuality } from './journey-quality.js?v=journey-40';
-import { createScrollFx } from './scroll-fx.js?v=journey-40';
+import {createContextRecovery} from './context-recovery.js?v=journey-41';
+import {createIdleWorldSnap} from './idle-world-snap.js?v=journey-41';
+import {resultSummary, resultTitle, formatRunTime} from './game-session-ui.js?v=journey-41';
+import {createGameAudio} from './game-audio.js?v=journey-41';
+import { createTitleDecode } from './title-decode.js?v=journey-41';
+import { initialQuality } from './journey-quality.js?v=journey-41';
+import { createScrollFx } from './scroll-fx.js?v=journey-41';
 const audio=createGameAudio();
 const $=s=>document.querySelector(s);let world=null,ready=false,light=false,failed=false,queued=false,lastP=0,inGame=false,savedY=0,returnFocus=null,reduced=false;
 let recovering=false,hostGeneration=0,worldFactory=null;
@@ -163,7 +163,7 @@ async function boot(){
  try{
   document.body.style.overflowY='hidden';status('点亮引擎',25,'LINK');
   // The module graph is preloaded by HTML. Reuse it instead of fetching every file twice.
-  worldFactory=(await import('./open-adventure.js?v=journey-40')).createWorld;
+  worldFactory=(await import('./open-adventure.js?v=journey-41')).createWorld;
   status('连接游戏世界',88,'GRAINS');world=await createHost();update();
  }catch(e){clearTimeout(timeout);renderFailure(e);}
 }

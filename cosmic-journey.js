@@ -1,11 +1,11 @@
-import { createSpaceBackdrop } from './space-backdrop.js?v=journey-40';
-import { createJourneyUltra } from './journey-ultra.js?v=journey-40';
-import { createVoxelHeybox } from './voxel-heybox.js?v=journey-40';
-import { createJourneyParticles } from './journey-particles.js?v=journey-40';
-import { createCommunityPlaza } from './community-plaza.js?v=journey-40';
-import { createLunarOpening } from './lunar-opening.js?v=journey-40';
-import { SHED_AT } from './brick-hero.js?v=journey-40';
-import { createShowcaseScenes } from './showcase-scenes.js?v=journey-40';
+import { createSpaceBackdrop } from './space-backdrop.js?v=journey-41';
+import { createJourneyUltra } from './journey-ultra.js?v=journey-41';
+import { createVoxelHeybox } from './voxel-heybox.js?v=journey-41';
+import { createJourneyParticles } from './journey-particles.js?v=journey-41';
+import { createCommunityPlaza } from './community-plaza.js?v=journey-41';
+import { createLunarOpening } from './lunar-opening.js?v=journey-41';
+import { SHED_AT, INTRO } from './brick-hero.js?v=journey-41';
+import { createShowcaseScenes } from './showcase-scenes.js?v=journey-41';
 
 const coarsePointer=globalThis.matchMedia?.('(pointer: coarse)');
 // A continuous, scene-space expedition. Imported GLB transforms are never modified.
@@ -149,7 +149,7 @@ export function createCosmicJourney({ THREE, scene, camera, entries, audio = nul
     [.955, 1.85,.42,-411.6, 1.95,-.9,-418.6,56], [.975, 1.45,.4,-412.1, 1.9,-1.2,-418.9,59],
     [.99, 1.4,.38,-412.3, 1.9,-1.24,-418.9,60], [1, 1.4,.38,-412.3, 1.9,-1.24,-418.9,60]
   ];
-  const pose=new Array(7).fill(0),focus=new THREE.Vector3();let active='helmet',lastFov=-1,indoorMix=0;
+  const pose=new Array(7).fill(0),focus=new THREE.Vector3(),railCam=new THREE.Vector3(),introOff=new THREE.Vector3(),introSph=new THREE.Spherical(),railSph=new THREE.Spherical();let active='helmet',lastFov=-1,indoorMix=0;
   let hoverTarget=null,hoverCameraOffset=null,hoverApproach=0;const heldModelPoses=new Map();
   // Monotone cubic Hermite rail: continuous velocity through flight waypoints,
   // exactly stationary on the three existing interaction plateaus, no overshoot.
@@ -180,7 +180,7 @@ export function createCosmicJourney({ THREE, scene, camera, entries, audio = nul
     focus.set(pose[3],pose[4],pose[5]);if(mobile){const own=1-smooth(.88,.92,p);focus.x=focus.x*(1-own)+own*(1.1*(1-smooth(.12,.23,p))+1.5*smooth(.30,.36,p));}
     // The hit hull stays frozen in screen space while this small approach is rendered.
     hoverApproach=THREE.MathUtils.damp(hoverApproach,hovered&&!reduced?clamp(options.hoverProgress)*.055:0,9,Math.max(0,dt));
-    camera.position.lerp(focus,hoverApproach);
+    camera.position.lerp(focus,hoverApproach);railCam.copy(camera.position);
     camera.lookAt(focus);if(!reduced)camera.rotateZ(Math.sin(p*Math.PI*9)*flight*.045);
     const fov=(ultra&&!reduced?THREE.MathUtils.lerp(pose[6],52+18*ultraEffects.rift(p),ultraEffects.rift(p)):pose[6])+(mobile?5+17*indoor:0);if(Math.abs(fov-lastFov)>.01 || Math.abs(camera.fov-fov)>.01 || camera.far<900){camera.fov=fov;camera.far=Math.max(camera.far,900);camera.updateProjectionMatrix();lastFov=fov;}
     // Opening: the bricks lift off the regolith and stack, breathe, then shed down to the mark.
@@ -188,13 +188,18 @@ export function createCosmicJourney({ THREE, scene, camera, entries, audio = nul
     lastT=t;if(introStart===null&&p>.01)introStart=t-9;
     if(introStart!==null&&introClock===0)introClock=Math.max(0,t-introStart);else if(introStart!==null)introClock+=Math.max(0,dt)*(p>.012?5:1);
     const since=introStart===null?0:reduced?99:introClock;
-    const intro={since,shed:since>SHED_AT?since-SHED_AT:-1},assembled=smooth(2.2,3.8,since);
+    const intro={since,shed:since>SHED_AT?since-SHED_AT:-1},assembled=smooth(3,4.6,since);
     tiltX=THREE.MathUtils.damp(tiltX,reduced?0:pointerX,3.5,Math.max(0,dt));tiltY=THREE.MathUtils.damp(tiltY,reduced?0:pointerY,3.5,Math.max(0,dt));
     // Scroll turns the box square to the camera; at REVEAL_AT the channel is exactly aligned.
     const align=smooth(0,REVEAL_AT,p),off=1-align,drift=reduced?0:Math.sin(t*.21)*.05*off;
     heroAnchor.position.set(1.1,.15+(reduced?0:(Math.sin(t*.6)*.07+Math.sin(t*1.3)*.012)*assembled),0);heroAnchor.scale.setScalar(mobile?.9:1.08);
-    heroAnchor.lookAt(camera.position);heroAnchor.rotateY((.62+drift)*off+tiltX*.16*off);heroAnchor.rotateX((-.2*off+tiltY*.1*off));
+    heroAnchor.lookAt(railCam);heroAnchor.rotateY((.62+drift)*off+tiltX*.16*off);heroAnchor.rotateX((-.2*off+tiltY*.1*off));
     heroReveal=Math.max(0,1-Math.abs(.62*off+tiltX*.16*off)/.3)**2*assembled;
+    // Entrance: one unbroken shot that starts almost overhead and swings down onto the rail.
+    const descend=reduced?1:smooth(INTRO.camera[0],INTRO.camera[1],since);
+    if(descend<1){const w=1-descend,e=w*w*(3-2*w);introOff.copy(camera.position).sub(heroAnchor.position);railSph.setFromVector3(introOff);
+      introSph.set(railSph.radius*(1+.12*e),THREE.MathUtils.lerp(railSph.phi,.3,e),railSph.theta+.95*e);
+      camera.position.setFromSpherical(introSph).add(heroAnchor.position);focus.lerp(heroAnchor.position,e);camera.lookAt(focus);}
     for(let i=0;i<tunnels.length;i++){const q=tunnels[i],w=tunnelWindows[i],alpha=windowFade(p,...w);q.g.visible=alpha>.0001;
       q.mat.uniforms.time.value=reduced?0:t;q.mat.uniforms.strength.value=alpha*(.12+flight*.10);}
     plaza.update({progress:p,time:t,dt,reduced,camera,quality:options.quality});
@@ -211,11 +216,12 @@ export function createCosmicJourney({ THREE, scene, camera, entries, audio = nul
     for(const e of showcase.update({fades:[windowFade(p,...ARRIVE[0],.475,.51),windowFade(p,...ARRIVE[1],.67,.70),windowFade(p,...ARRIVE[2],.925,.95)],focus:plateau,progress:p,time:t,dt,reduced,view:height*Math.min(2,globalThis.devicePixelRatio||1)}))audio?.play(e.name,{intensity:e.intensity,pan:e.pan});
     sceneryFades[0](windowFade(p,...ARRIVE[0],.51,.56));sceneryFades[1](windowFade(p,...ARRIVE[1],.67,.70));sceneryFades[2](windowFade(p,...ARRIVE[2],.925,.95));
     planet.rotation.y=reduced?0:t*.012;skyRing.rotation.z=reduced?0:t*.025;
-    backdrop.update({quality:options.quality,progress:pj,time:t,reduced,width,height,pointerX,pointerY,desktop:!coarsePointer?.matches,cameraZ:camera.position.z});
+    backdrop.update({sky:reduced?1:smooth(INTRO.ground[0]+1.2,INTRO.ground[1]+.8,since),quality:options.quality,progress:pj,time:t,reduced,width,height,pointerX,pointerY,desktop:!coarsePointer?.matches,cameraZ:camera.position.z});
     ultraEffects.update({progress:pj,time:t,dt,reduced,quality:options.quality,hoverTarget:hovered,hoverProgress:options.hoverProgress||0});
-    particles.update({cut:{car:smooth(.862,.89,p)},progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,hoverTarget:hovered,hoverProgress:options.hoverProgress||0,flight});
+    particles.update({sky:reduced?1:smooth(INTRO.ground[0]+1.2,INTRO.ground[1]+.8,since),cut:{car:smooth(.862,.89,p)},progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,hoverTarget:hovered,hoverProgress:options.hoverProgress||0,flight});
     dustMaterial.uniforms.uTime.value=reduced?0:t;
-    lunarOpening.update({fade:1-smooth(.11,.2,p),time:t,reduced});
+    // The ground spreads out from under the box once it is solid; the sky and the Earth follow.
+    lunarOpening.update({fade:1-smooth(.11,.2,p),grow:reduced?1:smooth(INTRO.ground[0],INTRO.ground[1],since),sky:reduced?1:smooth(INTRO.ground[0]+1.2,INTRO.ground[1]+.8,since),time:t,reduced});
     voxels.update({progress:p,time:t,dt,reduced,quality:options.quality,width,height,pointerX,pointerY,peel:!!options.peel&&!coarsePointer?.matches,intro,reveal:heroReveal,tremble:reduced?0:smooth(.07,.088,p)*(1-smooth(.089,.095,p))});
     optics.center.copy(hovered&&entries[hovered]?.group?entries[hovered].group.position:p<.23?heroAnchor.position:focus);
     optics.strength=reduced?0:Math.max(windowFade(p,.085,.11,.15,.205)*.55,heroReveal*.25,hovered?clamp(options.hoverProgress)*.55:0,flight*.16);

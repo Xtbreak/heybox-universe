@@ -1,6 +1,7 @@
 // The opening landscape: sunlit regolith with craters and half-buried rocks, a low dust
 // haze along the horizon and the Earth over it. Procedural only. Everything dissolves
-// from the far edge inwards as the camera leaves for the first world.
+// from the far edge inwards as the camera leaves for the first world. On arrival it grows the
+// other way: out from under the box, behind a ragged, glowing pixel front (uGrow, in metres).
 const clamp = x => Math.max(0, Math.min(1, x));
 const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
 
@@ -23,15 +24,17 @@ function regolith(T, material, uniforms, { bump = .9, scale = 1 } = {}) {
         rw=instanceMatrix*rw;
         #endif
         vRw=(modelMatrix*rw).xyz;`);
-    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', `#include <common>\nvarying vec3 vRw;uniform float uFade;uniform vec3 uCenter;\n${NOISE_GLSL}`)
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>', `#include <common>\nvarying vec3 vRw;uniform float uFade,uGrow;uniform vec3 uCenter;\n${NOISE_GLSL}`)
       .replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
-        if(uFade<.999){float far=clamp(length(vRw.xz-uCenter.xz)/48.,0.,1.);if(lnN(vRw*1.7)*.4+far*.6>uFade*1.02)discard;}`)
+        if(uFade<.999){float far=clamp(length(vRw.xz-uCenter.xz)/48.,0.,1.);if(lnN(vRw*1.7)*.4+far*.6>uFade*1.02)discard;}
+        float gF=uGrow-length(vRw.xz-uCenter.xz)-(lnH(floor(vRw*3.))*.5+lnN(vRw*.6)*1.2)*min(1.,uGrow*.4);if(gF<0.)discard;`)
       .replace('#include <color_fragment>', `#include <color_fragment>
         vec3 q=vRw*${scale.toFixed(2)};float n1=lnF(q*vec3(.42,.8,.42)),n2=lnN(q*3.3+7.),sp=lnH(floor(q*24.));
         diffuseColor.rgb*=.6+.6*n1+.16*(n2-.5)+(sp>.975?.32:sp<.02?-.22:0.);`)
       .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor=clamp(roughnessFactor-.08*n2,.55,1.);')
       .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
-        float bh=lnF(q*4.6)*.55+lnN(q*17.)*.22+lnN(q*46.)*.08;normal=lnBump(normal,-vViewPosition,bh*${bump.toFixed(2)}*.06);`);
+        float bh=lnF(q*4.6)*.55+lnN(q*17.)*.22+lnN(q*46.)*.08;normal=lnBump(normal,-vViewPosition,bh*${bump.toFixed(2)}*.06);`)
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance+=vec3(.75,.88,1.)*(1.-smoothstep(0.,.45,gF))*step(uGrow,500.)*1.6;');
   };
   material.customProgramCacheKey = () => 'lunar-regolith-' + bump + '-' + scale;
   return material;
@@ -54,7 +57,7 @@ export function createLunarOpening({ THREE: T, root, center, floorY }) {
     for (const [cx, cz, r, depth] of craters) { const q = Math.hypot(x - cx, z - cz) / r; if (q < 1.7) h += (q < 1 ? -depth * (1 - q * q) : 0) + depth * .38 * Math.exp(-(((q - 1) / .24) ** 2)); }
     return h * (.12 + .88 * smooth(1.4, 4.2, d)) - d * d / 1800;
   }
-  const uniforms = { uFade: { value: 1 }, uCenter: { value: new T.Vector3(center.x, floorY, center.z) } };
+  const uniforms = { uFade: { value: 1 }, uGrow: { value: 1e3 }, uCenter: { value: new T.Vector3(center.x, floorY, center.z) } };
 
   // Ground: one dense sheet, biased towards where the camera looks (-z).
   const geo = keep(new T.PlaneGeometry(150, 150, 240, 240)); geo.rotateX(-Math.PI / 2); geo.translate(0, 0, -38);
@@ -80,31 +83,31 @@ export function createLunarOpening({ THREE: T, root, center, floorY }) {
 
   // The Earth: ocean, continents and cloud bands, lit from the same sun, with a thin limb.
   const sunDir = new T.Vector3(-7, 4.2, 2.6).normalize();
-  const earthMat = keep(new T.ShaderMaterial({ uniforms: { uSun: { value: sunDir }, uFade: uniforms.uFade, uTime: { value: 0 } }, fog: false,
+  const earthMat = keep(new T.ShaderMaterial({ uniforms: { uSun: { value: sunDir }, uFade: uniforms.uFade, uSky: { value: 1 }, uTime: { value: 0 } }, fog: false,
     vertexShader: 'varying vec3 vN,vO,vW;void main(){vO=position;vN=normalize(mat3(modelMatrix)*normal);vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}',
-    fragmentShader: `uniform vec3 uSun;uniform float uFade,uTime;varying vec3 vN,vO,vW;${NOISE_GLSL}
+    fragmentShader: `uniform vec3 uSun;uniform float uFade,uSky,uTime;varying vec3 vN,vO,vW;${NOISE_GLSL}
       void main(){vec3 n=normalize(vN),p=normalize(vO);float l=dot(n,uSun);
         float land=smoothstep(.5,.56,lnF(p*2.3+3.1)),cl=smoothstep(.52,.78,lnF(p*vec3(3.,6.,3.)+vec3(uTime*.004,0.,0.)));
         vec3 c=mix(vec3(.012,.05,.13),mix(vec3(.10,.14,.07),vec3(.33,.27,.17),lnN(p*7.)),land);
         c=mix(c,vec3(.9,.93,.96),cl*.85);float day=smoothstep(-.1,.3,l);
         vec3 col=c*day*1.5+vec3(.9,.7,.4)*.04*(1.-day)*land;
         float rim=pow(1.-max(0.,dot(n,normalize(cameraPosition-vW))),3.);col+=vec3(.22,.48,1.)*rim*smoothstep(-.25,.35,l)*1.1;
-        gl_FragColor=vec4(col*uFade,1.);}` }));
+        gl_FragColor=vec4(col*uFade*uSky,1.);}` }));
   const earth = new T.Mesh(keep(new T.SphereGeometry(10, 64, 48)), earthMat); earth.position.set(center.x - 62, floorY + 30, center.z - 175); earth.rotation.set(.35, 0, .2); earth.raycast = () => {}; group.add(earth);
 
   // Horizon haze: a back-lit dust band where the ground meets the sky.
-  const hazeMat = keep(new T.ShaderMaterial({ transparent: true, depthWrite: false, side: T.BackSide, uniforms: { uFade: uniforms.uFade, uBase: { value: floorY - 6 } },
+  const hazeMat = keep(new T.ShaderMaterial({ transparent: true, depthWrite: false, side: T.BackSide, uniforms: { uFade: uniforms.uFade, uSky: { value: 1 }, uBase: { value: floorY - 6 } },
     vertexShader: 'varying vec3 vW;void main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}',
-    fragmentShader: 'uniform float uFade,uBase;varying vec3 vW;void main(){float h=clamp((vW.y-uBase)/9.,0.,1.);gl_FragColor=vec4(vec3(.36,.39,.43)*.55,pow(1.-h,2.6)*.55*uFade);}' }));
+    fragmentShader: 'uniform float uFade,uSky,uBase;varying vec3 vW;void main(){float h=clamp((vW.y-uBase)/9.,0.,1.);gl_FragColor=vec4(vec3(.36,.39,.43)*.55,pow(1.-h,2.6)*.55*uFade*uSky);}' }));
   const haze = new T.Mesh(keep(new T.CylinderGeometry(58, 58, 12, 72, 1, true)), hazeMat); haze.position.set(center.x, floorY, center.z - 6); haze.raycast = () => {}; group.add(haze);
 
   // Ground mist: two slow, thin layers hugging the regolith around the box.
-  const mistMat = keep(new T.ShaderMaterial({ transparent: true, depthWrite: false, blending: T.AdditiveBlending, uniforms: { uFade: uniforms.uFade, uTime: { value: 0 }, uAlpha: { value: .2 } },
+  const mistMat = keep(new T.ShaderMaterial({ transparent: true, depthWrite: false, blending: T.AdditiveBlending, uniforms: { uFade: uniforms.uFade, uSky: { value: 1 }, uTime: { value: 0 }, uAlpha: { value: .2 } },
     vertexShader: 'varying vec2 vP;void main(){vP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader: `uniform float uFade,uTime,uAlpha;varying vec2 vP;${NOISE_GLSL}
+    fragmentShader: `uniform float uFade,uSky,uTime,uAlpha;varying vec2 vP;${NOISE_GLSL}
       void main(){float r=length(vP);float n=lnF(vec3(vP*.32+vec2(uTime*.035,-uTime*.02),uTime*.03));
-        float a=smoothstep(.35,.85,n)*(1.-smoothstep(3.,10.,r))*uAlpha*uFade;gl_FragColor=vec4(vec3(.62,.67,.74)*a,1.);}` }));
-  const mists = [[.06, .22], [.38, .1]].map(([y, a], i) => { const m = i ? mistMat.clone() : mistMat; if (i) keep(m); m.uniforms = { ...mistMat.uniforms, uAlpha: { value: a } };
+        float a=smoothstep(.35,.85,n)*(1.-smoothstep(3.,10.,r))*uAlpha*uFade*uSky;gl_FragColor=vec4(vec3(.62,.67,.74)*a,1.);}` }));
+  const mists = [[.06, .22], [.38, .1]].map(([y, a], i) => { const m = i ? mistMat.clone() : mistMat; if (i) keep(m); m.uniforms = { ...mistMat.uniforms, uSky: { value: 1 }, uAlpha: { value: a } };
     const o = new T.Mesh(keep(new T.PlaneGeometry(22, 22)), m); o.rotation.x = -Math.PI / 2; o.position.set(center.x + i * .8, floorY + y, center.z - 1.5); o.renderOrder = 2; o.raycast = () => {}; group.add(o); return o; });
 
   // A low, hard sun from the left: long shadows, bright brick edges.
@@ -112,9 +115,12 @@ export function createLunarOpening({ THREE: T, root, center, floorY }) {
   sun.castShadow = true; Object.assign(sun.shadow.camera, { left: -6.5, right: 6.5, top: 6.5, bottom: -6.5, near: 1, far: 34 }); sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -.0004; sun.shadow.normalBias = .025; sun.shadow.radius = 2.5;
   group.add(sun, sun.target);
 
-  function update({ fade = 1, time = 0, reduced = false }) {
+  // grow: 0..1 for the ground spreading out; sky: 0..1 for the Earth, haze and mist; light: the sun.
+  function update({ fade = 1, grow = 1, sky = 1, light = 1, time = 0, reduced = false }) {
     uniforms.uFade.value = fade; group.visible = fade > .001;
-    sun.intensity = 3.4 * fade; sun.shadow.autoUpdate = fade > .001;
+    uniforms.uGrow.value = grow >= 1 ? 1e3 : grow <= 0 ? -9 : .9 + 118 * Math.pow(grow, 2.4); earthMat.uniforms.uSky.value = sky; earth.visible = sky > .001;
+    hazeMat.uniforms.uSky.value = sky; for (const m of mists) m.material.uniforms.uSky.value = grow;
+    sun.intensity = 3.4 * fade * light; sun.shadow.autoUpdate = fade > .001;
     earthMat.uniforms.uTime.value = reduced ? 0 : time; for (const m of mists) m.material.uniforms.uTime.value = reduced ? 0 : time;
   }
   return {

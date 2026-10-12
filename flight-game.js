@@ -1,5 +1,5 @@
-import { createToyShip, createToyCarrier } from './toy-ship.js?v=journey-40';
-import { heyboxMarkShapes } from './heybox-mark.js?v=journey-40';
+import { createToyShip, createToyCarrier } from './toy-ship.js?v=journey-41';
+import { heyboxMarkShapes } from './heybox-mark.js?v=journey-41';
 
 /* DEEP SPACE RESCUE, flat edition. A side-scrolling toy shooter on a cardboard
  * stage: the camera looks straight at the XY play plane, cut-out scenery layers

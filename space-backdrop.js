@@ -2,11 +2,11 @@
 export function createSpaceBackdrop({ THREE:T, root }) {
   const resources=new Set(),own=r=>(resources.add(r),r);
   const group=new T.Group();group.name='ultra-nebula-and-parallax-stars';root.add(group);
-  const uniforms={uTime:{value:0},uProgress:{value:0},uAspect:{value:1},uPointer:{value:new T.Vector2()},uDepth:{value:0}};
+  const uniforms={uSky:{value:1},uTime:{value:0},uProgress:{value:0},uAspect:{value:1},uPointer:{value:new T.Vector2()},uDepth:{value:0}};
   const nebulaMat=own(new T.ShaderMaterial({
     uniforms,transparent:true,depthWrite:false,depthTest:true,blending:T.AdditiveBlending,
     vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,.9999,1.);}',
-    fragmentShader:`varying vec2 vUv;uniform float uTime,uProgress,uAspect;uniform vec2 uPointer;
+    fragmentShader:`varying vec2 vUv;uniform float uTime,uProgress,uAspect,uSky;uniform vec2 uPointer;
       float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
       float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
         return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),mix(hash(i+vec2(0.,1.)),hash(i+1.),f.x),f.y);}
@@ -18,7 +18,7 @@ export function createSpaceBackdrop({ THREE:T, root }) {
         vec3 color=mix(vec3(.16,.22,.27),vec3(.21,.22,.25),tint*.85);
         color=mix(color,vec3(.27,.23,.2),smoothstep(.80,1.,uProgress)*.5);
         float title=.25+.75*smoothstep(.24,.67,length((vUv-vec2(.40,.55))*vec2(1.,1.4)));
-        gl_FragColor=vec4(color*density*.7,title*.75);
+        gl_FragColor=vec4(color*density*.7*uSky,title*.75);
       }`
   }));
   const nebula=new T.Mesh(own(new T.PlaneGeometry(2,2)),nebulaMat);nebula.frustumCulled=false;nebula.renderOrder=-20;nebula.raycast=()=>{};group.add(nebula);
@@ -29,13 +29,13 @@ export function createSpaceBackdrop({ THREE:T, root }) {
     vertexShader:`uniform float uTime,uDepth,uAspect;uniform vec2 uPointer;varying float vLight;
       void main(){float layer=position.z+1.;vec2 p=fract(position.xy+uPointer*.005*layer+vec2(uDepth*.00017*layer,uTime*.0008*layer));
       gl_Position=vec4(p*2.-1.,.9998,1.);gl_PointSize=.7+layer*.5;vLight=.13+position.x*.36;}`,
-    fragmentShader:`varying float vLight;void main(){float r=length(gl_PointCoord-.5);if(r>.5)discard;
-      gl_FragColor=vec4(vec3(.95,1.05,1.15),(1.-smoothstep(.06,.5,r))*vLight);}`
+    fragmentShader:`uniform float uSky;varying float vLight;void main(){float r=length(gl_PointCoord-.5);if(r>.5)discard;
+      gl_FragColor=vec4(vec3(.95,1.05,1.15),(1.-smoothstep(.06,.5,r))*vLight*uSky);}`
   }));
   const stars=new T.Points(starGeo,starMat);stars.frustumCulled=false;stars.renderOrder=-19;stars.raycast=()=>{};group.add(stars);
   group.visible=false;
   return {
-    update({quality,progress,time,reduced,width,height,pointerX=0,pointerY=0,desktop=true,cameraZ=0}){
+    update({sky=1,quality,progress,time,reduced,width,height,pointerX=0,pointerY=0,desktop=true,cameraZ=0}){uniforms.uSky.value=sky;
       group.visible=quality==='ultra';if(!group.visible)return;
       uniforms.uTime.value=reduced?0:time;uniforms.uProgress.value=progress;uniforms.uAspect.value=width/Math.max(1,height);
       uniforms.uPointer.value.set(desktop&&!reduced?pointerX:0,desktop&&!reduced?pointerY:0);uniforms.uDepth.value=reduced?0:cameraZ;

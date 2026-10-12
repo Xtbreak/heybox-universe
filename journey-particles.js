@@ -124,7 +124,7 @@ fragmentShader:`uniform float uUltra,uProgress;varying float vAlpha,vSeed,vEnerg
     }
   }
   function update(options={}){
-    if(disposed)return;const p=clamp(options.progress||0);clock+=options.reduced?0:Math.min(.1,Math.max(0,options.dt||0));
+    if(disposed)return;const p=clamp(options.progress||0);starMat.opacity=.32*(options.sky??1);clock+=options.reduced?0:Math.min(.1,Math.max(0,options.dt||0));
     root.updateWorldMatrix(true,true);inverseRoot.copy(root.matrixWorld).invert();
     for(const name of names){
       const group=getGroup(name);if(!group||!group.children.length)continue;

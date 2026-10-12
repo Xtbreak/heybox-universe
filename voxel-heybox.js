@@ -1,10 +1,10 @@
-// The opening box is built from big bricks (brick-hero.js). When the scroll lines up the
-// mark, its bricks shatter into 4800 small obsidian grains, one instanced draw. The same
+// The opening box is drawn, scanned and burnt open by brick-hero.js. When the scroll lines up
+// the mark, its bricks shatter into 4800 small obsidian grains, one instanced draw. The same
 // grains scatter and re-form as each world; every moving grain sheds a tail of fine ice
 // glitter. After the car only the glitter remains: it streams up the road, through the
 // front door, and fades out in the room.
-import { createBrickHero, BX, BY, SHED_AT } from './brick-hero.js?v=journey-40';
-export const NX = 20, NY = 20, NZ = 12, VOXELS = NX * NY * NZ, PITCH = .11, BRICK = .18;
+import { createBrickHero, BX, BY } from './brick-hero.js?v=journey-41';
+export const NX = 20, NY = 20, NZ = 12, VOXELS = NX * NY * NZ, PITCH = .11, BRICK = .15;
 export const VOXEL_PATH = [
   { from: 'box', to: 'helmet', leave: [.088, .15], arrive: [.295, .367], burst: 2.6 },
   { from: 'helmet', to: 'robot', leave: [.432, .475], arrive: [.514, .573], burst: 1.3 },
@@ -269,7 +269,7 @@ export function createVoxelHeybox({ THREE: T, root, camera, particles, heroAncho
     if (index === 3 && doorway) { doorway.group.updateWorldMatrix(true, false); const dm = m4.multiplyMatrices(inv, doorway.group.matrixWorld), ln = new T.Matrix3().setFromMatrix4(dm);
       u.uDoorA.value.set(...doorway.outside).applyMatrix4(dm); u.uDoorB.value.set(...doorway.inside).applyMatrix4(dm);
       u.uDoorR.value.set(doorway.halfWidth, 0, 0).applyMatrix3(ln); u.uDoorU.value.set(0, doorway.halfHeight, 0).applyMatrix3(ln); u.uDoorN.value.set(0, 0, doorway.approach).applyMatrix3(ln); }
-    const built = index === 0 ? smooth(1.2, 3.6, intro.since) : 0;
+    const built = index === 0 ? smooth(3.2, 5.6, intro.since) : 0;
     const view = height * Math.min(2, globalThis.devicePixelRatio || 1);
     for (const [air, alpha] of [[heroAir, built * (1 - smooth(.13, .2, p))], [roomAir, smooth(.935, .965, p)]]) { if (!air) continue;
       air.visible = alpha > .002; air.material.uniforms.uAlpha.value = alpha * (quality === 'ultra' ? .9 : .7); air.material.uniforms.uTime.value = reduced ? 0 : clock; air.material.uniforms.uView.value = view; }
